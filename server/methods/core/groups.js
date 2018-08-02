@@ -10,13 +10,13 @@ import { getSlug } from "/lib/api";
  * @file Methods for creating and managing admin user permission groups.
  * Run these methods using `Meteor.call()`.
  * @example Meteor.call("group/createGroup", sampleCustomerGroup, shop._id)
- * @namespace Methods/Group
+ * @namespace Group/Methods
 */
 Meteor.methods({
   /**
    * @name group/createGroup
    * @method
-   * @memberof Methods/Group
+   * @memberof Group/Methods
    * @summary Creates a new permission group for a shop
    * It creates permission group for a given shop with passed in roles
    * @param {Object} groupData - info about group to create
@@ -26,18 +26,18 @@ Meteor.methods({
    * @param {String} shopId - id of the shop the group belongs to
    * @return {Object} - `object.status` of 200 on success or Error object on failure
    */
-  "group/createGroup": function (groupData, shopId) {
+  "group/createGroup"(groupData, shopId) {
     check(groupData, Object);
     check(groupData.name, String);
     check(groupData.description, Match.Optional(String));
-    check(groupData.permissions,  Match.Optional([String]));
+    check(groupData.permissions, Match.Optional([String]));
     check(shopId, String);
     let _id;
 
     // we are limiting group method actions to only users with admin roles
     // this also include shop owners, since they have the `admin` role in their Roles.GLOBAL_GROUP
     if (!Reaction.hasPermission("admin", Meteor.userId(), shopId)) {
-      throw new Meteor.Error(403, "Access Denied");
+      throw new Meteor.Error("access-denied", "Access Denied");
     }
 
     const defaultCustomerGroupForShop = Groups.findOne({ slug: "customer", shopId }) || {};
@@ -55,13 +55,13 @@ Meteor.methods({
     // ensure one group type per shop
     const groupExists = Groups.findOne({ slug: newGroupData.slug, shopId });
     if (groupExists) {
-      throw new Meteor.Error(409, "Group already exist for this shop");
+      throw new Meteor.Error("conflict", "Group already exist for this shop");
     }
     try {
       _id = Groups.insert(newGroupData);
     } catch (error) {
       Logger.error(error);
-      throw new Meteor.Error(400, "Bad request");
+      throw new Meteor.Error("invalid-parameter", "Bad request");
     }
 
     return { status: 200, group: Groups.findOne({ _id }) };
@@ -70,7 +70,7 @@ Meteor.methods({
   /**
    * @name group/updateGroup
    * @method
-   * @memberof Methods/Group
+   * @memberof Group/Methods
    * @summary Updates a permission group for a shop.
    * Change the details of a group (name, desc, permissions etc) to the values passed in.
    * It also goes into affected user data to modify both the groupName (using Accounts schema)
@@ -81,7 +81,7 @@ Meteor.methods({
    * @param {String} shopId - id of the shop the group belongs to
    * @return {Object} - `object.status` of 200 on success or Error object on failure
    */
-  "group/updateGroup": function (groupId, newGroupData, shopId) {
+  "group/updateGroup"(groupId, newGroupData, shopId) {
     check(groupId, String);
     check(newGroupData, Object);
     check(shopId, String);
@@ -89,7 +89,7 @@ Meteor.methods({
     // we are limiting group method actions to only users with admin roles
     // this also include shop owners, since they have the `admin` role in their Roles.GLOBAL_GROUP
     if (!Reaction.hasPermission("admin", Meteor.userId(), shopId)) {
-      throw new Meteor.Error(403, "Access Denied");
+      throw new Meteor.Error("access-denied", "Access Denied");
     }
 
     // 1. Update the group data
@@ -100,7 +100,7 @@ Meteor.methods({
 
     // prevent edits on owner. Owner groups is the default containing all roles, and as such should be untouched
     if (group.slug === "owner") {
-      throw new Meteor.Error(400, "Invalid request");
+      throw new Meteor.Error("invalid-parameter", "Bad request");
     }
 
     Groups.update({ _id: groupId, shopId }, { $set: update });
@@ -118,21 +118,21 @@ Meteor.methods({
       return { status: 200, group: Groups.findOne({ _id: groupId }) };
     }
     Logger.error(error);
-    throw new Meteor.Error(500, "Update not successful");
+    throw new Meteor.Error("server-error", "Update not successful");
   },
 
   /**
    * @name group/addUser
    * @method
-   * @memberof Methods/Group
+   * @memberof Group/Methods
    * @summary Adds a user to a permission group
    * Updates the user's list of permissions/roles with the defined the list defined for the group
    * (NB: At this time, a user only belongs to only one group per shop)
-   * @param {String} userId - current data of the group to be updated
-   * @param {String} groupId - id of the group
-   * @return {Object} - `object.status` of 200 on success or Error object on failure
+   * @param {String} userId - The account ID to add to the group
+   * @param {String} groupId - ID of the group
+   * @return {Object} - The modified group object
    */
-  "group/addUser": function (userId, groupId) {
+  "group/addUser"(userId, groupId) {
     check(userId, String);
     check(groupId, String);
     const group = Groups.findOne({ _id: groupId }) || {};
@@ -143,20 +143,20 @@ Meteor.methods({
     // we are limiting group method actions to only users with admin roles
     // this also include shop owners, since they have the `admin` role in their Roles.GLOBAL_GROUP
     if (!Reaction.hasPermission("admin", loggedInUserId, shopId)) {
-      throw new Meteor.Error(403, "Access Denied");
+      throw new Meteor.Error("access-denied", "Access Denied");
     }
 
     // Users with `owner` and/or `admin` roles can invite to any group
     // Also a user with `admin` can invite to only groups they have permissions that are a superset of
     // See details of canInvite method in core (i.e Reaction.canInviteToGroup)
     if (!canInvite) {
-      throw new Meteor.Error(403, "Access Denied");
+      throw new Meteor.Error("access-denied", "Access Denied");
     }
 
     if (slug === "owner") {
       // if adding a user to the owner group, check that the request is done by current owner
       if (!Reaction.hasPermission("owner", Meteor.userId(), shopId)) {
-        throw new Meteor.Error(403, "Access Denied");
+        throw new Meteor.Error("access-denied", "Access Denied");
       }
     }
 
@@ -178,7 +178,10 @@ Meteor.methods({
     try {
       setUserPermissions({ _id: userId }, permissions, shopId);
       Accounts.update({ _id: userId }, { $set: { groups: newGroups } });
-
+      Hooks.Events.run("afterAccountsUpdate", loggedInUserId, {
+        accountId: userId,
+        updatedFields: ["groups"]
+      });
       if (slug === "owner") {
         if (shopId === Reaction.getPrimaryShopId()) {
           changeMarketplaceOwner({ userId, permissions });
@@ -187,25 +190,26 @@ Meteor.methods({
         Meteor.call("group/addUser", Meteor.userId(), currentUserGrpInShop);
       }
 
-      return { status: 200 };
+      // Return the group the account as added to
+      return Groups.findOne({ _id: groupId });
     } catch (error) {
       Logger.error(error);
-      throw new Meteor.Error(500, "Could not add user");
+      throw new Meteor.Error("server-error", "Could not add user");
     }
   },
 
   /**
    * @name group/removeUser
    * @method
-   * @memberof Methods/Group
+   * @memberof Group/Methods
    * @summary Removes a user from a group for a shop, and adds them to the default customer group.
    * Updates the user's permission list to reflect.
    * (NB: At this time, a user only belongs to only one group per shop)
-   * @param {String} userId - current data of the group to be updated
-   * @param {String} groupId - name of the group
-   * @return {Object} - `object.status` of 200 on success or Error object on failure
+   * @param {String} userId - The account ID to remove from the group
+   * @param {String} groupId - ID of the group
+   * @return {Object} - The modified group object
    */
-  "group/removeUser": function (userId, groupId) {
+  "group/removeUser"(userId, groupId) {
     check(userId, String);
     check(groupId, String);
 
@@ -216,20 +220,24 @@ Meteor.methods({
     // we are limiting group method actions to only users with admin roles
     // this also include shop owners, since they have the `admin` role in their Roles.GLOBAL_GROUP
     if (!Reaction.hasPermission("admin", Meteor.userId(), shopId)) {
-      throw new Meteor.Error(403, "Access Denied");
+      throw new Meteor.Error("access-denied", "Access Denied");
     }
 
     if (!user) {
-      throw new Meteor.Error(404, "Could not find user");
+      throw new Meteor.Error("invalid-parameter", "Could not find user");
     }
 
     try {
       setUserPermissions(user, defaultCustomerGroupForShop.permissions, shopId);
       Accounts.update({ _id: userId, groups: groupId }, { $set: { "groups.$": defaultCustomerGroupForShop._id } }); // replace the old id with new id
-      return { status: 200 };
+      Hooks.Events.run("afterAccountsUpdate", Meteor.userId(), {
+        accountId: userId,
+        updatedFields: ["groups"]
+      });
+      return defaultCustomerGroupForShop;
     } catch (error) {
       Logger.error(error);
-      throw new Meteor.Error(500, "Could not add user");
+      throw new Meteor.Error("server-error", "Could not add user");
     }
   }
 });
@@ -271,5 +279,9 @@ function setUserPermissions(users, permissions, shopId) {
 // set default admin user's account as "owner"
 Hooks.Events.add("afterCreateDefaultAdminUser", (user) => {
   const group = Groups.findOne({ slug: "owner", shopId: Reaction.getShopId() });
-  Accounts.update({ _id: user._id  }, { $set: { groups: [group._id] } });
+  Accounts.update({ _id: user._id }, { $set: { groups: [group._id] } });
+  Hooks.Events.run("afterAccountsUpdate", null, {
+    accountId: user._id,
+    updatedFields: ["groups"]
+  });
 });

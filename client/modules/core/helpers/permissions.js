@@ -1,69 +1,60 @@
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
-import { Reaction } from "../";
-
-/*
- * Methods for the reaction permissions
- * helpers for roles, uses alanning:meteor-roles
- * see: http://alanning.github.io/meteor-roles/classes/Roles.html
- * use: {{hasPermission admin userId}}
- */
+import { Reaction } from "/client/api";
 
 /**
- * hasPermission template helper
- * @summary check current user hasPermission
+ * @method hasPermission
+ * @memberof BlazeTemplateHelpers
+ * @summary check current user hasPermission, uses [alanning:meteor-roles](http://alanning.github.io/meteor-roles/classes/Roles.html)
+ * @example {{hasPermission admin userId}}
  * @param  {String|Array} "permissions"
  * @param  {String} checkUserId - optional Meteor.userId, default to current
  * @return {Boolean}
  */
-Template.registerHelper("hasPermission", function (permissions, options) {
+Template.registerHelper("hasPermission", (permissions, options) => {
   // default to checking this.userId
-  let userId = Meteor.userId();
+  const loggedInUser = Meteor.userId();
   const shopId = Reaction.getShopId();
   // we don't necessarily need to check here
   // as these same checks and defaults are
   // also performed in Reaction.hasPermission
   if (typeof options === "object") {
     if (options.hash.userId) {
-      userId = options.hash.userId;
-      return Reaction.hasPermission(permissions, userId, shopId);
+      const { userId } = options.hash;
+      return Reaction.hasPermission(permissions, userId || loggedInUser, shopId);
     }
   }
-  return Reaction.hasPermission(permissions, userId, shopId);
+  return Reaction.hasPermission(permissions, loggedInUser, shopId);
 });
 
 /**
- * hasOwnerAccess template helper
- * @summary check if user has owner access
+ * @method hasOwnerAccess
+ * @memberof BlazeTemplateHelpers
+ * @summary check if user has owner access, uses [alanning:meteor-roles](http://alanning.github.io/meteor-roles/classes/Roles.html)
  * @return {Boolean} return true if owner
  */
-Template.registerHelper("hasOwnerAccess", function () {
-  return Reaction.hasOwnerAccess();
-});
+Template.registerHelper("hasOwnerAccess", () => Reaction.hasOwnerAccess());
 
 /**
- * hasAdminAccess template helper
- * @summary check if user has admin access
+ * @method hasAdminAccess
+ * @memberof BlazeTemplateHelpers
+ * @summary check if user has admin access, uses [alanning:meteor-roles](http://alanning.github.io/meteor-roles/classes/Roles.html)
  * @return {Boolean} return true if admin
  */
-Template.registerHelper("hasAdminAccess", function () {
-  return Reaction.hasAdminAccess();
-});
+Template.registerHelper("hasAdminAccess", () => Reaction.hasAdminAccess());
 
 /**
- * hasDashboardAccess template helper
- * @summary check if user has dashboard access
+ * @method hasDashboardAccess
+ * @memberof BlazeTemplateHelpers
+ * @summary check if user has dashboard access, uses [alanning:meteor-roles](http://alanning.github.io/meteor-roles/classes/Roles.html)
  * @return {Boolean} return true if user has dashboard permission
  */
-Template.registerHelper("hasDashboardAccess", function () {
-  return Reaction.hasDashboardAccess();
-});
+Template.registerHelper("hasDashboardAccess", () => Reaction.hasDashboardAccess());
 
 /**
- * allowGuestCheckout template helper
- * @summary check if guest users are allowed to checkout
+ * @method allowGuestCheckout
+ * @memberof BlazeTemplateHelpers
+ * @summary check if guest users are allowed to checkout, uses [alanning:meteor-roles](http://alanning.github.io/meteor-roles/classes/Roles.html)
  * @return {Boolean} return true if shop has guest checkout enabled
  */
-Template.registerHelper("allowGuestCheckout", function () {
-  return Reaction.allowGuestCheckout();
-});
+Template.registerHelper("allowGuestCheckout", () => Reaction.allowGuestCheckout());

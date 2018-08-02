@@ -1,16 +1,15 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Avatar from "react-avatar";
-import moment from "moment";
 import classnames from "classnames/dedupe";
-import { i18next } from "/client/api";
+import { formatPriceString, i18next } from "/client/api";
 import { Orders } from "/lib/collections";
+import { Components, withMoment } from "@reactioncommerce/reaction-components";
 import { Badge, ClickToCopy, Icon, Translation, Checkbox, Loading, SortableTable } from "@reactioncommerce/reaction-ui";
+import { getOrderRiskBadge, getOrderRiskStatus, getBillingInfo, getShippingInfo } from "../helpers";
 import OrderTableColumn from "./orderTableColumn";
 import OrderBulkActionsBar from "./orderBulkActionsBar";
-import { formatPriceString } from "/client/api";
-import ProductImage from "./productImage";
-import { getOrderRiskBadge, getOrderRiskStatus, getBillingInfo, getShippingInfo } from "../helpers";
+
 
 const classNames = {
   colClassNames: {
@@ -43,10 +42,15 @@ class OrderTable extends Component {
     handleSelect: PropTypes.func,
     isLoading: PropTypes.object,
     isOpen: PropTypes.bool,
-    multipleSelect: PropTypes.bool,
+    moment: PropTypes.func,
+    multipleSelect: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
+    onPageChange: PropTypes.func,
+    onPageSizeChange: PropTypes.func,
     orders: PropTypes.array,
+    page: PropTypes.number,
+    pages: PropTypes.number,
     query: PropTypes.object,
-    renderFlowList: PropTypes.bool,
+    renderFlowList: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
     selectAllOrders: PropTypes.func,
     selectedItems: PropTypes.array,
     setShippingStatus: PropTypes.func,
@@ -92,7 +96,7 @@ class OrderTable extends Component {
   }
 
   renderOrderInfo(order) {
-    const { displayMedia } = this.props;
+    const { displayMedia, moment } = this.props;
     const invoice = getBillingInfo(order).invoice || {};
 
     return (
@@ -100,7 +104,9 @@ class OrderTable extends Component {
         <div className="order-totals">
           <span className="order-data order-data-date">
             <strong>Date: </strong>
-            {moment(order.createdAt).fromNow()} | {moment(order.createdAt).format("MM/D/YYYY")}
+            {(moment && moment(order.createdAt).fromNow()) || order.createdAt.toLocaleString()}
+            &nbsp;|&nbsp;
+            {(moment && moment(order.createdAt).format("MM/D/YYYY")) || order.createdAt.toLocaleString()}
           </span>
 
           <span className="order-data order-data-id">
@@ -119,20 +125,18 @@ class OrderTable extends Component {
         </div>
 
         <div className="order-items">
-          {order.items.map((item, i) => {
-            return (
-              <div className="order-item" key={i}>
-                <div className="order-item-media">
-                  <ProductImage
-                    item={item}
-                    displayMedia={displayMedia}
-                    size="small"
-                    badge={true}
-                  />
-                </div>
+          {order.items.map((item, i) => (
+            <div className="order-item" key={i}>
+              <div className="order-item-media">
+                <Components.ProductImage
+                  item={item}
+                  displayMedia={displayMedia}
+                  size="thumbnail"
+                  badge={true}
+                />
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -190,22 +194,30 @@ class OrderTable extends Component {
   renderOrderCard(order) {
     return (
       <div className="rui card order">
-        <div className="content" onClick={() => this.props.handleClick(order, false)}>
+        <div className="content" onClick={() => this.props.handleClick(order, false)} role="presentation">
           {this.renderShipmentInfo(order)}
           {this.renderOrderInfo(order)}
         </div>
-        <div className="controls" onClick={() => this.props.handleClick(order)}>
+        <div className="controls" onClick={() => this.props.handleClick(order)} role="presentation">
           {this.renderOrderButton(order)}
         </div>
       </div>
     );
   }
 
+  onPageChange = (index) => {
+    this.props.onPageChange(index);
+  }
+
+  onPageSizeChange = (pageSize, pageIndex) => {
+    this.props.onPageSizeChange(pageSize, pageIndex);
+  }
+
   render() {
-    let getTrProps = undefined;
-    let getTheadProps = undefined;
-    let getTrGroupProps = undefined;
-    let getTableProps = undefined;
+    let getTrProps;
+    let getTheadProps;
+    let getTrGroupProps;
+    let getTableProps;
 
     const customColumnMetadata = [];
 
@@ -213,7 +225,7 @@ class OrderTable extends Component {
       // Render order list column/row data
       const filteredFields = {
         name: {
-          accessor: row => getShippingInfo(row).address && getShippingInfo(row).address.fullName,
+          accessor: (row) => getShippingInfo(row).address && getShippingInfo(row).address.fullName,
           id: "shippingFullName"
         },
         email: {
@@ -229,11 +241,11 @@ class OrderTable extends Component {
           id: "_id"
         },
         total: {
-          accessor: row => getBillingInfo(row).invoice && getBillingInfo(row).invoice.total,
+          accessor: (row) => getBillingInfo(row).invoice && getBillingInfo(row).invoice.total,
           id: "billingTotal"
         },
         shipping: {
-          accessor: row => getShippingInfo(row).workflow && getShippingInfo(row).workflow.status,
+          accessor: (row) => getShippingInfo(row).workflow && getShippingInfo(row).workflow.status,
           id: "shippingStatus"
         },
         status: {
@@ -248,27 +260,21 @@ class OrderTable extends Component {
 
       const columnNames = Object.keys(filteredFields);
 
-      getTheadProps = () => {
-        return {
-          className: "order-table-thead"
-        };
-      };
+      getTheadProps = () => ({
+        className: "order-table-thead"
+      });
 
-      getTrGroupProps = () => {
-        return {
-          className: "order-table-tr-group"
-        };
-      };
+      getTrGroupProps = () => ({
+        className: "order-table-tr-group"
+      });
 
-      getTableProps = () => {
-        return {
-          className: "order-table-list"
-        };
-      };
+      getTableProps = () => ({
+        className: "order-table-list"
+      });
 
       // https://react-table.js.org/#/story/cell-renderers-custom-components
       columnNames.forEach((columnName) => {
-        let colHeader = undefined;
+        let colHeader;
         let resizable = true;
         let sortable = true;
         let columnNameLabel;
@@ -303,12 +309,12 @@ class OrderTable extends Component {
         const columnMeta = {
           accessor: filteredFields[columnName].accessor,
           id: filteredFields[columnName].id,
-          Header: colHeader ? colHeader : columnNameLabel,
+          Header: colHeader || columnNameLabel,
           headerClassName: classNames.headerClassNames[columnName],
           className: classNames.colClassNames[columnName],
-          resizable: resizable,
-          sortable: sortable,
-          Cell: row => (
+          resizable,
+          sortable,
+          Cell: (row) => (
             <OrderTableColumn
               row={row}
               handleClick={this.props.handleClick}
@@ -324,34 +330,26 @@ class OrderTable extends Component {
       // Render order detail column/row data
 
       const columnMeta = {
-        Cell: row => (<div>{this.renderOrderCard(row.original)}</div>)
+        Cell: (row) => (<div>{this.renderOrderCard(row.original)}</div>)
       };
 
       customColumnMetadata.push(columnMeta);
 
-      getTheadProps = () => {
-        return {
-          className: "hidden"
-        };
-      };
+      getTheadProps = () => ({
+        className: "hidden"
+      });
 
-      getTrGroupProps = () => {
-        return {
-          className: "order-table-details-tr-group"
-        };
-      };
+      getTrGroupProps = () => ({
+        className: "order-table-details-tr-group"
+      });
 
-      getTableProps = () => {
-        return {
-          className: "order-table-detail"
-        };
-      };
+      getTableProps = () => ({
+        className: "order-table-detail"
+      });
 
-      getTrProps = () => {
-        return {
-          className: "order-table-detail-tr"
-        };
-      };
+      getTrProps = () => ({
+        className: "order-table-detail-tr"
+      });
     }
 
     return (
@@ -385,17 +383,20 @@ class OrderTable extends Component {
           getTheadProps={getTheadProps}
           getTrProps={getTrProps}
           getTrGroupProps={getTrGroupProps}
-          getPaginationProps={() => {
-            return {
-              className: "order-table-pagination-visible"
-            };
-          }}
+          getPaginationProps={() => ({
+            className: "order-table-pagination-visible"
+          })}
           getTableProps={getTableProps}
-          showPaginationTop={this.props.selectedItems.length ? false : true}
+          showPaginationTop={!this.props.selectedItems.length}
+          onPageChange={this.onPageChange}
+          onPageSizeChange={this.onPageSizeChange}
+          pages={this.props.pages}
+          page={this.props.page}
+          manual={true}
         />
       </div>
     );
   }
 }
 
-export default OrderTable;
+export default withMoment(OrderTable);

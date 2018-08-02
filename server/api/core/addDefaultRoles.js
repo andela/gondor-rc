@@ -23,12 +23,10 @@ function addRolesToUsersInGroups(options) {
 
   const groupsToUpdate = Groups.find(query, { fields: { _id: 1, shopId: 1 } }).fetch();
   // We need a list of groups => shops to determine which users get which updates
-  const groupAndShopIds = groupsToUpdate.map((group) => {
-    return {
-      id: group._id,
-      shopId: group.shopId
-    };
-  });
+  const groupAndShopIds = groupsToUpdate.map((group) => ({
+    id: group._id,
+    shopId: group.shopId
+  }));
 
   // We perform one update for each groupId and return a count of the number of updates performed
   groupAndShopIds.forEach((group) => {
@@ -54,7 +52,10 @@ function addRolesToUsersInGroups(options) {
 }
 
 /**
- * Add roles to the default groups for shops and updates any users that are in
+ * @name addRolesToGroups
+ * @method
+ * @memberof Core
+ * @summary Add roles to the default groups for shops and updates any users that are in
  * those permission groups
  * Options:
  * allShops: add supplied roles to all shops, defaults to false

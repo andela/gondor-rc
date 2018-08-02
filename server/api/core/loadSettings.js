@@ -6,8 +6,8 @@ import { Logger } from "/server/api";
 import { EJSON } from "meteor/ejson";
 
 /**
- * ReactionRegistry.loadSettings
- * @description
+ * @method loadSettings
+ * @summary
  * This basically allows you to "hardcode" all the settings. You can change them
  * via admin etc for the session, but when the server restarts they'll
  * be restored back to the supplied json
@@ -15,7 +15,7 @@ import { EJSON } from "meteor/ejson";
  * All settings are private unless added to `settings.public`
  *
  * Meteor account services can be added in `settings.services`
- * @summary updates package settings, accepts json string
+ * @memberof Core
  * @param {Object} json - json object to insert
  * @return {Boolean} boolean -  returns true on insert
  * @example
@@ -31,8 +31,7 @@ export function loadSettings(json) {
 
   // validate json and error out if not an array
   if (!_.isArray(validatedJson[0])) {
-    Logger.warn(
-      "Load Settings is not an array. Failed to load settings.");
+    Logger.warn("Load Settings is not an array. Failed to load settings.");
     return false;
   }
 
@@ -43,10 +42,7 @@ export function loadSettings(json) {
       exists = Packages.findOne({
         name: item.name
       });
-      //
-      // TODO migrate functionality to Reaction.Import
-      // Reaction.Import.package(item, shopId);
-      //
+
       // insert into the Packages collection
       if (exists) {
         result = Packages.upsert({
@@ -71,12 +67,11 @@ export function loadSettings(json) {
             if ({}.hasOwnProperty.call(services, service)) {
               settings = services[service];
               ServiceConfiguration.configurations.upsert({
-                service: service
+                service
               }, {
                 $set: settings
               });
-              Logger.debug("service configuration loaded: " +
-                item.name + " | " + service);
+              Logger.debug(`service configuration loaded: ${item.name} | ${service}`);
             }
           }
         }

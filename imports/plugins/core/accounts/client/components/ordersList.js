@@ -4,20 +4,20 @@ import CompletedOrder from "../../../checkout/client/components/completedOrder";
 
 /**
  * @summary React component to display an array of completed orders
- * @class OrdersList
+ * @memberof Accounts
  * @extends {Component}
  * @property {Array} allOrdersInfo - array of orders
  * @property {Function} handeleDisplayMedia - function to display order image
+ * @property {Boolean} isProfilePage - Profile or non-profile page
  */
 class OrdersList extends Component {
   static propTypes = {
     allOrdersInfo: PropTypes.array,
-    handleDisplayMedia: PropTypes.func,
     isProfilePage: PropTypes.bool
   }
 
   render() {
-    const { allOrdersInfo, handleDisplayMedia } = this.props;
+    const { allOrdersInfo } = this.props;
 
     if (allOrdersInfo) {
       return (
@@ -29,11 +29,8 @@ class OrdersList extends Component {
                 key={orderKey}
                 shops={order.shops}
                 order={order.order}
-                orderId={order.orderId}
                 orderSummary={order.orderSummary}
                 paymentMethods={order.paymentMethods}
-                productImages={order.productImages}
-                handleDisplayMedia={handleDisplayMedia}
                 isProfilePage={this.props.isProfilePage}
               />
             );

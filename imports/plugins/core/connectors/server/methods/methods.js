@@ -6,25 +6,25 @@ import { connectorsRoles } from "../lib/roles";
 
 /**
  *
- * @namespace Methods/Connectors
+ * @namespace Connectors/Methods
  */
 
 export const methods = {
   /**
    * @name connectors/connection/toggle
    * @method
-   * @memberof Methods/Connectors
+   * @memberof Connectors/Methods
    * @example Meteor.call("connectors/connection/toggle", packageId, settingsKey)
    * @summary Toggle enabled connection
    * @param { String } packageId - packageId
    * @param { String } connection - connection name
    * @return { Number } update - result
    */
-  "connectors/connection/toggle": function (packageId, connection) {
+  "connectors/connection/toggle"(packageId, connection) {
     check(packageId, String);
     check(connection, String);
     if (!Reaction.hasPermission(connectorsRoles)) {
-      throw new Meteor.Error(403, "Access Denied");
+      throw new Meteor.Error("access-denied", "Access Denied");
     }
     const pkg = Packages.findOne(packageId);
     if (pkg && pkg.settings[connection]) {

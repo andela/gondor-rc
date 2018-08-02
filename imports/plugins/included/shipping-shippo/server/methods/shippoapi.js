@@ -1,8 +1,8 @@
 /* eslint camelcase: 0 */
 import Shippo from "shippo";
+import SimpleSchema from "simpl-schema";
 import { Meteor } from "meteor/meteor";
 import { ValidatedMethod } from "meteor/mdg:validated-method";
-import { SimpleSchema } from "meteor/aldeed:simple-schema";
 import { Logger } from "/server/api";
 import { purchaseAddressSchema, parcelSchema } from "../lib/shippoApiSchema";
 
@@ -38,7 +38,7 @@ ShippoApi.methods.getAddressList = new ValidatedMethod({
       return addressList;
     } catch (error) {
       Logger.error(error.message);
-      throw new Meteor.Error(error.message);
+      throw new Meteor.Error("server-error", error.message);
     }
   }
 });
@@ -84,7 +84,7 @@ ShippoApi.methods.getCarrierAccountsList = new ValidatedMethod({
         return fetchCarriers();
       } catch (error) {
         Logger.error(error.message);
-        throw new Meteor.Error(error.message);
+        throw new Meteor.Error("server-error", error.message);
       }
     }
 
@@ -108,12 +108,13 @@ ShippoApi.methods.getCarrierAccountsList = new ValidatedMethod({
 ShippoApi.methods.createShipment = new ValidatedMethod({
   name: "ShippoApi.methods.createShipment",
   validate: new SimpleSchema({
-    shippoAddressFrom: { type: purchaseAddressSchema },
-    shippoAddressTo: { type: purchaseAddressSchema },
-    shippoParcel: { type: parcelSchema },
-    purpose: { type: String, allowedValues: ["QUOTE", "PURCHASE"] },
-    apiKey: { type: String },
-    carrierAccounts: { type: [String], optional: true }
+    "shippoAddressFrom": purchaseAddressSchema,
+    "shippoAddressTo": purchaseAddressSchema,
+    "shippoParcel": parcelSchema,
+    "purpose": { type: String, allowedValues: ["QUOTE", "PURCHASE"] },
+    "apiKey": String,
+    "carrierAccounts": { type: Array, optional: true },
+    "carrierAccounts.$": String
   }).validator(),
   run({ shippoAddressFrom, shippoAddressTo, shippoParcel, purpose, apiKey, carrierAccounts }) {
     const shippoObj = new Shippo(apiKey);
@@ -133,7 +134,7 @@ ShippoApi.methods.createShipment = new ValidatedMethod({
       return shipment;
     } catch (error) {
       Logger.error(error.message);
-      throw new Meteor.Error(error.message);
+      throw new Meteor.Error("server-error", error.message);
     }
   }
 });
@@ -169,13 +170,13 @@ ShippoApi.methods.createTransaction = new ValidatedMethod({
       if (transaction.object_status !== "SUCCESS") {
         const error = transaction.messages[0].text;
         Logger.error(error);
-        throw new Meteor.Error(error);
+        throw new Meteor.Error("server-error", error);
       }
 
       return transaction;
     } catch (error) {
       Logger.debug(error.message);
-      throw new Meteor.Error(error.message);
+      throw new Meteor.Error("server-error", error.message);
     }
   }
 });
@@ -205,7 +206,7 @@ ShippoApi.methods.getTransaction = new ValidatedMethod({
       return transaction;
     } catch (error) {
       Logger.error(error.message);
-      throw new Meteor.Error(error.message);
+      throw new Meteor.Error("server-error", error.message);
     }
   }
 });

@@ -7,7 +7,7 @@ class TotalActionsContaner extends Component {
   static propTypes = {
     adjustedTotal: PropTypes.number,
     invoice: PropTypes.object,
-    paymentCaptured: PropTypes.bool
+    paymentCaptured: PropTypes.bool // eslint-disable-line react/boolean-prop-naming
   }
 
   constructor(props) {
@@ -25,7 +25,7 @@ class TotalActionsContaner extends Component {
   }
 
   render() {
-    const  { paymentCaptured, adjustedTotal, invoice } =  this.props;
+    const { paymentCaptured, adjustedTotal, invoice } = this.props;
     return (
       <div>
         <TotalActions

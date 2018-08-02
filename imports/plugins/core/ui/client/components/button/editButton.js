@@ -10,22 +10,22 @@ import IconButton from "./iconButton";
  * Use this button in places where you need a pre-styled button for toggling editing
  * states of components.
  *
+ * @memberof Components
+ * @summary EditButton component
  * @param {Object} props Props passed into component
  * @returns {IconButton} Retruns an IconButton component with pre-configured icons for editing
  */
-const EditButton = (props) => {
-  return (
-    <IconButton
-      icon="fa fa-pencil"
-      onIcon="fa fa-check"
-      toggle={true}
-      primary={true}
-      bezelStyle="solid"
-      kind="round"
-      {...props}
-    />
-  );
-};
+const EditButton = (props) => (
+  <IconButton
+    icon="fa fa-pencil"
+    onIcon="fa fa-check"
+    toggle={true}
+    primary={true}
+    bezelStyle="solid"
+    kind="round"
+    {...props}
+  />
+);
 
 registerComponent("EditButton", EditButton);
 

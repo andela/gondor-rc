@@ -1,11 +1,17 @@
 import { Meteor } from "meteor/meteor";
-import { check, Match } from "meteor/check";
-import { Catalog } from "/lib/api";
-import { Inventory } from "/lib/collections";
+import { Inventory, Products } from "/lib/collections";
 import { Logger, Reaction } from "/server/api";
+import rawCollections from "/imports/collections/rawCollections";
+import getVariants from "/imports/plugins/core/catalog/server/no-meteor/utils/getVariants";
 
 /**
- * inventory/register
+ * @namespace Inventory/Methods
+ */
+
+/**
+ * @name inventory/register
+ * @method
+ * @memberof Inventory/Methods
  * @summary check a product and update Inventory collection with inventory documents.
  * @param {Object} product - valid Schemas.Product object
  * @return {Number} - returns the total amount of new inventory created
@@ -13,28 +19,17 @@ import { Logger, Reaction } from "/server/api";
 export function registerInventory(product) {
   // Retrieve schemas
   // TODO: Permit product type registration and iterate through product types and schemas
-  const simpleProductSchema = Reaction.collectionSchema("Products", { type: "simple" });
-  const variantProductSchema = Reaction.collectionSchema("Products", { type: "variant" });
-  check(product, Match.OneOf(simpleProductSchema, variantProductSchema));
-  let type;
-  switch (product.type) {
-    case "variant":
-      check(product, variantProductSchema);
-      type = "variant";
-      break;
-    default:
-      check(product, simpleProductSchema);
-      type = "simple";
-  }
+  Products.simpleSchema(product).validate(product);
+  const { type } = product;
 
   let totalNewInventory = 0;
   const productId = type === "variant" ? product.ancestors[0] : product._id;
-  const variants = Catalog.getVariants(productId);
+  const variants = Promise.await(getVariants(productId, rawCollections));
 
   // we'll check each variant to see if it has been fully registered
   for (const variant of variants) {
     const inventory = Inventory.find({
-      productId: productId,
+      productId,
       variantId: variant._id,
       shopId: product.shopId
     });
@@ -46,27 +41,24 @@ export function registerInventory(product) {
       const newQty = variant.inventoryQuantity || 0;
       let i = inventoryVariantCount + 1;
 
-      Logger.debug(
-        `inserting ${newQty - inventoryVariantCount
-        } new inventory items for ${variant._id}`
-      );
+      Logger.debug(`inserting ${newQty - inventoryVariantCount} new inventory items for ${variant._id}`);
 
-      const batch = Inventory.
-        _collection.rawCollection().initializeUnorderedBulkOp();
+      const batch = Inventory._collection.rawCollection().initializeUnorderedBulkOp();
       while (i <= newQty) {
         const id = Inventory._makeNewID();
         batch.insert({
           _id: id,
-          productId: productId,
+          productId,
           variantId: variant._id,
           shopId: product.shopId,
-          createdAt: new Date,
-          updatedAt: new Date,
-          workflow: { // we add this line because `batchInsert` doesn't know
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          workflow: {
+            // we add this line because `batchInsert` doesn't know
             status: "new" // about SimpleSchema, so `defaultValue` will not
           }
         });
-        i++;
+        i += 1;
       }
 
       // took from: http://guide.meteor.com/collections.html#bulk-data-changes
@@ -74,7 +66,8 @@ export function registerInventory(product) {
       const inventoryItem = execute();
       const inserted = inventoryItem.nInserted;
 
-      if (!inserted) { // or maybe `inventory.length === 0`?
+      if (!inserted) {
+        // or maybe `inventory.length === 0`?
         // throw new Meteor.Error("Inventory Anomaly Detected. Abort! Abort!");
         return totalNewInventory;
       }
@@ -86,32 +79,29 @@ export function registerInventory(product) {
   return totalNewInventory;
 }
 
+/**
+ * @name inventory/adjust
+ * @method
+ * @memberof Inventory/Methods
+ * @param {Object} product - valid Schemas.Product object
+ * @param {String} userId - ID of user who is adjusting
+ * @param {Object} context - Meteor method context
+ * @return {undefined} - No return
+ */
 function adjustInventory(product, userId, context) {
   // TODO: This can fail even if updateVariant succeeds.
-  // Should probably look at making these two more atomic
-  const simpleProductSchema = Reaction.collectionSchema("Products", { type: "simple" });
-  const variantProductSchema = Reaction.collectionSchema("Products", { type: "variant" });
-  let type;
+  Products.simpleSchema(product).validate(product);
+  const { type } = product;
   let results;
-  // adds or updates inventory collection with this product
-  switch (product.type) {
-    case "variant":
-      check(product, variantProductSchema);
-      type = "variant";
-      break;
-    default:
-      check(product, simpleProductSchema);
-      type = "simple";
-  }
 
   // calledByServer is only true if this method was triggered by the server, such as from a webhook.
   // there will be a null connection and no userId.
-  const calledByServer = (context && context.connection === null && !Meteor.userId());
+  const calledByServer = context && context.connection === null && !Meteor.userId();
   // if this method is calledByServer, skip permission check.
   // user needs createProduct permission to adjust inventory
   // REVIEW: Should this be checking shop permission instead?
   if (!calledByServer && !Reaction.hasPermission("createProduct", userId, product.shopId)) {
-    throw new Meteor.Error(403, "Access Denied");
+    throw new Meteor.Error("access-denied", "Access Denied");
   }
 
   // Quantity and variants of this product's variant inventory
@@ -135,15 +125,18 @@ function adjustInventory(product, userId, context) {
         // determine how many records to delete
         const removeQty = itemCount - variant.qty;
         // we're only going to delete records that are new
-        const removeInventory = Inventory.find({
-          "variantId": variant._id,
-          "workflow.status": "new"
-        }, {
-          sort: {
-            updatedAt: -1
+        const removeInventory = Inventory.find(
+          {
+            "variantId": variant._id,
+            "workflow.status": "new"
           },
-          limit: removeQty
-        }).fetch();
+          {
+            sort: {
+              updatedAt: -1
+            },
+            limit: removeQty
+          }
+        ).fetch();
 
         results = itemCount;
         // delete latest inventory "status:new" records
@@ -152,24 +145,21 @@ function adjustInventory(product, userId, context) {
           // we could add handling for the case when aren't enough "new" items
         }
       }
-      Logger.debug(
-        `adjust variant ${variant._id} from ${itemCount} to ${results}`
-      );
+      Logger.debug(`adjust variant ${variant._id} from ${itemCount} to ${results}`);
     }
   }
 }
 
 Meteor.methods({
-  "inventory/register": function (product) {
+  "inventory/register"(product) {
     if (!Reaction.hasPermission("createProduct", this.userId, product.shopId)) {
-      throw new Meteor.Error(403, "Access Denied");
+      throw new Meteor.Error("access-denied", "Access Denied");
     }
     registerInventory(product);
   },
-  "inventory/adjust": function (product) { // TODO: this should be variant
-    const simpleProductSchema = Reaction.collectionSchema("Products", { type: "simple" });
-    const variantProductSchema = Reaction.collectionSchema("Products", { type: "variant" });
-    check(product, Match.OneOf(simpleProductSchema, variantProductSchema));
+  "inventory/adjust"(product) {
+    // TODO: this should be variant
+    Products.simpleSchema(product).validate(product);
     adjustInventory(product, this.userId, this);
   }
 });

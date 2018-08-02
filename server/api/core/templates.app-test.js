@@ -1,3 +1,4 @@
+/* eslint prefer-arrow-callback:0 */
 import React from "react";
 import { expect } from "meteor/practicalmeteor:chai";
 import Reaction from "./";
@@ -21,7 +22,7 @@ function sampleReactComponent() {
 
 describe("Templates:", function () {
   beforeEach(function () {
-    Templates.direct.remove();
+    Templates.remove();
     resetRegisteredTemplates();
   });
 

@@ -1,17 +1,18 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames/dedupe";
-import moment from "moment";
 import { formatPriceString, i18next } from "/client/api";
 import Avatar from "react-avatar";
+import { withMoment } from "@reactioncommerce/reaction-components";
 import { Badge, ClickToCopy, Icon, RolloverCheckbox, Checkbox } from "@reactioncommerce/reaction-ui";
-import { getOrderRiskBadge, getOrderRiskStatus, getBillingInfo } from "../helpers";
+import { getOrderRiskBadge, getOrderRiskStatus, getBillingInfo, getTaxRiskStatus } from "../helpers";
 
 class OrderTableColumn extends Component {
   static propTypes = {
     fulfillmentBadgeStatus: PropTypes.func,
     handleClick: PropTypes.func,
     handleSelect: PropTypes.func,
+    moment: PropTypes.func,
     row: PropTypes.object,
     selectedItems: PropTypes.array
   }
@@ -50,7 +51,10 @@ class OrderTableColumn extends Component {
   render() {
     const columnAccessor = this.props.row.column.id;
     const invoice = getBillingInfo(this.props.row.original).invoice || {};
-    const orderRisk = getOrderRiskStatus(this.props.row.original);
+    const { moment } = this.props;
+    const orderPaymentRisk = getOrderRiskStatus(this.props.row.original);
+    const orderTaxRisk = getTaxRiskStatus(this.props.row.original);
+    const orderRisk = orderPaymentRisk || orderTaxRisk;
 
     if (columnAccessor === "shippingFullName") {
       return (
@@ -75,7 +79,7 @@ class OrderTableColumn extends Component {
       );
     }
     if (columnAccessor === "createdAt") {
-      const createdDate = moment(this.props.row.value).format("MM/D/YYYY");
+      const createdDate = (moment && moment(this.props.row.value).format("MM/D/YYYY")) || this.props.row.value.toLocaleString();
       return (
         <div style={{ marginTop: 7 }}>{createdDate}</div>
       );
@@ -145,4 +149,4 @@ class OrderTableColumn extends Component {
   }
 }
 
-export default OrderTableColumn;
+export default withMoment(OrderTableColumn);

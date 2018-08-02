@@ -7,12 +7,12 @@ import { Notifications, Packages } from "/lib/collections";
  * @file Methods for Notifications. Run these methods using `Meteor.call()`.
  *
  *
- * @namespace Methods/Notification
+ * @namespace Notification/Methods
 */
 Meteor.methods({
   /**
   * @name notification/send
-  * @memberof Methods/Notification
+  * @memberof Notification/Methods
   * @method
   * @summary This send a notification to a user
   * @param {String} userId - The user
@@ -22,7 +22,7 @@ Meteor.methods({
   * @param {String} details - details of the Notification
   * @return {Object} returns result
   */
-  "notification/send": function (userId, type, url, sms, details) {
+  "notification/send"(userId, type, url, sms, details) {
     check(userId, String);
     check(type, String);
     check(sms, Boolean);
@@ -69,7 +69,7 @@ Meteor.methods({
 
   /**
    * @name notification/markOneAsRead
-   * @memberof Methods/Notification
+   * @memberof Notification/Methods
    * @method
    * @summary This marks all user's notification as ready
    * @param {String} id - The notification id
@@ -87,7 +87,7 @@ Meteor.methods({
 
   /**
    * @name notification/delete
-   * @memberof Methods/Notification
+   * @memberof Notification/Methods
    * @method
    * @summary This deletes a notification
    * @param {String} id - The notification id

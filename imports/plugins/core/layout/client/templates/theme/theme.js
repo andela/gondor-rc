@@ -11,6 +11,7 @@ import { Shops } from "/lib/collections";
  * Adds body classes to help themes distinguish pages and components based on the current route name and layout theme
  * @param  {Object} context - route context
  * @returns {undefined}
+ * @private
  */
 function addBodyClasses(context) {
   let classes;
@@ -22,7 +23,7 @@ function addBodyClasses(context) {
   } else {
     classes = [
       // push clean route-name
-      "app-" + context.route.name.replace(/[\/_]/i, "-")
+      `app-${context.route.name.replace(/[/_]/i, "-")}`
     ];
   }
 

@@ -10,27 +10,18 @@ import { Meteor } from "meteor/meteor";
 import Blaze from "meteor/gadicc:blaze-react-component";
 import { Template } from "meteor/templating";
 import { Session } from "meteor/session";
-import { Counts } from "meteor/tmeasday:publish-counts";
 import { Tracker } from "meteor/tracker";
 import { Packages, Shops } from "/lib/collections";
 import { getComponent } from "@reactioncommerce/reaction-components/components";
-import BlazeLayout from "/imports/plugins/core/layout/lib/blazeLayout";
 import Hooks from "./hooks";
 
-export let history;
+// Using a ternary operator here to avoid a mutable export - open to suggestions for a better way to do this
+export const history = Meteor.isClient ? createBrowserHistory() : createMemoryHistory();
 
 // Private vars
-// const currentRoute = new ReactiveVar({});
 let currentRoute = Immutable.Map();
-const routerReadyDependency = new Tracker.Dependency;
-const routerChangeDependency = new Tracker.Dependency;
-
-// Create history object depending on if this is client or server
-if (Meteor.isClient) {
-  history = createBrowserHistory();
-} else {
-  history = createMemoryHistory();
-}
+const routerReadyDependency = new Tracker.Dependency();
+const routerChangeDependency = new Tracker.Dependency();
 
 /** Class representing a static base router */
 class Router {
@@ -127,7 +118,7 @@ class Router {
   static getRouteName() {
     const current = Router.current();
 
-    return current.route && current.route.name || "";
+    return (current.route && current.route.name) || "";
   }
 
   /**
@@ -139,7 +130,7 @@ class Router {
     routerChangeDependency.depend();
     const current = Router.current();
 
-    return current.params && current.params[name] || undefined;
+    return (current.params && current.params[name]) || undefined;
   }
 
   /**
@@ -151,7 +142,7 @@ class Router {
     routerChangeDependency.depend();
     const current = Router.current();
 
-    return current.query && current.query[name] || undefined;
+    return (current.query && current.query[name]) || undefined;
   }
 
   /**
@@ -186,7 +177,6 @@ class Router {
 }
 
 /**
- * pathFor
  * @summary get current router path
  * @param {String} path - path to fetch
  * @param {Object} options - url params
@@ -214,7 +204,7 @@ Router.pathFor = (path, options = {}) => {
     // This is becuase of Spacebars that we have hash.
     // Spacebars takes all params passed into a template tag and places
     // them into the options.hash object. This will also include any `query` params
-    const hash = options && options.hash || {};
+    const hash = (options && options.hash) || {};
 
     // Create an executable function based on the route regex
     const toPath = pathToRegexp.compile(foundPath.route);
@@ -267,7 +257,7 @@ Router.go = (path, params, query) => {
 
   // if Router is in a non ready/initialized state yet, wait until it is
   if (!Router.ready()) {
-    Tracker.autorun(routerReadyWaitFor => {
+    Tracker.autorun((routerReadyWaitFor) => {
       if (Router.ready()) {
         routerReadyWaitFor.stop();
         routerGo();
@@ -321,14 +311,14 @@ Router.reload = () => {
  */
 Router.isActiveClassName = (routeName) => {
   const current = Router.current();
-  const group = current.route.group;
+  const { group } = current.route;
   let prefix = "";
 
   if (current.route) {
-    const path = current.route.path;
+    const { path } = current.route;
 
     if (group && group.prefix) {
-      prefix = current.route.group.prefix;
+      ({ prefix } = current.route.group);
     }
 
     // Match route
@@ -348,32 +338,26 @@ Router.isActiveClassName = (routeName) => {
 };
 
 /**
- * hasRoutePermission
  * check if user has route permissions
- * @access private
  * @param  {Object} route - route context
- * @return {Boolean} returns `true` if route is autoriized, `false` otherwise
+ * @return {Boolean} returns `true` if user is allowed to see route, `false` otherwise
+ * @private
  */
 function hasRoutePermission(route) {
   const routeName = route.name;
 
-  if (routeName === "index" || routeName === "not-found") {
-    return true;
-  } else if (Router.Reaction.hasPermission(route.permissions, Meteor.userId())) {
-    return true;
-  }
-
-  return false;
+  return routeName === "index" ||
+    routeName === "not-found" ||
+    Router.Reaction.hasPermission(route.permissions, Meteor.userId());
 }
 
 
 /**
- * getRegistryRouteName
- * assemble route name to be standard
- * prefix/package name + registry name or route
+ * assemble route name to be standard prefix/package name + registry name or route
  * @param  {String} packageName  [package name]
  * @param  {Object} registryItem [registry object]
  * @return {String}              [route name]
+ * @private
  */
 function getRegistryRouteName(packageName, registryItem) {
   let routeName;
@@ -386,7 +370,7 @@ function getRegistryRouteName(packageName, registryItem) {
       routeName = packageName;
     }
     // dont include params in the name
-    routeName = routeName.split(":")[0];
+    [routeName] = routeName.split(":");
     return routeName;
   }
   return null;
@@ -394,11 +378,11 @@ function getRegistryRouteName(packageName, registryItem) {
 
 /**
  * selectLayout
- * @access private
  * @param {Object} layout - element of shops.layout array
  * @param {Object} setLayout - layout
  * @param {Object} setWorkflow - workflow
  * @returns {Object} layout - return object of template definitions for Blaze Layout
+ * @private
  */
 function selectLayout(layout, setLayout, setWorkflow) {
   const currentLayout = setLayout || Session.get("DEFAULT_LAYOUT") || "coreLayout";
@@ -410,15 +394,16 @@ function selectLayout(layout, setLayout, setWorkflow) {
 }
 
 /**
- * ReactionLayout
- * sets and returns reaction layout structure
- * @access public
+ * @name ReactionLayout
+ * @method
+ * @summary sets and returns reaction layout structure
  * @param {Object} options - this router context
  * @param {String} options.layout - string of shop.layout.layout (defaults to coreLayout)
  * @param {String} options.workflow - string of shop.layout.workflow (defaults to coreLayout)
  * @returns {Object} layout - return object of template definitions for Blaze Layout
+ * @private
  */
-export function ReactionLayout(options = {}) {
+function ReactionLayout(options = {}) {
   // Find a workflow layout to render
 
   // By default we'll use the primary shop for layouts
@@ -521,36 +506,30 @@ export function ReactionLayout(options = {}) {
     theme: layoutTheme,
     structure: layoutStructure,
     component: (props) => { // eslint-disable-line react/no-multi-comp, react/display-name
-      const route = Router.current().route;
-      const permissions = options.permissions;
+      const { route } = Router.current();
+      const { permissions } = options;
       const structure = {
         ...layoutStructure
       };
 
       // If the current route is unauthorized, and is not the "not-found" route,
-      // then override the template to use the default unauthroized template
-      if (hasRoutePermission({ ...route, permissions }) === false && route.name !== "not-found") {
-        structure.template = "unauthorized";
+      // then override the template to use the default unauthorized template
+      if (hasRoutePermission({ ...route, permissions }) === false && route.name !== "not-found" && !Meteor.user()) {
+        if (!Router.Reaction.hasPermission(route.permissions, Meteor.userId())) {
+          structure.template = "unauthorized";
+        }
+        return false;
       }
-
       try {
         // Try to create a React component if defined
         return React.createElement(getComponent(layoutName), {
           ...props,
-          structure: structure
+          structure
         });
       } catch (e) {
-        // Otherwise fallback to a blaze template
-        if (Template[layoutName]) {
-          return (
-            <BlazeLayout
-              {...structure}
-              blazeTemplate={layoutName}
-            />
-          );
-        }
+        // eslint-disable-next-line
+        console.warn(e, "Failed to create a React layout element");
       }
-
       // If all else fails, render a not found page
       return <Blaze template={structure.notFound} />;
     }
@@ -572,27 +551,20 @@ Router.initPackageRoutes = (options) => {
   Router.Reaction = options.reactionContext;
   Router.routes = [];
 
+  let marketplaceSettings = {
+    shopPrefix: "/shop" // default value
+  };
+
+  const marketplace = Packages.findOne({
+    name: "reaction-marketplace",
+    shopId: Router.Reaction.getPrimaryShopId()
+  });
+
+  if (marketplace && marketplace.settings && marketplace.settings.public) {
+    marketplaceSettings = marketplace.settings.public;
+  }
+
   const pkgs = Packages.find().fetch();
-  const shops = Shops.find({}, { fields: { _id: 1, name: 1, shopType: 1 } }).fetch();
-
-  const shopPrefixes = shops.reduce((prefixesByShopId, shop) => {
-    const shopName = shop.name;
-    const shopSlug = Router.Reaction.getSlug(shopName.toLowerCase());
-
-    // If this is the primary shop
-    if (shop.shopType === "primary") {
-      // If naked routes is turned off, use the shop slug for our primary shop routes
-      if (Router.Reaction.marketplace && Router.Reaction.marketplace.marketplaceNakedRoutes === false) {
-        prefixesByShopId[shop._id] = `/${shopSlug}`;
-      } else {
-        prefixesByShopId[shop._id] = "";
-      }
-    } else {
-      // If this is not the primary shop, use the shop slug in routes for this shop
-      prefixesByShopId[shop._id] = `/${shopSlug}`;
-    }
-    return prefixesByShopId;
-  }, {});
 
   const routeDefinitions = [];
 
@@ -601,11 +573,10 @@ Router.initPackageRoutes = (options) => {
   // subscription to determine this.
   const shopSub = Meteor.subscribe("shopsCount");
 
-  Tracker.autorun(shopSubWaitFor => {
+  Tracker.autorun((shopSubWaitFor) => {
     if (shopSub.ready()) {
       shopSubWaitFor.stop();
       // using tmeasday:publish-counts
-      const shopCount = Counts.get("shops-count");
 
       // Default layouts
       const indexLayout = ReactionLayout(options.indexRoute);
@@ -625,7 +596,7 @@ Router.initPackageRoutes = (options) => {
       });
 
       routeDefinitions.push({
-        route: "/shop/:shopSlug",
+        route: `${marketplaceSettings.shopPrefix}/:shopSlug`,
         name: "index",
         options: {
           name: "index",
@@ -711,14 +682,8 @@ Router.initPackageRoutes = (options) => {
             route.group = {};
 
             if (route.route.substring(0, 1) !== "/") {
-              route.route = "/" + route.route;
+              route.route = `/${route.route}`;
               route.group.prefix = "";
-            } else if (shopCount <= 1) {
-              route.group.prefix = "";
-            } else {
-              const prefix = shopPrefixes[pkg.shopId];
-              route.group.prefix = prefix;
-              route.route = `${prefix}${route.route}`;
             }
 
             routeDefinitions.push(route);
@@ -734,26 +699,24 @@ Router.initPackageRoutes = (options) => {
       // TODO: In the future, sort by priority
       // TODO: Allow duplicated routes with a prefix / suffix / flag
       const uniqRoutes = uniqBy(routeDefinitions.reverse(), "route");
-      const reactRouterRoutes = uniqRoutes.map((route, index) => {
-        return (
-          <Route
-            key={`${route.name}-${index}`}
-            path={route.route}
-            exact={true}
-            render={route.options.component}
-          />
-        );
-      });
+      const reactRouterRoutes = uniqRoutes.map((route, index) => (
+        <Route
+          key={`${route.name}-${index}`}
+          path={route.route}
+          exact={true}
+          render={route.options.component}
+        />
+      ));
 
       // Last route, if no other route is matched, this one will be the not-found view
       // Note: This is last becuase all other routes must at-least attempt a match
       // before falling back to this not-found route.
-      reactRouterRoutes.push(
+      reactRouterRoutes.push((
         <Route
           key="not-found"
           render={notFoundLayout.component}
         />
-      );
+      ));
 
       // Finish initialization
       Router._initialized = true;

@@ -2,7 +2,7 @@ import { Meteor } from "meteor/meteor";
 import React, { Component } from "react";
 import { registerComponent, Components } from "@reactioncommerce/reaction-components";
 import { i18next } from "/client/api";
-import { default as ReactionAlerts } from "/imports/plugins/core/layout/client/templates/layout/alerts/inlineAlerts";
+import ReactionAlerts from "/imports/plugins/core/layout/client/templates/layout/alerts/inlineAlerts";
 
 class InviteOwner extends Component {
   constructor() {
@@ -20,19 +20,18 @@ class InviteOwner extends Component {
     this.setState({ [event.target.name]: event.target.value });
   }
 
-  removeAlert = oldAlert => {
-    return this.setState({
-      alertArray: this.state.alertArray.filter(alert => JSON.stringify(alert) === JSON.stringify(oldAlert))
-    });
-  };
+  removeAlert = (oldAlert) => this.setState({
+    alertArray: this.state.alertArray.filter((alert) => JSON.stringify(alert) === JSON.stringify(oldAlert))
+  });
 
   handleSubmit = (event) => {
     event.preventDefault();
     this.setState({ isLoading: true });
     const { name, email, alertId } = this.state;
     const alertOptions = { placement: alertId, id: alertId, autoHide: 4000 };
+    const shopData = {}; // TODO: add optional shop data to the form (maybe just name?)
 
-    Meteor.call("accounts/inviteShopOwner", { name, email }, (error, result) => {
+    Meteor.call("accounts/inviteShopOwner", { name, email }, shopData, (error, result) => {
       let message = "";
       if (error) {
         let messageKey;

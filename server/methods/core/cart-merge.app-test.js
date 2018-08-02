@@ -1,7 +1,8 @@
 /* eslint dot-notation: 0 */
+/* eslint prefer-arrow-callback:0 */
+import Random from "@reactioncommerce/random";
 import { Meteor } from "meteor/meteor";
 import { Factory } from "meteor/dburles:factory";
-import { Random } from "meteor/random";
 import { check, Match } from "meteor/check";
 import { expect } from "meteor/practicalmeteor:chai";
 import { sinon } from "meteor/practicalmeteor:sinon";
@@ -14,20 +15,13 @@ Fixtures();
 
 describe("Merge Cart function ", function () {
   const shop = getShop();
-  const sessionId = Reaction.sessionId = Random.id();
+  Reaction.sessionId = Random.id();
+  const { sessionId } = Reaction;
   let originals;
   let sandbox;
   let pushCartWorkflowStub;
-  let cartHookStub;
-  let productHookStub;
 
   before(function () {
-    // We are mocking inventory hooks, because we don't need them here, but
-    if (Array.isArray(Collections.Products._hookAspects.remove.after) &&
-      Collections.Products._hookAspects.remove.after.length) {
-      cartHookStub = sinon.stub(Collections.Cart._hookAspects.update.after[0], "aspect");
-      productHookStub = sinon.stub(Collections.Products._hookAspects.remove.after[0], "aspect");
-    }
     originals = {
       mergeCart: Meteor.server.method_handlers["cart/mergeCart"],
       copyCartToOrder: Meteor.server.method_handlers["cart/copyCartToOrder"],
@@ -39,16 +33,14 @@ describe("Merge Cart function ", function () {
     Collections.Products.remove({});
 
     // mock it. If you want to make full integration test, comment this out
-    pushCartWorkflowStub = sinon.stub(Meteor.server.method_handlers, "workflow/pushCartWorkflow", function () {
-      check(arguments, [Match.Any]);
+    pushCartWorkflowStub = sinon.stub(Meteor.server.method_handlers, "workflow/pushCartWorkflow", function (...args) {
+      check(args, [Match.Any]);
       return true;
     });
   });
 
   after(function () {
     pushCartWorkflowStub.restore();
-    cartHookStub.restore();
-    productHookStub.restore();
   });
 
   beforeEach(function () {
@@ -62,10 +54,10 @@ describe("Merge Cart function ", function () {
   });
 
   function spyOnMethod(method, id) {
-    return sandbox.stub(Meteor.server.method_handlers, `cart/${method}`, function () {
-      check(arguments, [Match.Any]); // to prevent audit_arguments from complaining
+    return sandbox.stub(Meteor.server.method_handlers, `cart/${method}`, function (...args) {
+      check(args, [Match.Any]); // to prevent audit_arguments from complaining
       this.userId = id;
-      return originals[method].apply(this, arguments);
+      return originals[method].apply(this, args);
     });
   }
 
@@ -77,11 +69,7 @@ describe("Merge Cart function ", function () {
     expect(cartCount).to.equal(2);
     spyOnMethod("mergeCart", cart.userId);
     const cartRemoveSpy = sandbox.spy(Collections.Cart, "remove");
-    Collections.Cart.update({}, {
-      $set: {
-        sessionId: sessionId
-      }
-    });
+    Collections.Cart.update({}, { $set: { sessionId } });
     const mergeResult = Meteor.call("cart/mergeCart", cart._id, sessionId);
     expect(mergeResult).to.be.ok;
     anonymousCart = Collections.Cart.findOne(anonymousCart._id);
@@ -105,11 +93,7 @@ describe("Merge Cart function ", function () {
     }, { $set: { "items.$.variants._id": cart.items[0].variants_id } });
     spyOnMethod("mergeCart", cart.userId);
     const cartRemoveSpy = sandbox.spy(Collections.Cart, "remove");
-    Collections.Cart.update({}, {
-      $set: {
-        sessionId: sessionId
-      }
-    });
+    Collections.Cart.update({}, { $set: { sessionId } });
     const mergeResult = Meteor.call("cart/mergeCart", cart._id, sessionId);
     expect(mergeResult).to.be.ok;
     const anonymousCartAfterMerge = Collections.Cart.findOne(anonymousCart._id);

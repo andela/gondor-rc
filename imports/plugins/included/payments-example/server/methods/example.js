@@ -1,35 +1,12 @@
 /* eslint camelcase: 0 */
 // meteor modules
 import { Meteor } from "meteor/meteor";
-import { check, Match } from "meteor/check";
+import { check } from "meteor/check";
 // reaction modules
-import { Reaction, Logger } from "/server/api";
+import { Logger } from "/server/api";
+import { ValidCardNumber, ValidExpireMonth, ValidExpireYear, ValidCVV } from "/lib/api";
 import { ExampleApi } from "./exampleapi";
-
-function luhnValid(x) {
-  return [...x].reverse().reduce((sum, c, i) => {
-    let d = parseInt(c, 10);
-    if (i % 2 !== 0) { d *= 2; }
-    if (d > 9) { d -= 9; }
-    return sum + d;
-  }, 0) % 10 === 0;
-}
-
-const ValidCardNumber = Match.Where(function (x) {
-  return /^[0-9]{13,16}$/.test(x) && luhnValid(x);
-});
-
-const ValidExpireMonth = Match.Where(function (x) {
-  return /^[0-9]{1,2}$/.test(x);
-});
-
-const ValidExpireYear = Match.Where(function (x) {
-  return /^[0-9]{4}$/.test(x);
-});
-
-const ValidCVV = Match.Where(function (x) {
-  return /^[0-9]{3,4}$/.test(x);
-});
+import { PaymentMethodArgument } from "/lib/collections/schemas";
 
 // function chargeObj() {
 //   return {
@@ -50,16 +27,23 @@ const ValidCVV = Match.Where(function (x) {
 //   };
 // }
 
+/**
+ * Meteor methods for Example Payment Plugin. Run these methods using `Meteor.call()`
+ * @namespace Payment/Example/Methods
+ */
+
 
 Meteor.methods({
   /**
    * Submit a card for Authorization
+   * @method
+   * @memberof Payment/Example/Methods
    * @param  {Object} transactionType authorize or capture
    * @param  {Object} cardData card Details
    * @param  {Object} paymentData The details of the Payment Needed
    * @return {Object} results normalized
    */
-  "exampleSubmit": function (transactionType, cardData, paymentData) {
+  "exampleSubmit"(transactionType, cardData, paymentData) {
     check(transactionType, String);
     check(cardData, {
       name: String,
@@ -78,9 +62,9 @@ Meteor.methods({
     let result;
     try {
       const transaction = ExampleApi.methods.authorize.call({
-        transactionType: transactionType,
-        cardData: cardData,
-        paymentData: paymentData
+        transactionType,
+        cardData,
+        paymentData
       });
 
       result = {
@@ -100,7 +84,7 @@ Meteor.methods({
       Logger.warn(error);
       result = {
         saved: false,
-        error: error
+        error
       };
     }
     return result;
@@ -108,55 +92,73 @@ Meteor.methods({
 
   /**
    * Capture a Charge
-   * @param {Object} paymentData Object containing data about the transaction to capture
+   * @method
+   * @memberof Payment/Example/Methods
+   * @param {Object} paymentMethod Object containing data about the transaction to capture
    * @return {Object} results normalized
    */
-  "example/payment/capture": function (paymentData) {
-    check(paymentData, Reaction.Schemas.PaymentMethod);
-    const authorizationId = paymentData.transactionId;
-    const amount = paymentData.amount;
+  "example/payment/capture"(paymentMethod) {
+    // Call both check and validate because by calling `clean`, the audit pkg
+    // thinks that we haven't checked paymentMethod arg
+    check(paymentMethod, Object);
+    PaymentMethodArgument.validate(PaymentMethodArgument.clean(paymentMethod));
+
+    const { amount, transactionId: authorizationId } = paymentMethod;
     const response = ExampleApi.methods.capture.call({
-      authorizationId: authorizationId,
-      amount: amount
+      authorizationId,
+      amount
     });
     const result = {
       saved: true,
-      response: response
+      response
     };
     return result;
   },
 
   /**
    * Create a refund
+   * @method
+   * @memberof Payment/Example/Methods
    * @param  {Object} paymentMethod object
    * @param  {Number} amount The amount to be refunded
    * @return {Object} result
    */
-  "example/refund/create": function (paymentMethod, amount) {
-    check(paymentMethod, Reaction.Schemas.PaymentMethod);
+  "example/refund/create"(paymentMethod, amount) {
     check(amount, Number);
+
+    // Call both check and validate because by calling `clean`, the audit pkg
+    // thinks that we haven't checked paymentMethod arg
+    check(paymentMethod, Object);
+    PaymentMethodArgument.validate(PaymentMethodArgument.clean(paymentMethod));
+
     const { transactionId } = paymentMethod;
     const response = ExampleApi.methods.refund.call({
-      transactionId: transactionId,
-      amount: amount
+      transactionId,
+      amount
     });
     const results = {
       saved: true,
-      response: response
+      response
     };
     return results;
   },
 
   /**
    * List refunds
+   * @method
+   * @memberof Payment/Example/Methods
    * @param  {Object} paymentMethod Object containing the pertinant data
    * @return {Object} result
    */
-  "example/refund/list": function (paymentMethod) {
-    check(paymentMethod, Reaction.Schemas.PaymentMethod);
+  "example/refund/list"(paymentMethod) {
+    // Call both check and validate because by calling `clean`, the audit pkg
+    // thinks that we haven't checked paymentMethod arg
+    check(paymentMethod, Object);
+    PaymentMethodArgument.validate(PaymentMethodArgument.clean(paymentMethod));
+
     const { transactionId } = paymentMethod;
     const response = ExampleApi.methods.refunds.call({
-      transactionId: transactionId
+      transactionId
     });
     const result = [];
     for (const refund of response.refunds) {

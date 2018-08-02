@@ -15,7 +15,7 @@ class ListItem extends Component {
     onClick: PropTypes.func,
     onSwitchChange: PropTypes.func,
     switchName: PropTypes.string,
-    switchOn: PropTypes.bool,
+    switchOn: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
     value: PropTypes.any
   }
 
@@ -25,6 +25,14 @@ class ListItem extends Component {
       this.handleSwitchChange(event, isChecked, this.props.switchName);
     } else if (typeof this.props.onClick === "function") {
       this.props.onClick(event, this.data);
+    }
+  }
+
+  handleOnKeyUp = (event) => {
+    // keyCode 32 (spacebar)
+    // keyCode 13 (enter/return)
+    if (event.keyCode === 32 || event.keyCode === 13) {
+      this.handleClick(event);
     }
   }
 
@@ -144,7 +152,13 @@ class ListItem extends Component {
     }, this.props.listItemClassName);
 
     return (
-      <div className={listItemClassName} onClick={this.handleClick}>
+      <div
+        className={listItemClassName}
+        onClick={this.handleClick}
+        onKeyUp={this.handleOnKeyUp}
+        role="button"
+        tabIndex={0}
+      >
         {this.renderIcon()}
         {this.renderContent()}
         {this.renderAction()}

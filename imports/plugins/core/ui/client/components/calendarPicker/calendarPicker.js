@@ -1,12 +1,11 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { DayPickerRangeController } from "react-dates";
 import omit from "lodash/omit";
 import { registerComponent } from "@reactioncommerce/reaction-components";
+import DayPickerRangeController from "./dayPickerRangeController";
 
 // CalendarPicker is a wrapper around react-dates DayPickerRangeController. Anything that works in react-dates should
 // work in CalendarPicker react-dates docs are available at: https://github.com/airbnb/react-dates
-
 class CalendarPicker extends Component {
   constructor(props) {
     super(props);
@@ -17,6 +16,23 @@ class CalendarPicker extends Component {
         ? "endDate"
         : "startDate"
     };
+  }
+
+  /**
+   * Getter returning a value of `true` if the current drection is set to RTL
+   * @return {Boolean} true if RTL false if LTR
+   */
+  get isRTL() {
+    if (typeof this.props.isRTL === "boolean") {
+      // If isRTL is set from props, then use
+      return this.props.isRTL;
+    } else if (document) {
+      // Otherwise try to determine RTL status from the html class name "rtl"
+      return document.getElementsByTagName("html")[0].className.includes("rtl");
+    }
+
+    // Return false if above matches fail
+    return false;
   }
 
   onDatesChange = ({ startDate, endDate }) => {
@@ -36,17 +52,25 @@ class CalendarPicker extends Component {
     });
   }
 
+  renderDayContents(day) {
+    return (
+      <span className="CalendarDay__contents">{day.format("D")}</span>
+    );
+  }
+
   render() {
-    const { focusedInput, startDate, endDate } = this.state;
+    const { focusedInput, startDate, endDate, renderDayContents } = this.state;
 
     const props = omit(this.props, ["autoFocus", "autoFocusEndDate", "initialStartDate", "initialEndDate"]);
 
     return (
       <DayPickerRangeController
         {...props}
+        renderDayContents={renderDayContents || this.renderDayContents}
         onDatesChange={this.onDatesChange}
         onFocusChange={this.onFocusChange}
         focusedInput={focusedInput}
+        isRTL={this.isRTL}
         startDate={startDate}
         endDate={endDate}
         navPrev={< i className = "fa fa-arrow-left" />}
@@ -63,7 +87,7 @@ CalendarPicker.defaultProps = {
   initialEndDate: null,
 
   // day presentation and interaction related props
-  renderDay: null,
+  renderDayContents: null,
   minimumNights: 1,
   isDayBlocked: () => false,
   isDayHighlighted: () => false,
@@ -76,7 +100,7 @@ CalendarPicker.defaultProps = {
   onOutsideClick() {},
   keepOpenOnDateSelect: false,
   renderCalendarInfo: null,
-  isRTL: false,
+  isRTL: undefined,
 
   // navigation related props
   navPrev: null,
@@ -89,8 +113,8 @@ CalendarPicker.defaultProps = {
 };
 
 CalendarPicker.propTypes = {
-  autoFocusEndDate: PropTypes.bool,
-  enableOutsideDays: PropTypes.bool,
+  autoFocusEndDate: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
+  enableOutsideDays: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   initialEndDate: PropTypes.object,
   initialStartDate: PropTypes.object,
   initialVisibleMonth: PropTypes.func,
@@ -98,7 +122,7 @@ CalendarPicker.propTypes = {
   isDayHighlighted: PropTypes.func,
   isOutsideRange: PropTypes.func,
   isRTL: PropTypes.bool,
-  keepOpenOnDateSelect: PropTypes.bool,
+  keepOpenOnDateSelect: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   minimumNights: PropTypes.number,
   monthFormat: PropTypes.string,
   navNext: PropTypes.node,
@@ -109,8 +133,8 @@ CalendarPicker.propTypes = {
   onOutsideClick: PropTypes.func,
   onPrevMonthClick: PropTypes.func,
   renderCalendarInfo: PropTypes.func,
-  renderDay: PropTypes.func,
-  withPortal: PropTypes.bool
+  renderDayContents: PropTypes.func,
+  withPortal: PropTypes.bool // eslint-disable-line react/boolean-prop-naming
 };
 
 registerComponent("CalendarPicker", CalendarPicker);

@@ -6,7 +6,7 @@ import { Reaction, Logger } from "/server/api";
 
 /**
  * @name accounts/sendResetPasswordEmail
- * @memberof Methods/Accounts
+ * @memberof Accounts/Methods
  * @method
  * @example Meteor.call("accounts/sendResetPasswordEmail", options)
  * @summary Send reset password email
@@ -24,14 +24,12 @@ Meteor.methods({
 
     if (!user) {
       Logger.error("accounts/sendResetPasswordEmail - User not found");
-      throw new Meteor.Error("user-not-found", "User not found");
+      throw new Meteor.Error("not-found", "User not found");
     }
 
     const emails = _.map(user.emails || [], "address");
 
-    const caseInsensitiveEmail = _.find(emails, (email) => {
-      return email.toLowerCase() === options.email.toLowerCase();
-    });
+    const caseInsensitiveEmail = _.find(emails, (email) => email.toLowerCase() === options.email.toLowerCase());
 
     Reaction.Accounts.sendResetPasswordEmail(user._id, caseInsensitiveEmail);
   }

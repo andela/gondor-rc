@@ -3,10 +3,17 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import { Components, registerComponent } from "@reactioncommerce/reaction-components";
-import { default as ReactionAlerts } from "/imports/plugins/core/layout/client/templates/layout/alerts/inlineAlerts";
+import ReactionAlerts from "/imports/plugins/core/layout/client/templates/layout/alerts/inlineAlerts";
 import { Reaction, i18next } from "/client/api";
 import { getDefaultUserInviteGroup } from "../helpers/accountsHelper";
 
+/**
+ * @summary React component to display admin invite form
+ * @memberof Accounts
+ * @extends {Component}
+ * @property {Function} canInviteToGroup
+ * @property {Array} groups
+ */
 class AdminInviteForm extends Component {
   static propTypes = {
     canInviteToGroup: PropTypes.func,
@@ -42,11 +49,9 @@ class AdminInviteForm extends Component {
     this.setState({ group });
   };
 
-  removeAlert = (oldAlert) => {
-    return this.setState({
-      alertArray: this.state.alertArray.filter((alert) => !_.isEqual(alert, oldAlert))
-    });
-  };
+  removeAlert = (oldAlert) => this.setState({
+    alertArray: this.state.alertArray.filter((alert) => !_.isEqual(alert, oldAlert))
+  });
 
   handleSubmit(event) {
     event.preventDefault();
@@ -62,7 +67,7 @@ class AdminInviteForm extends Component {
       );
     }
 
-    const options = { email, name, shopId: Reaction.getShopId(), groupId: group._id  };
+    const options = { email, name, shopId: Reaction.getShopId(), groupId: group._id };
     return Meteor.call("accounts/inviteShopMember", options, (error, result) => {
       if (error) {
         let messageKey;
@@ -111,8 +116,8 @@ class AdminInviteForm extends Component {
       <Components.DropDownMenu
         buttonElement={buttonElement(dropOptions)}
         onChange={this.handleGroupSelect}
-        attachment="bottom right"
-        targetAttachment="top right"
+        attachment="top right"
+        targetAttachment="bottom right"
       >
         {dropOptions
           .map((grp, index) => (

@@ -11,5 +11,5 @@ import { slugify } from "transliteration";
  * @return {String} slugified string
  */
 export function getSlug(slugString) {
-  return slugString ? slugify(slugString) : "";
+  return (typeof slugString === "string" && slugify(slugString)) || "";
 }

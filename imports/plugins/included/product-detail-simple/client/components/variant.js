@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
 import { Components, registerComponent } from "@reactioncommerce/reaction-components";
-import { Validation } from "@reactioncommerce/reaction-collections";
+import { Validation } from "@reactioncommerce/schemas";
 import { SortableItem } from "/imports/plugins/core/ui/client/containers";
 
 import { ReactionProduct } from "/lib/api";
@@ -21,7 +21,7 @@ class Variant extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.variantValidation();
   }
 
@@ -31,51 +31,16 @@ class Variant extends Component {
     }
   }
 
-  get price() {
-    return this.props.displayPrice || this.props.variant.price;
+  handleOnKeyUp = (event) => {
+    // keyCode 32 (spacebar)
+    // keyCode 13 (enter/return)
+    if (event.keyCode === 32 || event.keyCode === 13) {
+      this.handleClick(event);
+    }
   }
 
-  renderInventoryStatus() {
-    const {
-      inventoryManagement,
-      inventoryPolicy
-    } = this.props.variant;
-
-    // If variant is sold out, show Sold Out badge
-    if (inventoryManagement && this.props.soldOut) {
-      if (inventoryPolicy) {
-        return (
-          <span className="variant-qty-sold-out badge badge-danger variant-badge-label">
-            <Components.Translation defaultValue="Sold Out!" i18nKey="productDetail.soldOut" />
-          </span>
-        );
-      }
-
-      return (
-        <span className="variant-qty-sold-out badge badge-info variant-badge-label">
-          <Components.Translation defaultValue="Backorder" i18nKey="productDetail.backOrder" />
-        </span>
-      );
-    }
-
-    // If Warning Threshold is met, show Limited Supply Badge
-    if (inventoryManagement && this.props.variant.lowInventoryWarningThreshold >= this.props.variant.inventoryTotal) {
-      if (inventoryPolicy) {
-        return (
-          <span className="variant-qty-sold-out badge badge-warning variant-badge-label">
-            <Components.Translation defaultValue="Limited Supply" i18nKey="productDetail.limitedSupply" />
-          </span>
-        );
-      }
-
-      return (
-        <span className="variant-qty-sold-out badge badge-info variant-badge-label">
-          <Components.Translation defaultValue="Backorder" i18nKey="productDetail.backOrder" />
-        </span>
-      );
-    }
-
-    return null;
+  get price() {
+    return this.props.displayPrice || this.props.variant.price;
   }
 
   renderDeletionStatus() {
@@ -91,7 +56,9 @@ class Variant extends Component {
   }
 
   renderValidationButton = () => {
-    if (this.state.selfValidation.isValid === false) {
+    if (this.props.editable === false) {
+      return null;
+    } else if (this.state.selfValidation.isValid === false) {
       return (
         <Components.Badge
           status="danger"
@@ -100,8 +67,7 @@ class Variant extends Component {
           i18nKeyTooltip={"admin.tooltip.validationError"}
         />
       );
-    }
-    if (this.state.invalidVariant.length) {
+    } else if (this.state.invalidVariant.length) {
       return (
         <Components.Badge
           status="danger"
@@ -111,6 +77,8 @@ class Variant extends Component {
         />
       );
     }
+
+    return null;
   }
 
   variantValidation = () => {
@@ -119,11 +87,9 @@ class Variant extends Component {
     let invalidVariant;
 
     if (variants) {
-      validationStatus = variants.map((variant) => {
-        return this.validation.validate(variant);
-      });
+      validationStatus = variants.map((variant) => this.validation.validate(variant));
 
-      invalidVariant = validationStatus.filter(status => status.isValid === false);
+      invalidVariant = validationStatus.filter((status) => status.isValid === false);
     }
 
     const selfValidation = this.validation.validate(this.props.variant);
@@ -135,7 +101,7 @@ class Variant extends Component {
   }
 
   render() {
-    const variant = this.props.variant;
+    const { variant } = this.props;
     const classes = classnames({
       "variant-detail": true,
       "variant-button": true,
@@ -159,37 +125,39 @@ class Variant extends Component {
     const variantElement = (
       <li
         className="variant-list-item"
-        id="variant-list-item-{variant._id}"
+        id={`variant-list-item-${variant._id}`}
         key={variant._id}
-        onClick={this.handleClick}
       >
-        <div className={classes}>
-          <div className="title">
-            {variantTitleElement}
+        <div
+          onClick={this.handleClick}
+          onKeyUp={this.handleOnKeyUp}
+          role="button"
+          tabIndex={0}
+        >
+          <div className={classes}>
+            <div className="title">
+              {variantTitleElement}
+            </div>
+
+            <div className="actions">
+              <span className="variant-price">
+                <Components.Currency amount={this.price} editable={this.props.editable}/>
+              </span>
+            </div>
           </div>
 
-          <div className="actions">
-            <span className="variant-price">
-              <Components.Currency amount={this.price} editable={this.props.editable}/>
-            </span>
+          <div className="alerts">
+            {this.renderDeletionStatus()}
+            <Components.InventoryBadge className="variant-qty-sold-out variant-badge-label" {...this.props} />
+            {this.renderValidationButton()}
+            {this.props.editButton}
           </div>
-        </div>
-
-        <div className="alerts">
-          {this.renderDeletionStatus()}
-          {this.renderInventoryStatus()}
-          {this.renderValidationButton()}
-          {this.props.editButton}
         </div>
       </li>
     );
 
     if (this.props.editable) {
-      return this.props.connectDragSource(
-        this.props.connectDropTarget(
-          variantElement
-        )
-      );
+      return this.props.connectDragSource(this.props.connectDropTarget(variantElement));
     }
 
     return variantElement;
@@ -201,10 +169,10 @@ Variant.propTypes = {
   connectDropTarget: PropTypes.func,
   displayPrice: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   editButton: PropTypes.node,
-  editable: PropTypes.bool,
+  editable: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   isSelected: PropTypes.bool,
   onClick: PropTypes.func,
-  soldOut: PropTypes.bool,
+  soldOut: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   variant: PropTypes.object,
   visibilityButton: PropTypes.node
 };

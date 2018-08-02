@@ -1,3 +1,4 @@
+/* eslint prefer-arrow-callback:0 */
 import { Meteor } from "meteor/meteor";
 import { Roles } from "meteor/alanning:roles";
 import { expect } from "meteor/practicalmeteor:chai";
@@ -5,7 +6,6 @@ import { sinon } from "meteor/practicalmeteor:sinon";
 
 before(function () {
   this.timeout(10000);
-  Meteor._sleepForMs(7000);
 });
 
 describe("taxes methods", function () {

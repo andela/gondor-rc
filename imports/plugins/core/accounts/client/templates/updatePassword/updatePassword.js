@@ -1,8 +1,7 @@
+import Random from "@reactioncommerce/random";
 import { Accounts } from "meteor/accounts-base";
 import { Template } from "meteor/templating";
-import { Meteor } from "meteor/meteor";
 import { $ } from "meteor/jquery";
-import { Random } from "meteor/random";
 import { Blaze } from "meteor/blaze";
 import { ReactiveVar } from "meteor/reactive-var";
 import { i18next } from "/client/api";
@@ -15,7 +14,7 @@ import { LoginFormValidation } from "/lib/api";
  */
 Accounts.onResetPasswordLink((token, done) => {
   Blaze.renderWithData(Template.loginFormUpdatePasswordOverlay, {
-    token: token,
+    token,
     callback: done,
     isOpen: true,
     type: "updatePassword"
@@ -26,22 +25,14 @@ Accounts.onResetPasswordLink((token, done) => {
  * Accounts Event: onEnrollmentLink When a user uses an enrollment link
  */
 Accounts.onEnrollmentLink((token, done) => {
-  Meteor.call("accounts/verifyAccount", "", token);
   Blaze.renderWithData(Template.loginFormUpdatePasswordOverlay, {
-    token: token,
+    token,
     callback: done,
     isOpen: true,
     type: "setPassword"
   }, $("body").get(0));
 });
 
-/**
- * Accounts Event: onEmailVerificationLink When a user uses an verification link
- */
-Accounts.onEmailVerificationLink(function (token, done) {
-  Accounts.verifyEmail(token);
-  done();
-});
 
 // ----------------------------------------------------------------------------
 // /**
@@ -78,14 +69,7 @@ Template.loginFormChangePassword.helpers(LoginFormSharedHelpers);
  * Events: Login Form Change Password
  */
 Template.loginFormChangePassword.events({
-
-  /**
-   * Submit form for password update
-   * @param  {Event} event - jQuery Event
-   * @param  {Template} template - Blaze Template
-   * @return {void}
-   */
-  "submit form": function (event, template) {
+  "submit form"(event, template) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -116,7 +100,7 @@ Template.loginFormChangePassword.events({
 
     if ($.isEmptyObject(errors) === false) {
       templateInstance.formMessages.set({
-        errors: errors
+        errors
       });
       // prevent password update
       return;

@@ -1,9 +1,12 @@
-/* global sAlert */
+import React from "react";
+import ReactDOM from "react-dom";
 import _ from "lodash";
 import swal from "sweetalert2";
 import { Meteor } from "meteor/meteor";
 import "sweetalert2/dist/sweetalert2.css";
 import Alerts from "./inlineAlerts";
+import Alert from "react-s-alert";
+import { getRootNode } from "/imports/plugins/core/router/client/browserRouter.js";
 
 /**
  * @file ReactionAlerts - Shows a popup alert, extends Bootstrap Alerts and adds more alert types. See Bootstrap Alert documentation: https://getbootstrap.com/docs/3.3/components/#alerts
@@ -12,35 +15,32 @@ import Alerts from "./inlineAlerts";
  * @module ReactionAlerts
  */
 
-Meteor.startup(function () {
-  sAlert.config({
-    effect: "stackslide",
-    position: "bottom-left",
-    timeout: 5000,
-    html: false,
-    onRouteClose: true,
-    stack: true,
-    // or you can pass an object:
-    // stack: {
-    //     spacing: 10 // in px
-    //     limit: 3 // when fourth alert appears all previous ones are cleared
-    // }
-    offset: 0, // in px - will be added to first alert (bottom or top - depends of the position in config)
-    beep: false
-    // examples:
-    // beep: '/beep.mp3'  // or you can pass an object:
-    // beep: {
-    //     info: '/beep-info.mp3',
-    //     error: '/beep-error.mp3',
-    //     success: '/beep-success.mp3',
-    //     warning: '/beep-warning.mp3'
-    // }
-    // onClose: _.noop //
-    // examples:
-    // onClose: function() {
-    //     /* Code here will be executed once the alert closes. */
-    // }
-  });
+const getAlertWrapper = () => {
+  const rootNode = getRootNode();
+
+  rootNode.insertAdjacentHTML("beforebegin", "<div id='s-alert-wrapper'></div>");
+  return document.getElementById("s-alert-wrapper");
+};
+
+const initAlertWrapper = () => {
+  ReactDOM.render(
+    (
+      <Alert
+        effect="stackslide"
+        position="bottom-left"
+        timeout={5000}
+        html={false}
+        onRouteClose={true}
+        stack={true}
+        offset={0} // in px - will be added to first alert (bottom or top - depends of the position in config)
+        beep={false}
+      />
+    ), getAlertWrapper()
+  );
+};
+
+Meteor.startup(() => {
+  initAlertWrapper();
 });
 
 Object.assign(Alerts, {
@@ -58,9 +58,9 @@ Object.assign(Alerts, {
    * Alerts.alert("title", "message", {}, callbackFunction);
    * // - OR, for more control -
    * Alerts.alert({
-   * 	title: "Title",
-   * 	text: "Message Text",
-   * 	type: "success|info|warning|error|"
+   *   title: "Title",
+   *   text: "Message Text",
+   *   type: "success|info|warning|error|"
    * }, callbackFunction);
    *
    * @param  {string|object} titleOrOptions Pass a string or an object containing options
@@ -72,17 +72,19 @@ Object.assign(Alerts, {
   alert(titleOrOptions, messageOrCallback, options, callback) {
     if (_.isObject(titleOrOptions)) {
       return swal({
+        useRejections: true,
         type: "info",
         ...titleOrOptions
       }).then((isConfirm) => {
         if (isConfirm === true && typeof messageOrCallback === "function") {
           messageOrCallback(isConfirm, false);
         }
-      }, dismiss => {
+        return null;
+      }, (dismiss) => {
         if (dismiss === "cancel" || dismiss === "esc" || dismiss === "overlay") {
           messageOrCallback(false, dismiss);
         }
-      }).catch(function (err) {
+      }).catch((err) => {
         if (err === "cancel" || err === "overlay" || err === "timer") {
           return undefined; // Silence error
         }
@@ -94,6 +96,7 @@ Object.assign(Alerts, {
     const message = messageOrCallback;
 
     return swal({
+      useRejections: true,
       title,
       text: message,
       type: "info",
@@ -102,7 +105,8 @@ Object.assign(Alerts, {
       if (isConfirm === true && typeof callback === "function") {
         callback(isConfirm);
       }
-    }).catch(function (err) {
+      return null;
+    }).catch((err) => {
       if (err === "cancel" || err === "overlay" || err === "timer") {
         return undefined; // Silence error
       }
@@ -116,9 +120,9 @@ Object.assign(Alerts, {
       case "warning":
       case "success":
       case "info":
-        return sAlert[type](message, options);
+        return Alert[type](message, options);
       default:
-        return sAlert.success(message, options);
+        return Alert.success(message, options);
     }
   }
 });

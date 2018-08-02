@@ -7,12 +7,13 @@ import "velocity-animate/velocity.ui";
 import { registerComponent } from "@reactioncommerce/reaction-components";
 import { i18next } from "/client/api";
 import { Button, Handle } from "/imports/plugins/core/ui/client/components";
-import { SortableItem } from "../../containers";
+import { SortableItem } from "/imports/plugins/core/ui/client/containers";
+import { Router } from "@reactioncommerce/reaction-router";
 
 class TagItem extends Component {
   componentWillReceiveProps(nextProps) {
     if (this._updated && this._saved && this.refs.autoSuggestInput) {
-      const input = this.refs.autoSuggestInput.input;
+      const { input } = this.refs.autoSuggestInput;
 
       Velocity.RunSequence([
         { e: input, p: { backgroundColor: "#e2f2e2" }, o: { duration: 200 } },
@@ -175,10 +176,18 @@ class TagItem extends Component {
       "full-width": this.props.fullWidth
     });
 
+    const url = Router.pathFor("tag", {
+      hash: {
+        slug: this.props.tag.slug
+      }
+    });
+
     return (
       <a
         className={baseClassName}
-        href="#"
+        href={url}
+        onFocus={this.handleTagMouseOver}
+        onBlur={this.handleTagMouseOut}
         onMouseOut={this.handleTagMouseOut}
         onMouseOver={this.handleTagMouseOver}
         onClick={this.handleClick}
@@ -202,23 +211,21 @@ class TagItem extends Component {
     });
 
     return (
-      this.props.connectDropTarget(
-        <div className="rui item edit draggable">
-          <div
-            className={baseClassName}
-            data-id={this.props.tag._id}
-          >
-            <form onSubmit={this.handleTagFormSubmit}>
-              <Handle connectDragSource={this.props.connectDragSource} />
-              {this.renderAutosuggestInput()}
-              <Button icon="times-circle" onClick={this.handleTagRemove} status="danger" />
-              {this.props.isTagNav &&
-                <Button icon="chevron-down" onClick={this.handleTagSelect} status="default" />
-              }
-            </form>
-          </div>
+      this.props.connectDropTarget(<div className="rui item edit draggable">
+        <div
+          className={baseClassName}
+          data-id={this.props.tag._id}
+        >
+          <form onSubmit={this.handleTagFormSubmit}>
+            <Handle connectDragSource={this.props.connectDragSource} />
+            {this.renderAutosuggestInput()}
+            <Button icon="times-circle" onClick={this.handleTagRemove} status="danger" />
+            {this.props.isTagNav &&
+              <Button icon="chevron-down" onClick={this.handleTagSelect} status="default" />
+            }
+          </form>
         </div>
-      )
+      </div>)
     );
   }
 
@@ -297,12 +304,12 @@ class TagItem extends Component {
 }
 
 TagItem.propTypes = {
-  blank: PropTypes.bool,
+  blank: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   connectDragSource: PropTypes.func,
   connectDropTarget: PropTypes.func,
-  draggable: PropTypes.bool,
-  editable: PropTypes.bool,
-  fullWidth: PropTypes.bool,
+  draggable: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
+  editable: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
+  fullWidth: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   i18nKeyInputPlaceholder: PropTypes.string,
   index: PropTypes.number,
   inputPlaceholder: PropTypes.string,

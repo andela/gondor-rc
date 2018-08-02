@@ -1,52 +1,48 @@
 import { Meteor } from "meteor/meteor";
 import { check, Match } from "meteor/check";
-import { Media, Products, Revisions, Shops } from "/lib/collections";
+import { Catalog, Products, Shops } from "/lib/collections";
 import { Logger, Reaction } from "/server/api";
-import { RevisionApi } from "/imports/plugins/core/revisions/lib/api/revisions";
-
 
 /**
- * Helper function that creates and returns a Cursor of Media for relevant
- * products to a publication
- * @method findProductMedia
- * @param {Object} publicationInstance instance of the publication that invokes this method
- * @param {array} productIds array of productIds
- * @return {Object} Media Cursor containing the product media that matches the selector
+ * Flatten variant tree from a Catalog Item Product document
+ * @param {Object} product A Catalog Item Product document
+ * @returns {Array} Variant array
  */
-export function findProductMedia(publicationInstance, productIds) {
-  const selector = {};
+function flattenCatalogProductVariants(product) {
+  const variants = [];
 
-  if (Array.isArray(productIds)) {
-    selector["metadata.productId"] = {
-      $in: productIds
-    };
-  } else {
-    selector["metadata.productId"] = productIds;
+  // Un-tree the variant tree
+  if (Array.isArray(product.variants)) {
+    // Loop over top-level variants
+    product.variants.forEach((variant) => {
+      if (Array.isArray(variant.options)) {
+        // Loop over variant options
+        variant.options.forEach((option) => {
+          variants.push({
+            ancestors: [
+              product.productId,
+              variant.variantId
+            ],
+            type: "variant",
+            isVisible: true,
+            ...option
+          });
+        });
+      }
+
+      variants.push({
+        ancestors: [
+          product.productId
+        ],
+        type: "variant",
+        isVisible: true,
+        ...variant
+      });
+    });
   }
 
-  // No one needs to see archived images on products
-  selector["metadata.workflow"] = {
-    $nin: ["archived"]
-  };
-
-  // Product editors can see both published and unpublished images
-  // There is an implied shopId in Reaction.hasPermission that defaults to
-  // the active shopId via Reaction.getShopId
-  if (!Reaction.hasPermission(["createProduct"], publicationInstance.userId)) {
-    selector["metadata.workflow"].$in = [null, "published"];
-  }
-
-
-  // TODO: We should differentiate between the media selector for the product grid and PDP
-  // The grid shouldn't need more than one Media document per product, while the PDP will need
-  // all the images associated with the
-  return Media.find(selector, {
-    sort: {
-      "metadata.priority": 1
-    }
-  });
+  return variants;
 }
-
 
 /**
  * product detail publication
@@ -62,14 +58,11 @@ Meteor.publish("Product", function (productIdOrHandle, shopIdOrSlug) {
     return this.ready();
   }
 
-  const preSelector = {
+  const selector = {
     $or: [{
       _id: productIdOrHandle
     }, {
-      handle: {
-        $regex: productIdOrHandle,
-        $options: "i"
-      }
+      handle: productIdOrHandle
     }]
   };
 
@@ -83,30 +76,28 @@ Meteor.publish("Product", function (productIdOrHandle, shopIdOrSlug) {
     });
 
     if (shop) {
-      preSelector.shopId = shop._id;
+      selector.shopId = shop._id;
     } else {
       return this.ready();
     }
   }
 
   // TODO review for REGEX / DOS vulnerabilities.
-  const product = Products.findOne(preSelector);
-
+  // Need to peek into product to get associated shop. This is important to check permissions.
+  const product = Products.findOne(selector);
   if (!product) {
     // Product not found, return empty subscription.
     return this.ready();
   }
 
-  const _id = product._id;
+  const { _id } = product;
 
-  const selector = {
-    isVisible: true,
-    isDeleted: { $in: [null, false] },
-    $or: [
-      { _id: _id },
-      { ancestors: _id }
-    ]
-  };
+  selector.isVisible = true;
+  selector.isDeleted = { $in: [null, false] };
+  selector.$or = [
+    { _id },
+    { ancestors: _id },
+    { handle: productIdOrHandle }];
 
   // Authorized content curators for the shop get special publication of the product
   // all all relevant revisions all is one package
@@ -115,118 +106,49 @@ Meteor.publish("Product", function (productIdOrHandle, shopIdOrSlug) {
       $in: [true, false, undefined]
     };
 
-    if (RevisionApi.isRevisionControlEnabled()) {
-      const productCursor = Products.find(selector);
-      const productIds = productCursor.map(p => p._id);
-
-      const handle = productCursor.observeChanges({
-        added: (id, fields) => {
-          const revisions = Revisions.find({
-            "documentId": id,
-            "workflow.status": {
-              $nin: [
-                "revision/published"
-              ]
-            }
-          }).fetch();
-          fields.__revisions = revisions;
-
-          this.added("Products", id, fields);
-        },
-        changed: (id, fields) => {
-          const revisions = Revisions.find({
-            "documentId": id,
-            "workflow.status": {
-              $nin: [
-                "revision/published"
-              ]
-            }
-          }).fetch();
-
-          fields.__revisions = revisions;
-          this.changed("Products", id, fields);
-        },
-        removed: (id) => {
-          this.removed("Products", id);
-        }
-      });
-
-      const handle2 = Revisions.find({
-        "workflow.status": {
-          $nin: [
-            "revision/published"
-          ]
-        }
-      }).observe({
-        added: (revision) => {
-          let observedProduct;
-          if (!revision.parentDocument) {
-            observedProduct = Products.findOne(revision.documentId);
-          } else {
-            observedProduct = Products.findOne(revision.parentDocument);
-          }
-          if (observedProduct) {
-            this.added("Products", observedProduct._id, observedProduct);
-            this.added("Revisions", revision._id, revision);
-          }
-        },
-        changed: (revision) => {
-          let observedProduct;
-          if (!revision.parentDocument) {
-            observedProduct = Products.findOne(revision.documentId);
-          } else {
-            observedProduct = Products.findOne(revision.parentDocument);
-          }
-
-          if (observedProduct) {
-            observedProduct.__revisions = [revision];
-            this.changed("Products", observedProduct._id, observedProduct);
-            this.changed("Revisions", revision._id, revision);
-          }
-        },
-        removed: (revision) => {
-          let observedProduct;
-          if (!revision.parentDocument) {
-            observedProduct = Products.findOne(revision.documentId);
-          } else {
-            observedProduct = Products.findOne(revision.parentDocument);
-          }
-          if (observedProduct) {
-            observedProduct.__revisions = [];
-            this.changed("Products", observedProduct._id, observedProduct);
-            this.removed("Revisions", revision._id, revision);
-          }
-        }
-      });
-
-      this.onStop(() => {
-        handle.stop();
-        handle2.stop();
-      });
-
-      return [
-        findProductMedia(this, productIds)
-      ];
-    }
-
-    // Revision control is disabled, but is an admin
-    const productCursor = Products.find(selector);
-    const productIds = productCursor.map(p => p._id);
-    const mediaCursor = findProductMedia(this, productIds);
-
-    return [
-      productCursor,
-      mediaCursor
-    ];
+    return Products.find(selector);
   }
 
-  // Everyone else gets the standard, visible products and variants
-  const productCursor = Products.find(selector);
-  const productIds = productCursor.map(p => p._id);
-  const mediaCursor = findProductMedia(this, productIds);
+  if (!selector.shopId) {
+    selector.shopId = product.shopId;
+  }
+  // Product data for customers visiting the PDP page
+  const cursor = Catalog.find({
+    "$or": [{
+      "product._id": productIdOrHandle
+    }, {
+      "product.slug": productIdOrHandle
+    }],
+    "product.type": "product-simple",
+    "product.shopId": selector.shopId,
+    "product.isVisible": true,
+    "product.isDeleted": { $in: [null, false] }
+  });
 
-  return [
-    productCursor,
-    mediaCursor
-  ];
+  const handle = cursor.observeChanges({
+    added: (id, { product: catalogProduct }) => {
+      this.added("Products", catalogProduct.productId, catalogProduct);
+      flattenCatalogProductVariants(catalogProduct).forEach((variant) => {
+        this.added("Products", variant.variantId, variant);
+      });
+    },
+    changed: (id, { product: catalogProduct }) => {
+      this.changed("Products", catalogProduct.productId, catalogProduct);
+      flattenCatalogProductVariants(product).forEach((variant) => {
+        this.changed("Products", variant.variantId, variant);
+      });
+    },
+    removed: (id, { product: catalogProduct }) => {
+      this.removed("Products", catalogProduct.productId, catalogProduct);
+      flattenCatalogProductVariants(product).forEach((variant) => {
+        this.removed("Products", variant.variantId, variant);
+      });
+    }
+  });
+
+  this.onStop(() => {
+    handle.stop();
+  });
+
+  return this.ready();
 });
