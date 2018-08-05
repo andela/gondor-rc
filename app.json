@@ -1,0 +1,8 @@
+{
+  "name": "gondor-rc",
+  "scripts": {},
+  "env": {},
+  "formation": {},
+  "addons": [],
+  "buildpacks": []
+}
