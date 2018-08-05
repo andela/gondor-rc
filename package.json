@@ -81,7 +81,7 @@
     "meteor-node-stubs": "0.4.1",
     "moment": "^2.20.1",
     "moment-timezone": "^0.5.14",
-    "mongodb": "^3.0.5",
+    "mongodb": "2.2.36",
     "nexmo": "^2.2.0",
     "nock": "^9.1.6",
     "node-fetch": "^2.0.0",
