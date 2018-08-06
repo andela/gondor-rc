@@ -1,39 +1,68 @@
 import React from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
-import { Components, registerComponent } from "@reactioncommerce/reaction-components";
+import { getComponent, registerComponent } from "@reactioncommerce/reaction-components";
 import Blaze from "meteor/gadicc:blaze-react-component";
 import { Template } from "meteor/templating";
 
-const CoreLayout = ({ actionViewIsOpen, structure }) => {
-  const { layoutFooter, template } = structure || {};
+class CoreLayout extends React.Component {
+  constructor(props) {
+    super(props);
 
-  const pageClassName = classnames({
-    "page": true,
-    "show-settings": actionViewIsOpen
-  });
+    const { structure } = this.props;
+    const { layoutHeader, layoutFooter } = structure || {};
 
-  return (
-    <div className={pageClassName} id="reactionAppContainer">
-      <Components.NavBar />
+    const headerComponent = layoutHeader && getComponent(layoutHeader);
+    const footerComponent = layoutFooter && getComponent(layoutFooter);
 
-      <Blaze template="cartDrawer" className="reaction-cart-drawer" />
+    if (headerComponent) {
+      this.headerComponent = React.createElement(headerComponent, {});
+    }
 
-      { Template[template] &&
+    if (footerComponent) {
+      this.footerComponent = React.createElement(footerComponent, {});
+    }
+  }
+
+  render() {
+    const { actionViewIsOpen, structure } = this.props;
+    const { template } = structure || {};
+
+    const pageClassName = classnames({
+      "page": true,
+      "show-settings": actionViewIsOpen
+    });
+
+    let mainNode = null;
+    try {
+      const mainComponent = getComponent(template);
+      mainNode = React.createElement(mainComponent, {});
+    } catch (error) {
+    //  Probe for Blaze template (legacy)
+      if (Template[template]) {
+        mainNode = <Blaze template={template} />;
+      }
+    }
+
+    return (
+      <div className={pageClassName} id="reactionAppContainer">
+
+        {this.headerComponent}
+
+        <Blaze template="cartDrawer" className="reaction-cart-drawer" />
+
         <main>
-          <Blaze template={template} />
+          {mainNode}
         </main>
-      }
 
-      { Template[layoutFooter] &&
-        <Blaze template={layoutFooter} className="reaction-navigation-footer footer-default" />
-      }
-    </div>
-  );
-};
+        {this.footerComponent}
+      </div>
+    );
+  }
+}
 
 CoreLayout.propTypes = {
-  actionViewIsOpen: PropTypes.bool,
+  actionViewIsOpen: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   data: PropTypes.object,
   structure: PropTypes.object
 };

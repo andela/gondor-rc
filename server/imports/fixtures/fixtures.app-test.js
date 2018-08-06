@@ -1,3 +1,4 @@
+/* eslint prefer-arrow-callback:0 */
 import { Meteor } from "meteor/meteor";
 import { Factory } from "meteor/dburles:factory";
 import { check, Match } from "meteor/check";
@@ -17,12 +18,12 @@ describe("Fixtures:", function () {
 
   beforeEach(function () {
     sandbox = sinon.sandbox.create();
-    Collections.Orders.direct.remove();
+    Collections.Orders.remove();
   });
 
   afterEach(function () {
     sandbox.restore();
-    Collections.Orders.direct.remove();
+    Collections.Orders.remove();
   });
 
   it("Account fixture should create an account", function () {
@@ -67,15 +68,12 @@ describe("Fixtures:", function () {
   });
 
   it("Order fixture should create an order", function () {
-    // Order has analytics hooks on it that need to be turned off
-    sandbox.stub(Collections.Orders._hookAspects.insert.before[0], "aspect");
-    sandbox.stub(Collections.Orders._hookAspects.update.before[0], "aspect");
     sandbox.stub(Reaction, "hasPermission", () => true);
-    sandbox.stub(Meteor.server.method_handlers, "inventory/register", function () {
-      check(arguments, [Match.Any]);
+    sandbox.stub(Meteor.server.method_handlers, "inventory/register", function (...args) {
+      check(args, [Match.Any]);
     });
-    sandbox.stub(Meteor.server.method_handlers, "inventory/sold", function () {
-      check(arguments, [Match.Any]);
+    sandbox.stub(Meteor.server.method_handlers, "inventory/sold", function (...args) {
+      check(args, [Match.Any]);
     });
     const order = Factory.create("order");
     expect(order).to.not.be.undefined;

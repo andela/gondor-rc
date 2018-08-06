@@ -1,23 +1,17 @@
 import { Cart } from "/lib/collections";
 import { Template } from "meteor/templating";
 
-/*
- * Template helpers for cart
- *
- */
-
 /**
- * cart template helper
- * @description
- * methods to return cart calculated values
- * cartCount, cartSubTotal, cartShipping, cartTaxes, cartTotal
+ * @method cart
+ * @summary methods to return cart calculated values
+ * cartCount, cartSubTotal, cartShipping, cartTaxes, `cartTotal`
  * are calculated by a transformation on the collection
  * and are available to use in template as cart.xxx
- * in template: {{cart.getCount}}
- * in code: Cart.findOne().getTotal()
+ * @example {{cart.getCount}}
+ * @memberof BlazeTemplateHelpers
  * @return {Object} returns inventory helpers
  */
-Template.registerHelper("cart", function () {
+Template.registerHelper("cart", () => {
   const cartHelpers = {
     /**
      * showCartIconWarning
@@ -67,11 +61,13 @@ Template.registerHelper("cart", function () {
 });
 
 /**
- * cartPayerName
+ * @method cartPayerName
+ * @memberof BlazeTemplateHelpers
  * @summary gets current cart billing address / payment name
+ * @example {{>afFieldInput name="payerName" value=cartPayerName}}
  * @return {String} returns cart.billing[0].fullName
  */
-Template.registerHelper("cartPayerName", function () {
+Template.registerHelper("cartPayerName", () => {
   const cart = Cart.findOne();
   if (cart && cart.billing && cart.billing[0] && cart.billing[0].address && cart.billing[0].address.fullName) {
     const name = cart.billing[0].address.fullName;

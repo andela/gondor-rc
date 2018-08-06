@@ -1,4 +1,5 @@
 /* eslint camelcase: 0 */
+/* eslint prefer-arrow-callback:0 */
 import nock from "nock";
 
 import { Meteor } from "meteor/meteor";
@@ -203,12 +204,12 @@ describe("stripe/payment/createCharges", function () {
       return cart.userId;
     });
 
-    sandbox.stub(Meteor.server.method_handlers, "cart/createCart", function () {
-      check(arguments, [Match.Any]);
+    sandbox.stub(Meteor.server.method_handlers, "cart/createCart", function (...args) {
+      check(args, [Match.Any]);
     });
 
-    sandbox.stub(Meteor.server.method_handlers, "orders/sendNotification", function () {
-      check(arguments, [Match.Any]);
+    sandbox.stub(Meteor.server.method_handlers, "orders/sendNotification", function (...args) {
+      check(args, [Match.Any]);
     });
 
     // This stub causes the the charge to go through as the primary shop charge
@@ -290,12 +291,16 @@ describe("stripe/payment/createCharges", function () {
       .post("/v1/charges", `amount=${cart.getTotal() * 100}&capture=false&currency=USD&customer=${stripeCustomerResponse.id}`)
       .reply(200, chargeResult); // .log(console.log);
 
-    methods["stripe/payment/createCharges"]("authorize", cardData, cart._id).then((res) => {
-      const transactionIds = Object.keys(res.transactions);
-      const txId = transactionIds[0];
-      expect(res.success).to.equal(true);
-      expect(res.transactions[txId].amount).to.equal(cart.getTotal() * 100);
-    }).then(() => done(), done);
+    methods["stripe/payment/createCharges"]("authorize", cardData, cart._id)
+      .then((res) => {
+        const transactionIds = Object.keys(res.transactions);
+        const txId = transactionIds[0];
+        expect(res.success).to.equal(true);
+        expect(res.transactions[txId].amount).to.equal(cart.getTotal() * 100);
+        return null;
+      })
+      .then(() => done())
+      .catch(done);
   });
 });
 

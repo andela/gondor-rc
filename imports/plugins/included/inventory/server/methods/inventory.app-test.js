@@ -1,13 +1,13 @@
-/* eslint dot-notation: 0 */
+/* eslint dot-notation:0 */
+/* eslint prefer-arrow-callback:0 */
 import { Meteor } from "meteor/meteor";
 import { Roles } from "meteor/alanning:roles";
-import { Products, Inventory }  from "/lib/collections";
+import { Products, Inventory } from "/lib/collections";
 import { Reaction } from "/server/api";
 import { expect } from "meteor/practicalmeteor:chai";
 import { sinon } from "meteor/practicalmeteor:sinon";
 import { addProduct } from "/server/imports/fixtures/products";
 import Fixtures from "/server/imports/fixtures";
-import { RevisionApi } from "/imports/plugins/core/revisions/lib/api/revisions";
 
 Fixtures();
 
@@ -40,7 +40,6 @@ describe("inventory method", function () {
 
   beforeEach(function () {
     sandbox = sinon.sandbox.create();
-    sandbox.stub(RevisionApi, "isRevisionControlEnabled", () => true);
     // again hack. w/o this we can't remove products from previous spec.
     Inventory.remove({}); // Empty Inventory
   });

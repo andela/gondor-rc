@@ -3,14 +3,12 @@ import { Template } from "meteor/templating";
 import { Reaction } from "/client/api";
 import { Packages } from "/lib/collections";
 
-/**
- * Helpers for Settings Header (actionView)
- */
 Template.settingsHeader.helpers({
 
   /**
    * Data pased to action view
    * @return {Object} Registry entry for item
+   * @ignore
    */
   registry() {
     return Reaction.getActionView() || {};
@@ -23,6 +21,7 @@ Template.settingsHeader.helpers({
   /**
    * thisApp
    * @return {Object} Registry entry for item
+   * @ignore
    */
   thisApp() {
     const reactionApp = Packages.findOne({
@@ -36,9 +35,7 @@ Template.settingsHeader.helpers({
     });
 
     if (reactionApp) {
-      const settingsData = _.find(reactionApp.registry, function (item) {
-        return item.route === Reaction.Router.getRouteName() && item.provides && item.provides.includes("settings");
-      });
+      const settingsData = _.find(reactionApp.registry, (item) => item.route === Reaction.Router.getRouteName() && item.provides && item.provides.includes("settings")); // eslint-disable-line max-len
 
       return settingsData;
     }
@@ -47,9 +44,6 @@ Template.settingsHeader.helpers({
 
 });
 
-/**
- * Events for Setting Header (actionView)
- */
 Template.settingsHeader.events({
   "click [data-event-action=closeSettings]": () => {
     Reaction.hideActionView();
@@ -60,14 +54,11 @@ Template.settingsHeader.events({
   }
 });
 
-/**
- * Helpers for Settings Sidebar (actionView)
- */
 Template.settingsSidebar.helpers({
-
   /**
    * pkgPermissions Check package permissions
    * @return {Boolean} user has permission to see settings for this package
+   * @ignore
    */
   pkgPermissions() {
     if (Reaction.hasPermission("dashboard")) {
@@ -83,10 +74,10 @@ Template.settingsSidebar.helpers({
 });
 
 Template.settingsSidebarItem.helpers({
-
   /**
    * label
    * @return {String} Label for item
+   * @ignore
    */
   label() {
     return Template.parentData(1).label || this.label;

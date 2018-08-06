@@ -6,7 +6,7 @@ import { Reaction } from "/server/api";
 
 /**
  * @name accounts/updateServiceConfiguration
- * @memberof Methods/Accounts
+ * @memberof Accounts/Methods
  * @method
  * @example Meteor.call("accounts/updateServiceConfiguration", service, fields, (callBackFunction))
  * @summary Update service configuration
@@ -15,18 +15,18 @@ import { Reaction } from "/server/api";
  * @returns {false}
  */
 Meteor.methods({
-  "accounts/updateServiceConfiguration": function (service, fields) {
+  "accounts/updateServiceConfiguration"(service, fields) {
     check(service, String);
     check(fields, Array);
     const dataToSave = {};
 
-    _.each(fields, function (field) {
+    _.each(fields, (field) => {
       dataToSave[field.property] = field.value;
     });
 
     if (Reaction.hasPermission(["dashboard/accounts"])) {
       return ServiceConfiguration.configurations.upsert({
-        service: service
+        service
       }, {
         $set: dataToSave
       });

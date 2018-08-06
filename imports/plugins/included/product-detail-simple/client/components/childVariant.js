@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
 import { Components, registerComponent } from "@reactioncommerce/reaction-components";
-import { Validation } from "@reactioncommerce/reaction-collections";
-import { ProductVariant } from "/lib/collections/schemas/products";
+import { Validation } from "@reactioncommerce/schemas";
+import { ProductVariant } from "/lib/collections/schemas";
 
 
 class ChildVariant extends Component {
@@ -17,7 +17,7 @@ class ChildVariant extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.variantValidation();
   }
 
@@ -79,19 +79,21 @@ class ChildVariant extends Component {
   }
 
   renderMedia() {
-    if (this.hasMedia) {
-      const media = this.primaryMediaItem;
+    const media = this.primaryMediaItem;
+    if (!media) return null;
 
-      return (
-        <Components.MediaItem source={media.url()} />
-      );
-    }
-
-    return null;
+    return (
+      <Components.MediaItem
+        source={media}
+        onClick={this.handleClick}
+      />
+    );
   }
 
   renderValidationButton = () => {
-    if (this.state.invalidVariant === true) {
+    if (this.props.isEditable === false) {
+      return null;
+    } else if (this.state.invalidVariant === true) {
       return (
         <Components.Badge
           status="danger"
@@ -102,6 +104,8 @@ class ChildVariant extends Component {
         />
       );
     }
+
+    return null;
   }
 
   // checks whether the product variant is validated
@@ -114,7 +118,7 @@ class ChildVariant extends Component {
   }
 
   render() {
-    const variant = this.props.variant;
+    const { variant } = this.props;
     const classes = classnames({
       "btn": true,
       "btn-default": true,
@@ -148,10 +152,11 @@ class ChildVariant extends Component {
 
 ChildVariant.propTypes = {
   editButton: PropTypes.node,
+  isEditable: PropTypes.bool,
   isSelected: PropTypes.bool,
   media: PropTypes.arrayOf(PropTypes.object),
   onClick: PropTypes.func.isRequired,
-  soldOut: PropTypes.bool,
+  soldOut: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   variant: PropTypes.object,
   visibilityButton: PropTypes.node
 };

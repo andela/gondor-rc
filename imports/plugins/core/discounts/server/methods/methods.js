@@ -6,46 +6,46 @@ import Reaction from "../api";
 
 /**
  *
- * @namespace Methods/Discounts
+ * @namespace Discounts/Methods
  */
 
 export const methods = {
   /**
    * @name discounts/deleteRate
    * @method
-   * @memberof Methods/Discounts
+   * @memberof Discounts/Methods
    * @param  {String} discountId discount id to delete
    * @return {String} returns update/insert result
    */
-  "discounts/deleteRate": function (discountId) {
+  "discounts/deleteRate"(discountId) {
     check(discountId, String);
 
     // check permissions to delete
     if (!Reaction.hasPermission("discounts")) {
-      throw new Meteor.Error(403, "Access Denied");
+      throw new Meteor.Error("access-denied", "Access Denied");
     }
 
-    return Discounts.direct.remove({ _id: discountId });
+    return Discounts.remove({ _id: discountId });
   },
 
   /**
    * @name discounts/setRate
    * @method
-   * @memberof Methods/Discounts
+   * @memberof Discounts/Methods
    * @summary Update the cart discounts without hooks
    * @param  {String} cartId cartId
    * @param  {Number} discountRate discountRate
    * @param  {Object} discounts discounts
    * @return {Number} returns update result
    */
-  "discounts/setRate": function (cartId, discountRate, discounts) {
+  "discounts/setRate"(cartId, discountRate, discounts) {
     check(cartId, String);
     check(discountRate, Number);
     check(discounts, Match.Optional(Array));
 
-    return Cart.direct.update(cartId, {
+    return Cart.update(cartId, {
       $set: {
-        discounts: discounts,
+        discounts,
         discount: discountRate
       }
     });
@@ -54,20 +54,20 @@ export const methods = {
   /**
    * @name discounts/transaction
    * @method
-   * @memberof Methods/Discounts
+   * @memberof Discounts/Methods
    * @summary Applies a transaction to discounts for history
    * @param  {String} cartId cartId
    * @param  {String} discountId discountId
    * @return {String} returns update result
    */
-  "discounts/transaction": function (cartId, discountId) {
+  "discounts/transaction"(cartId, discountId) {
     check(cartId, String);
     check(discountId, String);
 
     const transaction = {
-      cartId: cartId,
+      cartId,
       userId: Meteor.userId(),
-      appliedAt: new Date
+      appliedAt: new Date()
     };
     // double duty validation, plus we need the method
     const discount = Discounts.findOne(discountId);
@@ -81,12 +81,12 @@ export const methods = {
   /**
    * @name discounts/calculate
    * @method
-   * @memberof Methods/Discounts
+   * @memberof Discounts/Methods
    * @param  {String} cart cartId
    * @return {Object}  returns discount object
    */
-  "discounts/calculate": function (cart) {
-    check(cart, Object); // Reaction.Schemas.Cart
+  "discounts/calculate"(cart) {
+    Reaction.Schemas.Cart.validate(cart);
 
     let currentDiscount = 0;
     // what's going on here?
@@ -98,14 +98,14 @@ export const methods = {
         if (billing.paymentMethod) {
           const discount = Discounts.findOne(billing.paymentMethod.id);
           if (discount && discount.calculation) {
-            const processor = billing.paymentMethod.processor;
+            const { processor } = billing.paymentMethod;
             const calculation = discount.calculation.method;
             // we're using processor/calculation
             // as a convention that can be easily
             // added in external discount methods
             // example: discounts/codes/discount
             // will also not reprocess invoiced orders
-            if (!billing.invoice && processor === "code" || processor === "rate") {
+            if ((!billing.invoice && processor === "code") || processor === "rate") {
               // discounts are additive, if we allow more than one.
               currentDiscount += Meteor.call(`discounts/${processor}s/${calculation}`, cart._id, discount._id);// note the added s.
             }

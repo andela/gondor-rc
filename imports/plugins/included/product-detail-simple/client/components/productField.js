@@ -18,7 +18,7 @@ class ProductField extends Component {
         value: nextProps.product[this.fieldName]
       }, () => {
         if (this._input && this._input.refs.input) {
-          const input = this._input.refs.input;
+          const { input } = this._input.refs;
 
           Velocity.RunSequence([
             { e: input, p: { backgroundColor: "#e2f2e2" }, o: { duration: 200 } },
@@ -110,7 +110,7 @@ class ProductField extends Component {
     return (
       <div className={baseClassName}>
         <Components.TextField
-          ref={(ref) => { this._input = ref;}}
+          ref={(ref) => { this._input = ref; }}
           className={textFieldClassName}
           multiline={this.props.multiline}
           onBlur={this.handleBlur}
@@ -130,16 +130,22 @@ class ProductField extends Component {
       return this.renderTextField();
     }
 
+    const classNames = classnames({
+      pdp: true,
+      field: true,
+      [this.fieldName]: !!this.fieldName
+    });
+
     if (this.props.element) {
       return React.createElement(this.props.element, {
-        className: "pdp field",
+        className: classNames,
         itemProp: this.props.itemProp,
         children: this.value
       });
     }
 
     return (
-      <div className="pdp field">
+      <div className={classNames}>
         {this.value}
       </div>
     );
@@ -148,12 +154,12 @@ class ProductField extends Component {
 
 ProductField.propTypes = {
   editContainerProps: PropTypes.object,
-  editable: PropTypes.bool,
+  editable: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   element: PropTypes.node,
   fieldName: PropTypes.string,
   fieldTitle: PropTypes.string,
   itemProp: PropTypes.string,
-  multiline: PropTypes.bool,
+  multiline: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   onProductFieldChange: PropTypes.func,
   product: PropTypes.object,
   textFieldProps: PropTypes.object

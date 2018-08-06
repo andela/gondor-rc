@@ -12,12 +12,15 @@ const wrapComponent = (Comp) => (
         query: {},
         searchQuery: "",
         shippingFilter: "",
-        workflowFilter: ""
+        workflowFilter: "",
+        skip: 0,
+        pageSize: 10,
+        page: 0
       };
     }
 
     filterDates = (startDate, endDate) => {
-      const query = this.state.query;
+      const { query } = this.state;
 
       if (startDate && endDate) {
         // generate time for start and end of day
@@ -43,12 +46,12 @@ const wrapComponent = (Comp) => (
 
     filterWorkflowStatus = (event, value) => {
       const query = filterWorkflowStatus(value);
-      const shippingFilter = this.state.shippingFilter;
+      const { shippingFilter } = this.state;
       if (this.state.query.createdAt) {
         query.createdAt = this.state.query.createdAt;
       }
 
-      if  (this.state.query._id) {
+      if (this.state.query._id) {
         query._id = this.state.query._id;
       }
 
@@ -60,13 +63,13 @@ const wrapComponent = (Comp) => (
 
     filterShippingStatus = (event, value) => {
       const query = filterShippingStatus(value);
-      const workflowFilter = this.state.workflowFilter;
+      const { workflowFilter } = this.state;
 
       if (this.state.query.createdAt) {
         query.createdAt = this.state.query.createdAt;
       }
 
-      if  (this.state.query._id) {
+      if (this.state.query._id) {
         query._id = this.state.query._id;
       }
 
@@ -78,8 +81,7 @@ const wrapComponent = (Comp) => (
 
     clearFilter = (filterString) => {
       let query;
-      let shippingFilter = this.state.shippingFilter;
-      let workflowFilter = this.state.workflowFilter;
+      let { shippingFilter, workflowFilter } = this.state;
 
       if (filterString === "workflow") {
         workflowFilter = "";
@@ -114,6 +116,16 @@ const wrapComponent = (Comp) => (
       });
     }
 
+    updatePage = (page) => {
+      const offset = page * this.state.pageSize;
+      this.setState({ skip: offset, page });
+    }
+
+    updatePageSize = (pageSize, pageIndex) => {
+      const offset = pageIndex * pageSize;
+      this.setState({ pageSize, skip: offset });
+    }
+
     render() {
       return (
         <Comp
@@ -124,12 +136,17 @@ const wrapComponent = (Comp) => (
           filterShippingStatus={this.filterShippingStatus}
           filterWorkflowStatus={this.filterWorkflowStatus}
           handleChange={this.handleSearchChange}
+          skip={this.state.skip}
+          pageSize={this.state.pageSize}
+          onPageChange={this.updatePage}
+          onPageSizeChange={this.updatePageSize}
+          currentPage={this.state.page}
         />
       );
     }
   }
 );
 
-registerComponent("OrderSubscription", OrderSubscription, [ wrapComponent ]);
+registerComponent("OrderSubscription", OrderSubscription, [wrapComponent]);
 
 export default compose(wrapComponent)(OrderSubscription);

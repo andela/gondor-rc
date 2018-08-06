@@ -1,4 +1,3 @@
-import { check } from "meteor/check";
 import { Meteor } from "meteor/meteor";
 import { Shipping, Packages } from "/lib/collections";
 import { Logger, Reaction, Hooks } from "/server/api";
@@ -15,9 +14,10 @@ import { Cart as CartSchema } from "/lib/collections/schemas";
  * be an updated list of shipping rates, and the second will contain info for
  * retrying this specific package if any errors occurred while retrieving the
  * shipping rates.
+ * @private
  */
 function getShippingRates(previousQueryResults, cart) {
-  check(cart, CartSchema);
+  CartSchema.validate(cart);
   const [rates, retrialTargets] = previousQueryResults;
   const shops = [];
   const products = cart.items;
@@ -29,8 +29,7 @@ function getShippingRates(previousQueryResults, cart) {
   if (retrialTargets.length > 0) {
     const isNotAmongFailedRequests = retrialTargets.every((target) =>
       target.packageName !== currentMethodInfo.packageName &&
-      target.fileName !== currentMethodInfo.fileName
-    );
+      target.fileName !== currentMethodInfo.fileName);
     if (isNotAmongFailedRequests) {
       return previousQueryResults;
     }
@@ -71,7 +70,7 @@ function getShippingRates(previousQueryResults, cart) {
   let merchantShippingRates = false;
   const marketplaceSettings = Reaction.getMarketplaceSettings();
   if (marketplaceSettings && marketplaceSettings.enabled) {
-    merchantShippingRates = marketplaceSettings.public.merchantShippingRates;
+    ({ merchantShippingRates } = marketplaceSettings.public);
   }
 
   let pkgData;
@@ -108,7 +107,7 @@ function getShippingRates(previousQueryResults, cart) {
       }
     }
     // if we have multiple shops in cart
-    if ((shops !== null ? shops.length : void 0) > 0) {
+    if ((shops !== null ? shops.length : undefined) > 0) {
       selector = {
         "shopId": {
           $in: shops
@@ -120,7 +119,7 @@ function getShippingRates(previousQueryResults, cart) {
 
   const shippingCollection = Shipping.find(selector);
   const initialNumOfRates = rates.length;
-  shippingCollection.forEach(function (doc) {
+  shippingCollection.forEach((doc) => {
     const _results = [];
     for (const method of doc.methods) {
       if (!method.enabled) {
@@ -138,14 +137,12 @@ function getShippingRates(previousQueryResults, cart) {
         method.carrier = doc.provider.label;
       }
       const rate = method.rate + method.handling;
-      _results.push(
-        rates.push({
-          carrier: doc.provider.label,
-          method: method,
-          rate: rate,
-          shopId: doc.shopId
-        })
-      );
+      _results.push(rates.push({
+        carrier: doc.provider.label,
+        method,
+        rate,
+        shopId: doc.shopId
+      }));
     }
     return _results;
   });

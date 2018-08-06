@@ -1,17 +1,23 @@
-import moment from "moment";
 import { Meteor } from "meteor/meteor";
-import { Job } from "meteor/vsivsi:job-collection";
+import { Job } from "/imports/plugins/core/job-collection/lib";
 import { Jobs, Logs } from "/lib/collections";
 import { Hooks, Logger } from "/server/api";
 import taxCalc from "../methods/taxCalc";
 
+let moment;
+async function lazyLoadMoment() {
+  if (moment) return;
+  moment = await import("moment");
+}
 
 /**
  * @summary Remove logs older than the configured number of days
  * @param {Function} callback - function to call when process complete
  * @returns {Number} results of remmoval query
+ * @private
  */
 function cleanupAvalaraJobs(callback) {
+  Promise.await(lazyLoadMoment());
   const pkgData = taxCalc.getPackageData();
   if (pkgData && pkgData.settings.avalara.enabled) {
     const saveDuration = pkgData.settings.avalara.logRetentionDuration;
@@ -26,35 +32,34 @@ function cleanupAvalaraJobs(callback) {
   callback();
 }
 
+export function setupAvalaraCleanupHook() {
+  Hooks.Events.add("afterCoreInit", () => {
+    if (!Meteor.isAppTest) {
+      Logger.debug("Adding Avalara log cleanup job and removing existing");
+      new Job(Jobs, "logs/removeOldAvalaraLogs", {})
+        .priority("normal")
+        .retry({
+          retries: 5,
+          wait: 60000,
+          backoff: "exponential"
+        })
+        .save({
+          cancelRepeats: true
+        });
+    }
+  });
+}
 
-Hooks.Events.add("afterCoreInit", () => {
-  if (!Meteor.isAppTest) {
-    Logger.debug("Adding Avalara log cleanup job and removing existing");
-    // Renove all previous jobs
-    Jobs.remove({ type: "logs/removeOldAvalaraLogs" });
-    new Job(Jobs, "logs/removeOldAvalaraLogs", {})
-      .priority("normal")
-      .retry({
-        retries: 5,
-        wait: 60000,
-        backoff: "exponential"
-      })
-      .save({
-        cancelRepeats: true
-      });
-  }
-});
-
-
-export default function () {
-  Jobs.processJobs("logs/removeOldAvalaraLogs",
+export function cleanupAvalogs() {
+  Jobs.processJobs(
+    "logs/removeOldAvalaraLogs",
     {
       pollInterval: 30 * 1000,
       workTimeout: 180 * 1000
     },
     (job, callback) => {
       Logger.debug("Avalara log cleanup running");
-      cleanupAvalaraJobs(function (error) {
+      cleanupAvalaraJobs((error) => {
         if (error) {
           job.done(error.toString(), { repeatId: true });
           callback();

@@ -1,34 +1,64 @@
 import _ from "lodash";
-import * as tz from "moment-timezone";
-import moment from "moment";
 import "moment/min/locales.min.js";
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
 import { Accounts } from "meteor/accounts-base";
 import { Spacebars } from "meteor/spacebars";
+import { ReactiveVar } from "meteor/reactive-var";
 import { Roles } from "meteor/alanning:roles";
-import { i18next } from "/client/api";
-import { Reaction } from "../";
+import { i18next, Reaction } from "/client/api";
 import * as Collections from "/lib/collections";
 import * as Schemas from "/lib/collections/schemas";
 import { toCamelCase } from "/lib/api";
 
+/**
+ * @file Meteor Blaze Template helper methods - Use these helpers in Meteor Blaze templates with `{{ }}`
+ * Read more about Meteor Blaze helpers in the [Blaze Documentation](blazejs.org/api/templates.html#Template-registerHelper).
+ * @namespace BlazeTemplateHelpers
+ */
 
-Template.registerHelper("Collections", function () {
-  return Collections;
-});
+// Lazily load moment-timezone.months
+const monthOptionsVar = new ReactiveVar([]);
+async function lazyLoadMonths() {
+  if (monthOptionsVar.get().length) return;
+  const { locale, months } = await import("moment-timezone");
 
-Template.registerHelper("Schemas", function () {
-  return Schemas;
-});
+  let lang = i18next.language;
+  if (lang === "zh") {
+    lang = "zh-cn";
+  }
+
+  locale(lang);
+
+  const monthOptions = [];
+  const monthsList = months();
+
+  // parse into autoform array
+  for (const index in monthsList) {
+    if ({}.hasOwnProperty.call(monthsList, index)) {
+      const month = monthsList[index];
+      const mnum = parseInt(index, 10) + 1;
+      monthOptions.push({
+        value: mnum,
+        label: `${mnum} | ${month}`
+      });
+    }
+  }
+
+  monthOptionsVar.set(monthOptions);
+}
+
+Template.registerHelper("Collections", () => Collections);
+
+Template.registerHelper("Schemas", () => Schemas);
 
 /**
- * currentUser
+ * @method currentUser
+ * @memberof BlazeTemplateHelpers
  * @summary overrides Meteor Package.blaze currentUser method
  * @return {Boolean} returns true/null if user has registered
  */
-
-Template.registerHelper("currentUser", function () {
+Template.registerHelper("currentUser", () => {
   if (typeof Reaction === "object") {
     const shopId = Reaction.getShopId();
     const user = Accounts.user();
@@ -43,180 +73,132 @@ Template.registerHelper("currentUser", function () {
   return null;
 });
 
-
 /**
- * registerHelper monthOptions
- * @summary formats moment.js months into an array for autoform selector
- * @return {Array} returns array of months [value:, label:]
+ * @method monthOptions
+ * @memberof BlazeTemplateHelpers
+ * @summary Get monthOptionsVar ReactiveVar
+ * @param {Boolean} [showDefaultOption]
+ * @return {Array} returns array of months
  */
-Template.registerHelper("monthOptions", function (showDefaultOption = true) {
+Template.registerHelper("monthOptions", (showDefaultOption = true) => {
   const label = i18next.t("app.monthOptions", "Choose month");
-  const localLocale = tz;
 
-  // adding cases where our lang w/o region
-  // isn't predefined in moment.
-  // because using defineLocale throws
-  // ugly deprecation warnings, we aren't doing:
-  //
-  // localLocale.defineLocale("zh", {
-  //   parentLocale: "zh-cn"
-  // });
-  let lang = i18next.language;
-  if (lang === "zh") {
-    lang = "zh-cn";
-  }
-
-  localLocale.locale(lang);
-  const monthOptions = [];
+  // Call to get monthOptionsVar ReactiveVar
+  lazyLoadMonths();
+  let monthOptions = [];
 
   if (showDefaultOption) {
     monthOptions.push({
       value: "",
-      label: label
+      label
     });
   }
 
-  const months = localLocale.months();
-  // parse into autoform array
-  for (const index in months) {
-    if ({}.hasOwnProperty.call(months, index)) {
-      const month = months[index];
-      const mnum = parseInt(index, 10) + 1;
-      monthOptions.push({
-        value: mnum,
-        label: `${mnum} | ${month}`
-      });
-    }
-  }
+  monthOptions = monthOptions.concat(monthOptionsVar.get());
 
   return monthOptions;
 });
 
 /**
- * yearOptions
+ * @method yearOptions
+ * @memberof BlazeTemplateHelpers
  * @summary formats moment.js next 9 years into array for autoform selector
+ * @param {Boolean} [showDefaultOption]
  * @return {Array} returns array of years [value:, label:]
  */
-Template.registerHelper("yearOptions", function (showDefaultOption = true) {
+Template.registerHelper("yearOptions", (showDefaultOption = true) => {
   const label = i18next.t("app.yearOptions", "Choose year");
   const yearOptions = [];
 
   if (showDefaultOption) {
     yearOptions.push({
       value: "",
-      label: label
+      label
     });
   }
 
   let year = new Date().getFullYear();
-  for (let i = 1; i < 9; i++) {
+  for (let i = 1; i < 9; i += 1) {
     yearOptions.push({
       value: year,
       label: year
     });
-    year++;
+    year += 1;
   }
   return yearOptions;
 });
 
 /**
- * timezoneOptions
- * @summary formats moment.js timezones into array for autoform selector
- * @return {Array} returns array of timezones [value:, label:]
- */
-Template.registerHelper("timezoneOptions", function () {
-  const label = i18next.t("app.timezoneOptions", "Choose timezone");
-  const timezoneOptions = [{
-    value: "",
-    label: label
-  }];
-  const timezones = moment.tz.names();
-  for (const timezone of timezones) {
-    timezoneOptions.push({
-      value: timezone,
-      label: timezone
-    });
-  }
-  return timezoneOptions;
-});
-
-
-/**
- * camelToSpace
+ * @method camelToSpace
  * @summary convert a camelcased string to spaces
  * @param {String} str - camelcased string
  * @return {String} returns space formatted string
  */
-Template.registerHelper("camelToSpace", function (str) {
+Template.registerHelper("camelToSpace", (str) => {
   const downCamel = str.replace(/\W+/g, "-").replace(/([a-z\d])([A-Z])/g, "$1 $2");
   return downCamel.toLowerCase();
 });
 
 /**
- * toLowerCase
+ * @method toLowerCase
+ * @memberof BlazeTemplateHelpers
  * @summary convert a string to lower case
  * @param {String} str - string
  * @return {String} returns lowercased string
  */
-Template.registerHelper("toLowerCase", function (str) {
-  return str.toLowerCase();
-});
+Template.registerHelper("toLowerCase", (str) => str.toLowerCase());
 
 /**
- * toUpperCase
+ * @method toUpperCase
+ * @memberof BlazeTemplateHelpers
  * @summary convert a string to upper case
  * @param {String} str - string
  * @return {String} returns uppercased string
  */
-Template.registerHelper("toUpperCase", function (str) {
-  return str.toUpperCase();
-});
+Template.registerHelper("toUpperCase", (str) => str.toUpperCase());
 
 /**
- * capitalize
+ * @method capitalize
+ * @memberof BlazeTemplateHelpers
  * @summary capitalize first character of string
  * @param {String} str - string
  * @return {String} returns string with first letter capitalized
  */
-Template.registerHelper("capitalize", function (str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-});
+Template.registerHelper("capitalize", (str) => str.charAt(0).toUpperCase() + str.slice(1));
 
 /**
- * toCamelCase
+ * @method toCamelCase
+ * @memberof BlazeTemplateHelpers
  * @summary camelCases a string
  * @param {String} str - string
  * @return {String|undefined} returns camelCased string
  */
-Template.registerHelper("toCamelCase", function (str) {
-  return !!str && toCamelCase(str);
-});
+Template.registerHelper("toCamelCase", (str) => !!str && toCamelCase(str));
 
 
 /**
- * siteName
+ * @method siteName
+ * @memberof BlazeTemplateHelpers
  * @summary get the shop name
+ * @example <a href="{{pathFor 'index'}}"><span>{{siteName}}</span></a>
  * @return {String} returns site name
  */
-Template.registerHelper("siteName", function () {
+Template.registerHelper("siteName", () => {
   const shop = Collections.Shops.findOne();
   return typeof shop === "object" && shop.name ? shop.name : "";
 });
 
-/*
- *  General helpers for template functionality
- */
-
 /**
- * condition
+ * @method condition
  * @summary conditional string comparison template helper
  * @example {{#if condition status "eq" ../value}}
+ * @memberof BlazeTemplateHelpers
  * @param {String} v1 - first variable to compare
  * @param {String} operator - eq,neq,ideq,or,lt,gt comparision operator
  * @param {String} v2 - second variable to compare
  * @return {Boolean} returns true/false
  */
-Template.registerHelper("condition", function (v1, operator, v2) {
+Template.registerHelper("condition", (v1, operator, v2) => {
   switch (operator) {
     case "==":
     case "eq":
@@ -249,93 +231,65 @@ Template.registerHelper("condition", function (v1, operator, v2) {
     case "gte":
       return v1 >= v2;
     default:
-      throw new Meteor.Error(`Undefined conditional operator ${operator}`);
+      throw new Meteor.Error("undefined-operator", `Undefined conditional operator ${operator}`);
   }
 });
 
 /**
- * orElse
+ * @method orElse
  * @summary if this is true, or else this
+ * @memberof BlazeTemplateHelpers
+ * @example {{#if showCartIconWarning}}
+  <div class="badge badge-warning">!</div>
+  {{/if}}
+  <div class="badge">{{orElse cartCount 0}}</div>
  * @param {String} v1 - variable one
  * @param {String} v2 - variable two
  * @return {String} returns v1 || v2
  */
-Template.registerHelper("orElse", function (v1, v2) {
-  return v1 || v2;
-});
+Template.registerHelper("orElse", (v1, v2) => v1 || v2);
 
 /**
- * key_value
+ * @method key_value
  * @summary template helper pushing object key/value into array
+ * @memberof BlazeTemplateHelpers
  * @param {Object} context - object to parse into key / value
  * @return {Array} returns array[key:,value:]
  */
-Template.registerHelper("key_value", function (context) {
+Template.registerHelper("key_value", (context) => {
   const result = [];
-  _.each(context, function (value, key) {
-    return result.push({
-      key: key,
-      value: value
-    });
-  });
+  _.each(context, (value, key) => result.push({
+    key,
+    value
+  }));
   return result;
 });
 
 /**
- * nl2br
+ * @method nl2br
  * @summary template helper nl2br - Converts new line (\n\r) to <br>
  * from http://phpjs.org/functions/nl2br:480
+ * @memberof BlazeTemplateHelpers
  * @param {String} text - text
  * @returns {String} returns formatted Spacebars.SafeString
  */
-Template.registerHelper("nl2br", function (text) {
-  const nl2br = (text + "").replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, "$1" +
-    "<br>" + "$2");
+Template.registerHelper("nl2br", (text) => {
+  const nl2br = (`${text}`).replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, "$1<br>$2");
   return new Spacebars.SafeString(nl2br);
 });
 
 /**
- * dateFormat
- * @description
- * format an ISO date using Moment.js
- * http://momentjs.com/
- * moment syntax example: moment(Date("2011-07-18T15:50:52")).format("MMMM YYYY")
- * @example {{dateFormat creation_date format="MMMM YYYY"}}
- * @param {String} context - moment context
- * @param {String} block - hash of moment options, ie: format=""
- * @return {Date} return formatted date
- */
-Template.registerHelper("dateFormat", function (context, block) {
-  const f = block.hash.format || "MMM DD, YYYY hh:mm:ss A";
-  return moment(context).format(f);
-});
-
-/**
- * timeAgo
- * @description
- * accept an ISO date using Moment.js and return elapsed time from today
- * http://momentjs.com/
- * moment syntax example: moment(Date("2011-07-18T15:50:52")).from(new Date())
- * @example {{timeAgo creation_date}}
- * @param {String} context - moment context
- * @return {Date} return formatted date
- */
-Template.registerHelper("timeAgo", function (context) {
-  return moment(context).from(new Date());
-});
-
-
-/**
- * pluralize
+ * @method pluralize
  * @summary general helper for plurization of strings
- * @example {{plurize "1 thing"}}
+ * @memberof BlazeTemplateHelpers
+ * @example {{pluralize "1 thing"}}
  * @param {String} nCount - number, ie "1 "
  * @param {String} pString - plural string ie " thing"
  * @todo adapt to, and use i18next
  */
-Template.registerHelper("pluralize", function (nCount, pString) {
+Template.registerHelper("pluralize", (nCount, pString) => {
   if (nCount === 1) {
-    return "1 " + pString;
+    return `1 ${pString}`;
   }
-  return nCount + " " + pString + "s";
+  return `${nCount} ${pString}s`;
 });

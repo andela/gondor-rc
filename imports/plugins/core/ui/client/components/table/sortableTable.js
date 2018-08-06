@@ -1,11 +1,11 @@
-import React,  { Component } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import matchSorter from "match-sorter";
 import ReactTable from "react-table";
 import { Meteor } from "meteor/meteor";
 import { Counts } from "meteor/tmeasday:publish-counts";
-import { SortableTableFilter, SortableTablePagination } from "./sortableTableComponents";
 import { registerComponent } from "@reactioncommerce/reaction-components";
+import { SortableTableFilter, SortableTablePagination } from "./sortableTableComponents";
 
 /**
  * @file SortableTable is a React Component wrapper around {@link https://react-table.js.org} ReactTable.
@@ -38,7 +38,6 @@ class SortableTable extends Component {
     }
   }
 
-
   /**
    * @name getMeteorData()
    * @method
@@ -68,8 +67,8 @@ class SortableTable extends Component {
 
     return {
       loading: !pubHandle.ready(),
-      results: results,
-      matchingResults: matchingResults
+      results,
+      matchingResults
     };
   }
 
@@ -144,11 +143,9 @@ class SortableTable extends Component {
     const { columnMetadata } = this.props;
 
     // Add minWidth = undefined to override 100px default set by ReactTable
-    const displayColumns = columnMetadata.map((element) => {
-      return Object.assign({}, element, {
-        minWidth: undefined
-      });
-    });
+    const displayColumns = columnMetadata.map((element) => Object.assign({}, element, {
+      minWidth: undefined
+    }));
 
     return displayColumns;
   }
@@ -253,6 +250,20 @@ class SortableTable extends Component {
     return className;
   }
 
+  /**
+   * @name displayNoResultsFound()
+   * @method
+   * @summary This function displays a 'No Results Found' when there is no data to populate the table
+   * @return {node} returns a JSX node or empty string
+   */
+  displayNoResultsFound() {
+    let displayText = "";
+    if (this.getTableData() === 0) {
+      displayText = <span className="sortableTable-noDataText">{this.props.noDataMessage}</span>;
+    }
+    return displayText;
+  }
+
   renderPaginationBottom = () => {
     if (this.getTableData() === 0) {
       return false;
@@ -288,7 +299,7 @@ class SortableTable extends Component {
           previousText={otherProps.previousText}
           nextText={otherProps.nextText}
           loadingText={otherProps.loadingText}
-          noDataText={() => <span className="sortableTable-noDataText">{this.props.noDataMessage}</span>}
+          noDataText={this.displayNoResultsFound()}
           pageText={otherProps.pageText}
           ofText={otherProps.ofText}
           rowsText={otherProps.rowsText}
@@ -302,7 +313,7 @@ class SortableTable extends Component {
             }
 
             return {
-              onClick: e => { // eslint-disable-line no-unused-vars
+              onClick: (e) => { // eslint-disable-line no-unused-vars
                 this.handleClick(rowInfo);
               },
               className: this.selectedRowsClassName(rowInfo)
@@ -312,6 +323,11 @@ class SortableTable extends Component {
           getTrGroupProps={otherProps.getTrGroupProps}
           getTheadProps={otherProps.getTheadProps}
           getPaginationProps={otherProps.getPaginationProps}
+          pages={otherProps.pages}
+          onPageChange={otherProps.onPageChange}
+          onPageSizeChange={otherProps.onPageSizeChange}
+          page={otherProps.page}
+          manual={otherProps.manual}
         />
       </div>
     );

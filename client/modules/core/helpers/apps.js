@@ -4,53 +4,28 @@ import { Meteor } from "meteor/meteor";
 import { Roles } from "meteor/alanning:roles";
 import { Reaction } from "/client/api";
 import { Packages, Shops } from "/lib/collections";
-import { Registry } from "/lib/collections/schemas/registry";
-
 
 /**
- *
- * reactionApps
- *   provides="<where matching registry provides is this >"
- *   enabled=true <false for disabled packages>
- *   context= true filter templates to current route
- *   returns matching package registry objects
- *   @example {{#each reactionApps provides="settings" name=packageName container=container}}
- *   @example {{#each reactionApps provides="userAccountDropdown" enabled=true}}
- *   @example
- *     {{#each reactionApps provides="social" name="reaction-social"}}
- *         {{> Template.dynamic template=template data=customSocialSettings }}
- *     {{/each}}
- *
- *   @typedef optionHash
- *   @type {object}
- *   @property {string} name - name of a package.
- *   @property {string} provides -purpose of this package as identified to the registry
- *   @property {string} container - filter registry entries for matching container.
- *   @property {string} shopId - filter to only display results matching shopId, not returned
- *   @property {string} template - filter registry entries for matching template
- *   @type {optionHash}
- *
- *  @return {optionHash} returns an array of filtered, structure reactionApps
- *  [{
- *  	enabled: true
- *   label: "Stripe"
- *   name: "reaction-stripe"
- *   packageId: "QqkGsQCDRhg2LSn8J"
- *   priority: 1
- *   provides: "paymentMethod"
- *   template: "stripePaymentForm"
- *   etc: "additional properties as defined in Packages.registry"
- *   ...
- *  }]
+ * @typedef optionHash
+ * @type {Object}
+ * @property {String} name - name of a package.
+ * @property {String} provides -purpose of this package as identified to the registry
+ * @property {String} container - filter registry entries for matching container.
+ * @property {String} shopId - filter to only display results matching shopId, not returned
+ * @property {String} template - filter registry entries for matching template
  */
 
+/**
+ * @method Apps
+ * @param {optionHash} optionHash Option hash
+ * @return {Object[]} returns an array of filtered, structure reactionApps
+ */
 export function Apps(optionHash) {
   const filter = {};
   const registryFilter = {};
   let key;
   const reactionApps = [];
   let options = {};
-  let shopType;
 
   // allow for object or option.hash
   if (optionHash) {
@@ -67,11 +42,8 @@ export function Apps(optionHash) {
   }
 
   // Get the shop to determine shopType
-  const shop = Shops.findOne({ _id: options.shopId });
-  if (shop) {
-    shopType = shop.shopType;
-  }
-
+  const shop = Shops.findOne({ _id: options.shopId }) || {};
+  const { shopType } = shop;
 
   // remove audience permissions for owner (still needed here for older/legacy calls)
   if (Reaction.hasOwnerAccess() && options.audience) {
@@ -86,7 +58,7 @@ export function Apps(optionHash) {
       const value = options[key];
       if (value) {
         if (!(key === "enabled" || key === "name" || key === "shopId")) {
-          filter["registry." + key] = Array.isArray(options[key]) ? { $in: value } : value;
+          filter[`registry.${key}`] = Array.isArray(options[key]) ? { $in: value } : value;
           registryFilter[key] = value;
         } else {
           // perhaps not the best way to check but lets admin see all packages
@@ -109,7 +81,7 @@ export function Apps(optionHash) {
   // For now, the audience checks (after the Package.find call) filters out the registry items based on permissions. But
   // part of the filtering should have been handled by the Package.find call, if the "audience" filter works as it should.
   Packages.find(filter).forEach((app) => {
-    const matchingRegistry = _.filter(app.registry, function (item) {
+    const matchingRegistry = _.filter(app.registry, (item) => {
       const itemFilter = _.cloneDeep(registryFilter);
 
       // check audience permissions only if they exist as part of optionHash and are part of the registry item
@@ -153,23 +125,17 @@ export function Apps(optionHash) {
         return false;
       }
 
-      const filterKeys = Object.keys(itemFilter);
       // Loop through all keys in the itemFilter
       // each filter item should match exactly with the property in the registry or
       // should be included in the array if that property is an array
-      return filterKeys.every((property) => {
-        // Check to see if the schema for this property is an array
-        // if so, we want to make sure that this item is included in the array
-        if (Array.isArray(Registry._schema[property].type())) {
-          // Check to see if the registry entry is an array.
-          // Legacy registry entries could exist that use a string even when the schema requires an array.
-          if (Array.isArray(item[property])) {
-            return item[property].includes(itemFilter[property]);
-          }
-        }
+      return Object.keys(itemFilter).every((property) => {
+        const filterVal = itemFilter[property];
+        const itemVal = item[property];
 
+        // Check to see if the registry entry is an array.
+        // Legacy registry entries could exist that use a string even when the schema requires an array.
         // If it's not an array, the filter should match exactly
-        return item[property] === itemFilter[property];
+        return Array.isArray(itemVal) ? itemVal.includes(filterVal) : itemVal === filterVal;
       });
     });
 
@@ -179,12 +145,28 @@ export function Apps(optionHash) {
   });
 
   // Sort apps by priority (registry.priority)
-  const sortedApps = reactionApps.sort((a, b) => a.priority - b.priority).slice();
-
-  return sortedApps;
+  return reactionApps.sort((a, b) => a.priority - b.priority).slice();
 }
 
-// Register global template helper
-Template.registerHelper("reactionApps", (optionHash) => {
-  return Reaction.Apps(optionHash);
-});
+/**
+ *
+ * @name reactionApps
+ * @memberof BlazeTemplateHelpers
+ * @summary Return an array of filtered, structured `reactionApps` as a Template Helper
+ * @example {{#each reactionApps provides="settings" name=packageName container=container}}
+ * @example {{#each reactionApps provides="userAccountDropdown" enabled=true}}
+ * @param {optionHash} optionHash Option hash
+ * @return {Object[]} returns an array of filtered, structure reactionApps
+ * ```[{
+ *   enabled: true
+ *   label: "Stripe"
+ *   name: "reaction-stripe"
+ *   packageId: "QqkGsQCDRhg2LSn8J"
+ *   priority: 1
+ *   provides: "paymentMethod"
+ *   template: "stripePaymentForm"
+ *   etc: "additional properties as defined in Packages.registry"
+ *   ...
+ *  }]```
+ */
+Template.registerHelper("reactionApps", (optionHash) => Reaction.Apps(optionHash));

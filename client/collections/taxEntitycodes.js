@@ -1,6 +1,8 @@
 import { Mongo } from "meteor/mongo";
 
 /**
- * Client side collections
+ * @name TaxEntityCodes
+ * @memberof Collections/ClientOnly
+ * @type {MongoCollection}
  */
 export const TaxEntityCodes = new Mongo.Collection(null);

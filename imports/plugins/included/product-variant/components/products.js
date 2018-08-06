@@ -21,7 +21,7 @@ class Products extends Component {
     products: PropTypes.array,
     productsSubscription: PropTypes.object,
     ready: PropTypes.func,
-    showNotFound: PropTypes.bool
+    showNotFound: PropTypes.bool // eslint-disable-line react/boolean-prop-naming
   };
 
   /**
@@ -50,7 +50,7 @@ class Products extends Component {
    * @return {Node} React node containing the `ProductGrid` component.
    */
   renderProductGrid() {
-    const products = this.props.products;
+    const { products } = this.props;
 
     const productsByKey = {};
 

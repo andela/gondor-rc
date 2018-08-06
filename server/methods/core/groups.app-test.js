@@ -1,3 +1,4 @@
+/* eslint prefer-arrow-callback:0 */
 import { Meteor } from "meteor/meteor";
 import { check, Match } from "meteor/check";
 import { Factory } from "meteor/dburles:factory";
@@ -40,7 +41,7 @@ describe("Group test", function () {
     shop = Factory.create("shop");
     user = getUser();
     // make the same user on Meteor.users available on Accounts
-    Accounts.upsert({ _id: user._id }, { $set: { userId: user._id } });
+    Accounts.upsert({ _id: user._id }, { $set: { shopId: shop._id, userId: user._id } });
   });
 
   afterEach(function () {
@@ -51,10 +52,10 @@ describe("Group test", function () {
   });
 
   function spyOnMethod(method, id) {
-    return sandbox.stub(Meteor.server.method_handlers, `group/${method}`, function () {
-      check(arguments, [Match.Any]); // to prevent audit_arguments from complaining
+    return sandbox.stub(Meteor.server.method_handlers, `group/${method}`, function (...args) {
+      check(args, [Match.Any]); // to prevent audit_arguments from complaining
       this.userId = id;
-      return methods[method].apply(this, arguments);
+      return methods[method].apply(this, args);
     });
   }
 

@@ -1,7 +1,7 @@
+import os from "os";
 import _ from "lodash";
 import accounting from "accounting-js";
-import os from "os";
-import moment from "moment";
+import SimpleSchema from "simpl-schema";
 import { Meteor } from "meteor/meteor";
 import { HTTP } from "meteor/http";
 import { check } from "meteor/check";
@@ -9,6 +9,40 @@ import { Shops, Accounts } from "/lib/collections";
 import { TaxCodes } from "/imports/plugins/core/taxes/lib/collections";
 import { Reaction, Logger } from "/server/api";
 import Avalogger from "./avalogger";
+
+const errorDetails = new SimpleSchema({
+  message: {
+    type: String
+  },
+  description: {
+    type: String,
+    optional: true
+  }
+});
+
+// Validate that whenever we return an error, we return the same format
+const ErrorObject = new SimpleSchema({
+  "type": {
+    type: String
+  },
+  "errorCode": {
+    type: Number
+  },
+  "errorDetails": {
+    type: Array,
+    optional: true
+  },
+  "errorDetails.$": {
+    type: errorDetails,
+    optional: true
+  }
+});
+
+let moment;
+async function lazyLoadMoment() {
+  if (moment) return;
+  moment = await import("moment");
+}
 
 const countriesWithRegions = ["US", "CA", "DE", "AU"];
 const requiredFields = ["username", "password", "apiLoginId", "companyCode", "shippingTaxCode"];
@@ -24,15 +58,16 @@ taxCalc.getPackageData = function () {
 /**
  * @summary Get the root URL for REST calls
  * @returns {String} Base url
+ * @private
  */
 function getUrl() {
   const packageData = taxCalc.getPackageData();
-  const { productionMode } = packageData.settings.avalara;
+  const { mode } = packageData.settings.avalara;
   let baseUrl;
-  if (!productionMode) {
-    baseUrl = "https://sandbox-rest.avatax.com/api/v2/";
+  if (mode) {
+    baseUrl = "https://rest.avatax.com/api/v2/";
   } else {
-    baseUrl = "https://rest.avatax.com";
+    baseUrl = "https://sandbox-rest.avatax.com/api/v2/";
   }
   return baseUrl;
 }
@@ -41,6 +76,7 @@ function getUrl() {
  * @summary Verify that we have all required configuration data before attempting to use the API
  * @param {Object} packageData - Package data retrieved from the database
  * @returns {boolean} - isValid Is the current configuration valid
+ * @private
  */
 function checkConfiguration(packageData = taxCalc.getPackageData()) {
   let isValid = true;
@@ -54,7 +90,7 @@ function checkConfiguration(packageData = taxCalc.getPackageData()) {
     }
   }
   if (!isValid) {
-    throw new Meteor.Error("The Avalara package is not configured correctly. Cannot continue");
+    Logger.error("The Avalara package is not configured correctly. Cannot continue");
   }
   return isValid;
 }
@@ -63,6 +99,7 @@ function checkConfiguration(packageData = taxCalc.getPackageData()) {
  * @summary Get the auth info to authenticate to REST API
  * @param {Object} packageData - Optionally pass in packageData if we already have it
  * @returns {String} Username/Password string
+ * @private
  */
 function getAuthData(packageData = taxCalc.getPackageData()) {
   if (checkConfiguration(packageData)) {
@@ -77,6 +114,7 @@ function getAuthData(packageData = taxCalc.getPackageData()) {
  * @summary Get exempt tax settings to pass to REST API
  * @param {String} userId id of user to find settings
  * @returns {Object} containing exemptCode and customerUsageType
+ * @private
  */
 function getTaxSettings(userId) {
   return _.get(Accounts.findOne({ _id: userId }), "taxSettings");
@@ -86,29 +124,51 @@ function getTaxSettings(userId) {
  * @summary: Break Avalara error object into consistent format
  * @param {Object} error The error result from Avalara
  * @returns {Object} Error object with code and errorDetails
+ * @private
  */
 function parseError(error) {
   let errorData;
   // The Avalara API constantly times out, so handle this special case first
-  if (error.code === "ETIMEDOUT") {
-    errorData = { errorCode: 503, errorDetails: { message: "ETIMEDOUT", description: "The request timeod out" } };
-    return errorData;
-  }
-  const errorDetails = [];
-  if (error.response.data.error.details) {
-    const details = error.response.data.error.details;
-    for (const detail of details) {
-      if (detail.severity === "Error") {
-        errorDetails.push({ message: detail.message, description: detail.description });
+  if (error && (error.code === "ETIMEDOUT" || error.code === "ESOCKETTIMEDOUT")) {
+    errorData = {
+      errorCode: 503,
+      type: "apiFailure",
+      errorDetails: [{ message: error.message, description: error.description }]
+    };
+  } else if (error && error.response && error.response.statusCode === 401) {
+    // authentification error
+    errorData = {
+      errorCode: 401,
+      type: "apiFailure",
+      errorDetails: {
+        message: error.message,
+        description: error.description
       }
+    };
+  } else if (error && error.response && error.response.statusCode === 400) {
+    // address validation error
+    if (error.response.data.error.code === "GetTaxError") {
+      errorData = {
+        errorCode: 300,
+        type: "addressError"
+      };
+      errorData.errorDetails = error.response.data.error.details.map((errorDetail) => { // eslint-disable-line
+        return ({ message: errorDetail.message, description: errorDetail.description });
+      });
     }
-    errorData = { errorCode: details[0].number, errorDetails };
   } else {
-    Avalogger.error("Unknown error or error format");
-    throw new Meteor.Error("bad-error", "Unknown error or error format");
+    Logger.error(error, "Unknown Error");
+    Avalogger.error(error, "Unknown error or error format");
+  }
+  const errorObjectContext = ErrorObject.newContext();
+  // No Generic errors ever
+  errorObjectContext.validate(errorData);
+  if (!errorObjectContext.isValid()) {
+    throw new Meteor.Error("invalid-return", "Returning invalid Error results");
   }
   return errorData;
 }
+
 
 /**
  * @summary function to get HTTP data and pass in extra Avalara-specific headers
@@ -116,6 +176,7 @@ function parseError(error) {
  * @param {Object} options - An object of other options
  * @param {Boolean} testCredentials - determines skipping of configuration check
  * @returns {Object} Response from call
+ * @private
  */
 function avaGet(requestUrl, options = {}, testCredentials = true) {
   const logObject = {};
@@ -171,12 +232,25 @@ function avaGet(requestUrl, options = {}, testCredentials = true) {
  * @param {String} requestUrl - The URL to make the request to
  * @param {Object} options - An object of others options, usually data
  * @returns {Object} Response from call
+ * @private
  */
 function avaPost(requestUrl, options) {
   const logObject = {};
   const pkgData = taxCalc.getPackageData();
+  // If package is not configured don't bother making an API call
+  if (!checkConfiguration(pkgData)) {
+    return {
+      error: {
+        errorCode: 400,
+        type: "apiFailure",
+        errorDetails: {
+          message: "API is not configured"
+        }
+      }
+    };
+  }
   const appVersion = Reaction.getAppVersion();
-  const meteorVersion = _.split(Meteor.release, "@")[1];
+  const meteorVersion = Meteor.release.split("@")[1];
   const machineName = os.hostname();
   const avaClient = `Reaction; ${appVersion}; Meteor HTTP; ${meteorVersion}; ${machineName}`;
   const headers = {
@@ -215,6 +289,13 @@ function avaPost(requestUrl, options) {
 }
 
 /**
+ * @namespace Taxes/Avalara/Methods
+ */
+
+/**
+ * @name avalara/getEntityCodes
+ * @method
+ * @memberof Taxes/Avalara/Methods
  * @summary Gets the full list of Avalara-supported entity use codes.
  * @returns {Object[]} API response
  */
@@ -225,7 +306,7 @@ taxCalc.getEntityCodes = function () {
     const result = avaGet(requestUrl);
 
     if (result && result.code === "ETIMEDOUT") {
-      throw new Meteor.Error("Request timed out while populating entity codes.");
+      throw new Meteor.Error("request-timeout", "Request timed out while populating entity codes.");
     }
 
     return _.get(result, "data.value", []);
@@ -233,9 +314,10 @@ taxCalc.getEntityCodes = function () {
   throw new Meteor.Error("bad-configuration", "Avalara package is enabled, but is not properly configured");
 };
 
-// API Methods
-
 /**
+ * @name avalara/calcTaxable
+ * @method
+ * @memberof Taxes/Avalara/Methods
  * @summary Calculate the taxable subtotal for a cart
  * @param {Cart} cart - Cart to calculate subtotal for
  * @returns {Number} Taxable subtotal
@@ -251,6 +333,9 @@ taxCalc.calcTaxable = function (cart) {
 };
 
 /**
+ * @name avalara/addressValidation
+ * @method
+ * @memberof Taxes/Avalara/Methods
  * @summary Validate a particular address
  * @param {Object} address Address to validate
  * @returns {Object} The validated result
@@ -270,7 +355,7 @@ taxCalc.validateAddress = function (address) {
   let messages;
   let validatedAddress = ""; // set default as falsy value
   const errors = [];
-  const addressToValidate  = {
+  const addressToValidate = {
     line1: address.address1,
     city: address.city,
     postalCode: address.postal,
@@ -281,15 +366,30 @@ taxCalc.validateAddress = function (address) {
     // if this is a country with regions, pass in region
     addressToValidate.region = address.region;
   }
-  if (address.line2) {
+  if (address.address2) {
     addressToValidate.line2 = address.address2;
   }
   const baseUrl = getUrl();
   const requestUrl = `${baseUrl}addresses/resolve`;
   const result = avaPost(requestUrl, { data: addressToValidate });
+  // Handle errors where we don't get back an address
+  if (result.error && result.error.type) {
+    if (result.error.type === "apiError") {
+      // If we have a problem with the API there's no reason to tell the customer
+      // so let's consider this unvalidated but move along
+      Logger.error("API error, ignoring address validation");
+    }
+
+    if (result.error.type === "addressError") {
+      // We received a validation error so we need somehow pass this up to the client
+      Logger.info("Address Validation Error");
+      // package up errors
+      return { validatedAddress: {}, errors: [result.error] };
+    }
+  }
   const content = result.data;
   if (content && content.messages) {
-    messages = content.messages;
+    ({ messages } = content);
   }
   if (messages) {
     for (const message of messages) {
@@ -307,13 +407,16 @@ taxCalc.validateAddress = function (address) {
       country: resultAddress.country
     };
     if (resultAddress.line2) {
-      validatedAddress.addresss2 = resultAddress.line2;
+      validatedAddress.address2 = resultAddress.line2;
     }
   }
   return { validatedAddress, errors };
 };
 
 /**
+ * @name avalara/testCredentials
+ * @method
+ * @memberof Taxes/Avalara/Methods
  * @summary Tests supplied Avalara credentials by calling company endpoint
  * @param {Object} credentials callback Callback function for asynchronous execution
  * @param {Boolean} testCredentials To be set as false so avaGet skips config check
@@ -328,7 +431,7 @@ taxCalc.testCredentials = function (credentials, testCredentials = false) {
   const result = avaGet(requestUrl, { auth, timeout: credentials.requestTimeout }, testCredentials);
 
   if (result && result.code === "ETIMEDOUT") {
-    throw new Meteor.Error("Request Timed out. Increase your timeout settings");
+    throw new Meteor.Error("request-timeout", "Request Timed out. Increase your timeout settings");
   }
 
   if (result.statusCode === 200) {
@@ -336,15 +439,15 @@ taxCalc.testCredentials = function (credentials, testCredentials = false) {
       Meteor.call("avalara/getTaxCodes", (error, res) => {
         if (error) {
           if (typeof error === "object") {
-            Meteor.call("logging/logError", "avalara",  error);
+            Meteor.call("logging/logError", "avalara", error);
           } else {
-            Meteor.call("logging/logError", "avalara",  { error });
+            Meteor.call("logging/logError", "avalara", { error });
           }
         } else if (res && Array.isArray(res)) {
-          res.forEach(function (code) {
+          res.forEach((code) => {
             Meteor.call("taxes/insertTaxCodes", Reaction.getShopId(), code, "taxes-avalara", (err) => {
               if (err) {
-                throw new Meteor.Error("Error populating TaxCodes collection", err);
+                throw new Meteor.Error("error-occurred", "Error populating TaxCodes collection", err);
               }
             });
           });
@@ -357,6 +460,9 @@ taxCalc.testCredentials = function (credentials, testCredentials = false) {
 };
 
 /**
+ * @name avalara/getTaxCodes
+ * @method
+ * @memberof Taxes/Avalara/Methods
  * @summary get Avalara Tax Codes
  * @returns {Array} An array of Tax code objects
  */
@@ -374,6 +480,7 @@ taxCalc.getTaxCodes = function () {
  * @summary Translate RC cart into format for submission
  * @param {Object} cart RC cart to send for tax estimate
  * @returns {Object} SalesOrder in Avalara format
+ * @private
  */
 function cartToSalesOrder(cart) {
   const pkgData = taxCalc.getPackageData();
@@ -382,12 +489,13 @@ function cartToSalesOrder(cart) {
   const companyShipping = _.filter(company.addressBook, (o) => o.isShippingDefault)[0];
   const currencyCode = company.currency;
   const cartShipping = cart.getShippingTotal();
+  Promise.await(lazyLoadMoment());
   const cartDate = moment(cart.createdAt).format();
   let lineItems = [];
   if (cart.items) {
-    lineItems = cart.items.map((item) => {
+    lineItems = cart.items.reduce((items, item) => {
       if (item.variants.taxable) {
-        return {
+        const itemObj = {
           number: item._id,
           itemCode: item.productId,
           quantity: item.quantity,
@@ -395,8 +503,10 @@ function cartToSalesOrder(cart) {
           description: item.taxDescription || item.title,
           taxCode: item.variants.taxCode
         };
+        items.push(itemObj);
       }
-    });
+      return items;
+    }, []);
     if (cartShipping) {
       lineItems.push({
         number: "shipping",
@@ -410,11 +520,11 @@ function cartToSalesOrder(cart) {
   }
 
   const salesOrder = {
-    companyCode: companyCode,
+    companyCode,
     type: "SalesOrder",
     customerCode: cart.userId,
     date: cartDate,
-    currencyCode: currencyCode,
+    currencyCode,
     addresses: {
       ShipFrom: {
         line1: companyShipping.address1,
@@ -437,7 +547,7 @@ function cartToSalesOrder(cart) {
 
   // current "coupon code" discount are based at the cart level, and every iten has it's
   // discounted property set to true.
-  if (cart.discount)  {
+  if (cart.discount) {
     salesOrder.discount = accounting.toFixed(cart.discount, 2);
     for (const line of salesOrder.lines) {
       if (line.itemCode !== "shipping") {
@@ -449,16 +559,19 @@ function cartToSalesOrder(cart) {
 }
 
 /**
+ * @name avalara/estimateCart
+ * @method
+ * @memberof Taxes/Avalara/Methods
  * @summary Submit cart for tax calculation
  * @param {Cart} cart Cart object for estimation
  * @param {Function} callback callback when using async version
  * @returns {Object} result Result of SalesOrder call
  */
 taxCalc.estimateCart = function (cart, callback) {
-  check(cart, Reaction.Schemas.Cart);
+  Reaction.Schemas.Cart.validate(cart);
   check(callback, Function);
 
-  if (cart.items && cart.shipping && cart.shipping[0].address) {
+  if (cart.items && cart.shipping && cart.shipping[0] && cart.shipping[0].address) {
     const salesOrder = Object.assign({}, cartToSalesOrder(cart), getTaxSettings(cart.userId));
     const baseUrl = getUrl();
     const requestUrl = `${baseUrl}transactions/create`;
@@ -468,12 +581,18 @@ taxCalc.estimateCart = function (cart, callback) {
     }
     return callback(result);
   }
+  return callback({
+    error: {
+      errorCode: 300
+    }
+  });
 };
 
 /**
  * @summary Translate RC order into format for final submission
  * @param {Object} order RC order to send for tax reporting
  * @returns {Object} SalesOrder in Avalara format
+ * @private
  */
 function orderToSalesInvoice(order) {
   let documentType;
@@ -488,10 +607,11 @@ function orderToSalesInvoice(order) {
   const companyShipping = _.filter(company.addressBook, (o) => o.isShippingDefault)[0];
   const currencyCode = company.currency;
   const orderShipping = order.getShippingTotal();
+  Promise.await(lazyLoadMoment());
   const orderDate = moment(order.createdAt).format();
-  const lineItems = order.items.map((item) => {
+  const lineItems = order.items.reduce((items, item) => {
     if (item.variants.taxable) {
-      return {
+      const itemObj = {
         number: item._id,
         itemCode: item.productId,
         quantity: item.quantity,
@@ -499,8 +619,11 @@ function orderToSalesInvoice(order) {
         description: item.taxDescription || item.title,
         taxCode: item.variants.taxCode
       };
+      items.push(itemObj);
     }
-  });
+    return items;
+  }, []);
+
   if (orderShipping) {
     lineItems.push({
       number: "shipping",
@@ -513,13 +636,13 @@ function orderToSalesInvoice(order) {
   }
 
   const salesInvoice = {
-    companyCode: companyCode,
+    companyCode,
     type: documentType,
     commit: commitDocuments,
     code: order._id,
     customerCode: order.userId,
     date: orderDate,
-    currencyCode: currencyCode,
+    currencyCode,
     addresses: {
       ShipFrom: {
         line1: companyShipping.address1,
@@ -540,7 +663,7 @@ function orderToSalesInvoice(order) {
     lines: lineItems
   };
 
-  if (order.discount)  {
+  if (order.discount) {
     salesInvoice.discount = accounting.toFixed(order.discount, 2);
     for (const line of salesInvoice.lines) {
       if (line.itemCode !== "shipping") {
@@ -552,6 +675,9 @@ function orderToSalesInvoice(order) {
 }
 
 /**
+ * @name avalara/recordOrder
+ * @method
+ * @memberof Taxes/Avalara/Methods
  * @summary Submit order for tax reporting
  * @param {Order} order Order object for submission
  * @param {Function} callback callback when using async version
@@ -575,6 +701,9 @@ taxCalc.recordOrder = function (order, callback) {
 };
 
 /**
+ * @name avalara/reportRefund
+ * @method
+ * @memberof Taxes/Avalara/Methods
  * @summary Report refund to Avalara
  * @param {Order} order - The original order the refund was against
  * @param {Number} refundAmount - Amount to be refunded
@@ -592,23 +721,24 @@ taxCalc.reportRefund = function (order, refundAmount, callback) {
   const baseUrl = getUrl();
   const requestUrl = `${baseUrl}transactions/create`;
   const returnAmount = refundAmount * -1;
+  Promise.await(lazyLoadMoment());
   const orderDate = moment(order.createdAt);
   const refundDate = moment();
   const refundReference = `${order.cartId}:${refundDate}`;
-  const  lineItems = {
+  const lineItems = {
     number: "01",
     quantity: 1,
     amount: returnAmount,
     description: "refund"
   };
   const returnInvoice = {
-    companyCode: companyCode,
+    companyCode,
     type: "ReturnInvoice",
     code: refundReference,
     commit: true,
     customerCode: order._id,
     date: refundDate,
-    currencyCode: currencyCode,
+    currencyCode,
     addresses: {
       ShipFrom: {
         line1: companyShipping.address1,

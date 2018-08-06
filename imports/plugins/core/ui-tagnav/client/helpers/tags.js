@@ -6,7 +6,8 @@ import { Session } from "meteor/session";
 import { Template } from "meteor/templating";
 
 /**
- * Reaction TagNav shared helpers
+ * @memberof Helpers
+ * @summary Reaction TagNav shared helpers
  * @type {Object}
  */
 export const TagHelpers = {
@@ -25,11 +26,7 @@ export const TagHelpers = {
         }
       }).fetch();
 
-      const subTags = parentTag.relatedTagIds.map((tagId) => {
-        return _.find(tags, (tagObject) => {
-          return tagObject._id === tagId;
-        });
-      });
+      const subTags = parentTag.relatedTagIds.map((tagId) => _.find(tags, (tagObject) => tagObject._id === tagId));
 
       return subTags;
     }
@@ -90,21 +87,19 @@ export const TagHelpers = {
       parentTagId = parentTag._id;
     }
 
-    Meteor.call("shop/updateHeaderTags", tagName, null, parentTagId,
-      function (error) {
-        if (error) {
-          Alerts.toast(i18next.t("productDetail.tagExists"), "error");
-        }
-      });
+    Meteor.call("shop/updateHeaderTags", tagName, null, parentTagId, (error) => {
+      if (error) {
+        Alerts.toast(i18next.t("productDetail.tagExists"), "error");
+      }
+    });
   },
 
   updateTag(tagId, tagName, parentTagId) {
-    Meteor.call("shop/updateHeaderTags", tagName, tagId, parentTagId,
-      function (error) {
-        if (error) {
-          Alerts.toast(i18next.t("productDetail.tagExists"), "error");
-        }
-      });
+    Meteor.call("shop/updateHeaderTags", tagName, tagId, parentTagId, (error) => {
+      if (error) {
+        Alerts.toast(i18next.t("productDetail.tagExists"), "error");
+      }
+    });
   },
 
   /* eslint no-unused-vars: 0 */
@@ -114,24 +109,20 @@ export const TagHelpers = {
   moveTagToNewParent(movedTagId, toListId, toIndex, ofList) {
     if (movedTagId) {
       if (toListId) {
-        const result = Tags.update(toListId,
-          {
-            $addToSet: {
-              relatedTagIds: movedTagId
-            }
+        const result = Tags.update(toListId, {
+          $addToSet: {
+            relatedTagIds: movedTagId
           }
-        );
+        });
 
         return result;
       }
 
-      const result = Tags.update(movedTagId,
-        {
-          $set: {
-            isTopLevel: true
-          }
+      const result = Tags.update(movedTagId, {
+        $set: {
+          isTopLevel: true
         }
-      );
+      });
 
       return result;
     }
@@ -162,21 +153,17 @@ export const TagHelpers = {
 
   removeTag(tag, parentTag) {
     if (_.isEmpty(parentTag) === false) {
-      Tags.update(parentTag._id,
-        {
-          $pullAll: {
-            relatedTagIds: [tag._id]
-          }
+      Tags.update(parentTag._id, {
+        $pullAll: {
+          relatedTagIds: [tag._id]
         }
-      );
+      });
     } else if (tag.isTopLevel === true) {
-      Tags.update(tag._id,
-        {
-          $set: {
-            isTopLevel: false
-          }
+      Tags.update(tag._id, {
+        $set: {
+          isTopLevel: false
         }
-      );
+      });
     }
   },
 
@@ -193,14 +180,19 @@ export const TagHelpers = {
       };
     }
 
-    const tags = Tags.find(selector).map((tag) => {
-      return {
-        label: tag.name
-      };
-    });
+    const tags = Tags.find(selector).map((tag) => ({
+      label: tag.name
+    }));
 
     return tags;
   }
 };
 
+/**
+ * @method reactionSubTags
+ * @summary Template method to return subTags
+ * @param parentTag {Object} Tag
+ * @return {Array} Array of subtags or empty Array
+ * @memberof BlazeTemplateHelpers
+ */
 Template.registerHelper("reactionSubTags", TagHelpers.subTags);

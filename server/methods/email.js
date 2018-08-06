@@ -9,14 +9,14 @@ import { Logger, Reaction } from "/server/api";
  * Run these methods using `Meteor.call()`
  *
  * @example Meteor.call("emails/retryFailed", email._id, (err)
- * @namespace Methods/Email
+ * @namespace Email/Methods
 */
 Meteor.methods({
   /**
    * @name email/verifySettings
    * @method
    * @summary Verify the current email configuration
-   * @memberof Methods/Email
+   * @memberof Email/Methods
    * @param {Object} settings - optional settings object (otherwise uses settings in database)
    * @return {Boolean} - returns true if SMTP connection succeeds
    */
@@ -71,7 +71,7 @@ Meteor.methods({
    * @name email/saveSettings
    * @method
    * @summary Save new email configuration
-   * @memberof Methods/Email
+   * @memberof Email/Methods
    * @param {Object} settings - mail provider settings
    * @return {Boolean} - returns true if update succeeds
    */
@@ -106,21 +106,36 @@ Meteor.methods({
    * @name email/retryFailed
    * @method
    * @summary Retry a failed or cancelled email job
-   * @memberof Methods/Email
+   * @memberof Email/Methods
    * @param {String} jobId - a sendEmail job ID
    * @return {Boolean} - returns true if job is successfully restarted
    */
   "emails/retryFailed"(jobId) {
-    if (!Reaction.hasPermission(["owner", "admin", "dashboard"], this.userId)) {
+    if (!Reaction.hasPermission(["owner", "admin", "reaction-email"], this.userId)) {
       Logger.error("email/retryFailed: Access Denied");
       throw new Meteor.Error("access-denied", "Access Denied");
     }
 
     check(jobId, String);
+    let emailJobId = jobId;
 
     Logger.debug(`emails/retryFailed - restarting email job "${jobId}"`);
 
-    Jobs.update({ _id: jobId }, {
+    // Get email job to retry
+    const job = Jobs.getJob(jobId);
+    // If this job was never completed, restart it and set it to "ready"
+    if (job._doc.status !== "completed") {
+      job.restart();
+      job.ready();
+    } else {
+      // Otherwise rerun the completed job
+      // `rerun` clones the job and returns the id.
+      // We'll set the new one to ready
+      emailJobId = job.rerun(); // Clone job to rerun
+    }
+
+    // Set the job status to ready to trigger the Jobs observer to trigger sendEmail
+    Jobs.update({ _id: emailJobId }, {
       $set: {
         status: "ready"
       }

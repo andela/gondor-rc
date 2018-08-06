@@ -1,4 +1,4 @@
-import { composeWithTracker, registerComponent } from  "@reactioncommerce/reaction-components";
+import { composeWithTracker, registerComponent } from "@reactioncommerce/reaction-components";
 import { Meteor } from "meteor/meteor";
 import { Shops } from "/lib/collections";
 import { Reaction } from "/client/api";
@@ -9,17 +9,19 @@ const onWorkflowChange = (shopId, value) => {
 };
 
 const composer = (props, onData) => {
-  // Get all shops, excluding the primary shop
-  const shops = Shops.find({
-    _id: {
-      $nin: [Reaction.getPrimaryShopId()]
-    }
-  }).fetch();
+  // Subscribe to merchant shops and get all shops (excluding the primary shop) if subscription is ready
+  if (Meteor.subscribe("MerchantShops").ready()) {
+    const shops = Shops.find({
+      _id: {
+        $nin: [Reaction.getPrimaryShopId()]
+      }
+    }).fetch();
 
-  onData(null, {
-    shops,
-    onWorkflowChange
-  });
+    onData(null, {
+      shops,
+      onWorkflowChange
+    });
+  }
 };
 
 registerComponent("MarketplaceShops", MarketplaceShops, composeWithTracker(composer));

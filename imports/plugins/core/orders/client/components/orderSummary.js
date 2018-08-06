@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import moment from "moment";
+import { withMoment, Components } from "@reactioncommerce/reaction-components";
 import { Badge, ClickToCopy } from "@reactioncommerce/reaction-ui";
-import { getOrderRiskBadge, getOrderRiskStatus, getBillingInfo, getShippingInfo } from "../helpers";
+import { getOrderRiskBadge, getOrderRiskStatus, getBillingInfo, getShippingInfo, getTaxRiskStatus } from "../helpers";
 
 class OrderSummary extends Component {
   static propTypes = {
     dateFormat: PropTypes.func,
+    moment: PropTypes.func,
     order: PropTypes.object,
     printableLabels: PropTypes.func,
     profileShippingAddress: PropTypes.object,
@@ -15,7 +16,7 @@ class OrderSummary extends Component {
   }
 
   badgeStatus() {
-    const order = this.props.order;
+    const { order } = this.props;
     const orderStatus = order && order.workflow && order.workflow.status;
 
     if (orderStatus === "new") {
@@ -44,11 +45,12 @@ class OrderSummary extends Component {
   }
 
   render() {
-    const { dateFormat, tracking, order, profileShippingAddress, printableLabels } = this.props;
+    const { dateFormat, moment, order, profileShippingAddress, printableLabels, tracking } = this.props;
     const paymentMethod = getBillingInfo(order).paymentMethod || {};
     const invoice = getBillingInfo(order).invoice || {};
     const shipmentMethod = getShippingInfo(order).shipmentMethod || {};
-    const orderRisk = getOrderRiskStatus(order);
+    const orderPaymentRisk = getOrderRiskStatus(order);
+    const orderTaxRisk = getTaxRiskStatus(order);
 
     return (
       <div>
@@ -71,14 +73,22 @@ class OrderSummary extends Component {
                 label={order && order.workflow && order.workflow.status}
                 status={this.badgeStatus()}
               />
-              {orderRisk &&
+              {orderPaymentRisk &&
                 <Badge
                   badgeSize="large"
-                  className={`risk-info risk-info-detail ${orderRisk}`}
-                  i18nKeyLabel={`admin.orderRisk.${orderRisk}`}
-                  label={orderRisk}
-                  status={getOrderRiskBadge(orderRisk)}
+                  className={`risk-info risk-info-detail ${orderPaymentRisk}`}
+                  i18nKeyLabel={`admin.orderRisk.${orderPaymentRisk}`}
+                  label={orderPaymentRisk}
+                  status={getOrderRiskBadge(orderPaymentRisk)}
                 />
+              }
+              {orderTaxRisk &&
+                <div className="risk-info risk-tax">
+                  <Components.Translation
+                    i18nKey="admin.orderRisk.orderTaxRisk"
+                    defaultValue="Tax not calulated"
+                  />
+                </div>
               }
             </div>
 
@@ -97,7 +107,7 @@ class OrderSummary extends Component {
             <div className="order-summary-form-group">
               <strong data-i18n="order.created">Created</strong>
               <div className="invoice-details">
-                {moment(order.createdAt).fromNow()} | {dateFormat(order.createdAt, "MM/D/YYYY")}
+                {moment && moment(order.createdAt).fromNow()} | {dateFormat(order.createdAt, "MM/D/YYYY")}
               </div>
             </div>
 
@@ -175,4 +185,4 @@ class OrderSummary extends Component {
   }
 }
 
-export default OrderSummary;
+export default withMoment(OrderSummary);

@@ -10,19 +10,19 @@ class CardHeader extends Component {
   };
 
   static propTypes = {
-    actAsExpander: PropTypes.bool,
+    actAsExpander: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
     children: PropTypes.node,
-    expandOnSwitchOn: PropTypes.bool,
-    expanded: PropTypes.bool,
+    expandOnSwitchOn: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
+    expanded: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
     i18nKeyTitle: PropTypes.string,
     icon: PropTypes.string,
     imageView: PropTypes.node,
     isValid: PropTypes.bool,
     onClick: PropTypes.func,
     onSwitchChange: PropTypes.func,
-    showSwitch: PropTypes.bool,
+    showSwitch: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
     switchName: PropTypes.string,
-    switchOn: PropTypes.bool,
+    switchOn: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
     title: PropTypes.string
   };
 
@@ -121,16 +121,23 @@ class CardHeader extends Component {
       "panel-heading": true,
       "card-header": true,
       "expandable": this.props.actAsExpander,
-      "validation": validation
+      validation
     });
 
     if (this.props.actAsExpander) {
       return (
         <div className={baseClassName}>
-          <div className="content-view" onClick={this.handleClick}>
+          <Components.Button
+            tagName="div"
+            className={{
+              "btn": false,
+              "content-view": true
+            }}
+            onClick={this.handleClick}
+          >
             {this.renderImage()}
             {this.renderTitle()}
-          </div>
+          </Components.Button>
           <div className="action-view">
             {this.renderChildren()}
           </div>

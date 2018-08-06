@@ -40,7 +40,7 @@ class AddToCartButton extends Component {
     if (this.props.editable && this.hasVariants === false) {
       return (
         <Components.Alert>
-          <Components.Translation defaultValue="Add options to enable 'Add to Cart' button" i18nkey="productVariant.addVariantOptions" />
+          <Components.Translation defaultValue="Add options to enable 'Add to Cart' button" i18nKey="productVariant.addVariantOptions" />
         </Components.Alert>
       );
     }
@@ -50,7 +50,7 @@ class AddToCartButton extends Component {
 
 AddToCartButton.propTypes = {
   cartQuantity: PropTypes.number,
-  editable: PropTypes.bool,
+  editable: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   onAddToCart: PropTypes.func,
   onCartQuantityChange: PropTypes.func,
   onClick: PropTypes.func,

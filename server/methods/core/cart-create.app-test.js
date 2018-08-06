@@ -1,7 +1,8 @@
 /* eslint dot-notation: 0 */
+/* eslint prefer-arrow-callback:0 */
+import Random from "@reactioncommerce/random";
 import { Meteor } from "meteor/meteor";
 import { check, Match } from "meteor/check";
-import { Random } from "meteor/random";
 import { Factory } from "meteor/dburles:factory";
 import { Reaction } from "/server/api";
 import { Cart, Products, Accounts } from "/lib/collections";
@@ -18,7 +19,8 @@ describe("Add/Create cart methods", function () {
   const user = Factory.create("user");
   const shop = getShop();
   const userId = user._id;
-  const sessionId = Reaction.sessionId = Random.id();
+  Reaction.sessionId = Random.id();
+  const { sessionId } = Reaction;
   let sandbox;
   let originals;
 
@@ -52,10 +54,10 @@ describe("Add/Create cart methods", function () {
 
 
   function spyOnMethod(method, id) {
-    return sandbox.stub(Meteor.server.method_handlers, `cart/${method}`, function () {
-      check(arguments, [Match.Any]); // to prevent audit_arguments from complaining
+    return sandbox.stub(Meteor.server.method_handlers, `cart/${method}`, function (...args) {
+      check(args, [Match.Any]); // to prevent audit_arguments from complaining
       this.userId = id;
-      return originals[method].apply(this, arguments);
+      return originals[method].apply(this, args);
     });
   }
 
@@ -64,7 +66,7 @@ describe("Add/Create cart methods", function () {
       sandbox.stub(Reaction, "getPrimaryShopId", () => shop._id);
       const cartInsertSpy = sandbox.spy(Cart, "insert");
       const cartId = Meteor.call("cart/createCart", userId, sessionId);
-      const cart = Cart.findOne({ userId: userId });
+      const cart = Cart.findOne({ userId });
       expect(cartInsertSpy).to.have.been.called;
       expect(cartId).to.equal(cart._id);
     });
@@ -84,12 +86,12 @@ describe("Add/Create cart methods", function () {
         return true;
       });
 
-      resetShipmentStub = sinon.stub(Meteor.server.method_handlers, "cart/resetShipmentMethod", function () {
-        check(arguments, [Match.Any]);
+      resetShipmentStub = sinon.stub(Meteor.server.method_handlers, "cart/resetShipmentMethod", function (...args) {
+        check(args, [Match.Any]);
         return true;
       });
-      updateShipmentQuoteStub = sinon.stub(Meteor.server.method_handlers, "shipping/updateShipmentQuotes", function () {
-        check(arguments, [Match.Any]);
+      updateShipmentQuoteStub = sinon.stub(Meteor.server.method_handlers, "shipping/updateShipmentQuotes", function (...args) {
+        check(args, [Match.Any]);
         return true;
       });
 
@@ -115,7 +117,6 @@ describe("Add/Create cart methods", function () {
       const items = cart.items.length;
       spyOnMethod("addToCart", cart.userId);
       Meteor.call("cart/addToCart", productId, variantId, quantity);
-      Meteor._sleepForMs(500);
       cart = Cart.findOne(cart._id);
       expect(cart.items.length).to.equal(items + 1);
       expect(cart.items[cart.items.length - 1].productId).to.equal(productId);
@@ -151,7 +152,7 @@ describe("Add/Create cart methods", function () {
       function addToCartFunc() {
         return Meteor.call("cart/addToCart", "fakeProductId", variantId, quantity);
       }
-      expect(addToCartFunc).to.throw(Meteor.Error, "Product not found [404]");
+      expect(addToCartFunc).to.throw(Meteor.Error, "Product with such id was not found [not-found]");
       return done();
     });
   });
@@ -163,7 +164,7 @@ describe("Add/Create cart methods", function () {
 
     it("should add an email to an anonymous user", function () {
       const cart = Factory.create("cart", {
-        userId: userId,
+        userId,
         email: undefined
       });
 
@@ -280,32 +281,30 @@ describe("Add/Create cart methods", function () {
 
       expect(function () {
         return Meteor.call("cart/unsetAddresses", 123456);
-      }).to.throw;
+      }).to.throw();
 
       expect(function () {
         return Meteor.call("cart/unsetAddresses", {});
-      }).to.throw;
+      }).to.throw();
 
       expect(function () {
         return Meteor.call("cart/unsetAddresses", null);
-      }).to.throw;
+      }).to.throw();
 
       expect(function () {
         return Meteor.call("cart/unsetAddresses");
-      }).to.throw;
+      }).to.throw();
 
       expect(function () {
         return Meteor.call("cart/unsetAddresses", "asdad", 123);
-      }).to.throw;
+      }).to.throw();
 
       // https://github.com/aldeed/meteor-simple-schema/issues/522
       expect(function () {
-        return Meteor.call(
-          "accounts/addressBookRemove", () => {
-            expect(true).to.be.true;
-          }
-        );
-      }).to.not.throw;
+        return Meteor.call("accounts/addressBookRemove", () => {
+          expect(true).to.be.true;
+        });
+      }).to.not.throw();
 
       expect(accountUpdateStub).to.not.have.been.called;
       accountUpdateStub.restore();

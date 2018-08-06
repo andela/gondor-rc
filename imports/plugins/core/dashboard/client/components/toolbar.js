@@ -1,18 +1,17 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Blaze from "meteor/gadicc:blaze-react-component";
+import { Tracker } from "meteor/tracker";
+import { Components } from "@reactioncommerce/reaction-components";
 import {
-  DropDownMenu,
-  MenuItem,
   FlatButton,
-  Toolbar,
-  ToolbarGroup,
   Switch,
   Icon,
   VerticalDivider
 } from "/imports/plugins/core/ui/client/components";
 import { Translatable } from "/imports/plugins/core/ui/client/providers";
 import { Reaction } from "/client/api";
+import ShopSelect from "../components/shopSelect";
 
 class PublishControls extends Component {
   static propTypes = {
@@ -29,14 +28,31 @@ class PublishControls extends Component {
     packageButtons: PropTypes.arrayOf(PropTypes.object),
     shopId: PropTypes.string,
     shops: PropTypes.arrayOf(PropTypes.object),
-    showViewAsControls: PropTypes.bool,
+    showViewAsControls: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
     translation: PropTypes.shape({
       lang: PropTypes.string
     })
   }
 
   static defaultProps = {
-    showViewAsControls: true
+    showViewAsControls: true,
+    isEnabled: true
+  }
+
+  componentDidMount() {
+    // Tracker is used to determine if a user has `hasShopSwitcherAccess` permission
+    // If they do not, set the shop one time, and then not again
+    // If the user does have hasShopSwitcherAccess` permission, shop is set by this.renderShopSelect()
+    this.tracker = Tracker.autorun(() => {
+      if (!Reaction.hasShopSwitcherAccess()) {
+        this.onShopSelectChange(null, Reaction.getSellerShopId());
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    // Unmount the tracker that is checking for `hasShopSwitcherAccess` permission
+    this.tracker.stop();
   }
 
   onViewContextChange = (event, isChecked) => {
@@ -75,29 +91,19 @@ class PublishControls extends Component {
   }
 
   renderShopSelect() {
-    let menuItems;
-    if (Array.isArray(this.props.shops)) {
-      menuItems = this.props.shops.map((shop, index) => {
-        return (
-          <MenuItem
-            label={shop.name}
-            selectLabel={shop.name}
-            value={shop._id}
-            key={index}
-          />
-        );
-      });
+    // If a user has owner, admin, or marketplace permissions for more than one (1) shops
+    // show the shop switcher to allow for easy switching between the shops
+    if (Reaction.hasShopSwitcherAccess()) {
+      return (
+        <ShopSelect
+          onShopSelectChange={this.onShopSelectChange}
+          shopId={this.props.shopId}
+          shops={this.props.shops}
+        />
+      );
     }
 
-    return (
-      <DropDownMenu
-        onChange={this.onShopSelectChange}
-        value={this.props.shopId}
-        closeOnClick={true}
-      >
-        {menuItems}
-      </DropDownMenu>
-    );
+    return null;
   }
 
   renderVisibilitySwitch() {
@@ -119,21 +125,23 @@ class PublishControls extends Component {
 
   renderAdminButton() {
     return (
-      <ToolbarGroup visibleOnMobile={true}>
-        <VerticalDivider key={"divder-2"} />
-        <FlatButton
-          key="dashboard-button"
-          onClick={() => {
-            Reaction.showActionView({
-              i18nKeyTitle: "dashboard.coreTitle",
-              title: "Dashboard",
-              template: "dashboardPackages"
-            });
-          }}
-        >
-          <Icon icon="icon icon-reaction-logo" />
-        </FlatButton>
-      </ToolbarGroup>
+      <div className="hidden-xs">
+        <Components.ToolbarGroup visibleOnMobile={true}>
+          <VerticalDivider key={"divder-2"} />
+          <FlatButton
+            key="dashboard-button"
+            onClick={() => {
+              Reaction.showActionView({
+                i18nKeyTitle: "dashboard.coreTitle",
+                title: "Dashboard",
+                template: "dashboardPackages"
+              });
+            }}
+          >
+            <Icon icon="icon icon-reaction-logo" />
+          </FlatButton>
+        </Components.ToolbarGroup>
+      </div>
     );
   }
 
@@ -154,11 +162,9 @@ class PublishControls extends Component {
 
   renderPackageButons() {
     if (Array.isArray(this.props.packageButtons)) {
-      return this.props.packageButtons.map((packageButton, index) => {
-        return (
-          <FlatButton {...packageButton} key={index} />
-        );
-      });
+      return this.props.packageButtons.map((packageButton, index) => (
+        <FlatButton {...packageButton} key={index} />
+      ));
     }
 
     return null;
@@ -168,7 +174,7 @@ class PublishControls extends Component {
     if (this.props.dashboardHeaderTemplate && this.props.hasCreateProductAccess) {
       if (this.props.isEnabled) {
         return [
-          <VerticalDivider key="customControlsVerticaldivider" />,
+          <div className="hidden-xs" key="customControlsVerticaldivider"><VerticalDivider/></div>,
           <Blaze key="customControls" template={this.props.dashboardHeaderTemplate} />
         ];
       }
@@ -182,18 +188,18 @@ class PublishControls extends Component {
 
   render() {
     return (
-      <Toolbar>
-        <ToolbarGroup firstChild={true}>
+      <Components.Toolbar>
+        <Components.ToolbarGroup firstChild={true}>
           {this.renderVisibilitySwitch()}
           {this.renderShopSelect()}
-        </ToolbarGroup>
-        <ToolbarGroup lastChild={true}>
+        </Components.ToolbarGroup>
+        <Components.ToolbarGroup lastChild={true}>
           {this.renderAddButton()}
           {this.renderPackageButons()}
           {this.renderCustomControls()}
-        </ToolbarGroup>
+        </Components.ToolbarGroup>
         {this.renderAdminButton()}
-      </Toolbar>
+      </Components.Toolbar>
     );
   }
 }

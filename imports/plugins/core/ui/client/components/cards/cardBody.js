@@ -19,8 +19,8 @@ class CardBody extends Component {
 
   static propTypes = {
     children: PropTypes.node,
-    expanded: PropTypes.bool,
-    padded: PropTypes.bool
+    expanded: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
+    padded: PropTypes.bool // eslint-disable-line react/boolean-prop-naming
   };
 
   renderCard() {
@@ -35,7 +35,7 @@ class CardBody extends Component {
         <div
           className={baseClassName}
           style={[
-            this.props.padded === false ? styles.noPadding : void 0
+            this.props.padded === false ? styles.noPadding : undefined
           ]}
         >
           {this.props.children}

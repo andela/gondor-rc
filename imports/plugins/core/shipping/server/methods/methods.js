@@ -6,21 +6,21 @@ import { shippingRoles } from "../lib/roles";
 
 /**
  *
- * @namespace Methods/Shipping
+ * @namespace Shipping/Methods
  */
 
 export const methods = {
   /**
    * @name shipping/status/refresh
    * @method
-   * @memberof Methods/Shipping
+   * @memberof Shipping/Methods
    * @todo This is a stub for future core processing
    * @summary Blank method. Serves as a place for Method Hooks,
    * in other shipping packages, like Shippo
    * @param  {String} orderId order ID
    * @return {String}         order ID
    */
-  "shipping/status/refresh": function (orderId) {
+  "shipping/status/refresh"(orderId) {
     check(orderId, String);
     // this is a stub for future core processing
     // it also serves as a place for Method Hooks
@@ -31,23 +31,23 @@ export const methods = {
   /**
    * @name shipping/provider/toggle
    * @method
-   * @memberof Methods/Shipping
+   * @memberof Shipping/Methods
    * @example Meteor.call("shipping/provider/toggle", packageId, settingsKey)
    * @summary Toggle enabled provider
    * @param { String } packageId packageId
    * @param { String } provider provider name
    * @return { Number } update result
    */
-  "shipping/provider/toggle": function (packageId, provider) {
+  "shipping/provider/toggle"(packageId, provider) {
     check(packageId, String);
     check(provider, String);
     if (!Reaction.hasPermission(shippingRoles)) {
-      throw new Meteor.Error(403, "Access Denied");
+      throw new Meteor.Error("access-denied", "Access Denied");
     }
     const pkg = Packages.findOne(packageId);
     if (pkg && pkg.settings[provider]) {
       const current = Shipping.findOne({ "provider.name": provider });
-      const enabled = pkg.settings[provider].enabled;
+      const { enabled } = pkg.settings[provider];
       // const enabled = !current.provider.enabled;
       if (current && current.provider) {
         return Shipping.update({

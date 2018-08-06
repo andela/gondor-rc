@@ -1,21 +1,21 @@
 import _ from "lodash";
-import Logger from "/client/modules/logger";
-import { Reaction } from "../";
-import * as Collections from "/lib/collections";
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
+import { Reaction } from "/client/api";
+import Logger from "/client/modules/logger";
+import * as Collections from "/lib/collections";
 
 /**
- * reactionTemplate helper
- * use the reactionTemplate helper when you are using templates defined
- * as workflow templates in the package registery.Layout
+ * @name reactionTemplate
+ * @summary use the reactionTemplate helper when you are using templates defined
+ * as workflow templates in the package registry.Layout
  * use "collection" on the layout to indicate a workflow source
- *
- * @summary reactionTemplate provides templates as defined in ReactionRegistry.Layout
+ * @memberof BlazeTemplateHelpers
+ * @description reactionTemplate provides templates as defined in ReactionRegistry.Layout
  * @param {Object} options - workflow defaults to "coreLayout/coreWorkflow"
  * @returns {Array} returns an array with labels, templates that match workflow
  */
-Template.registerHelper("reactionTemplate", function (options) {
+Template.registerHelper("reactionTemplate", (options) => {
   const shopId = options.hash.shopId || Reaction.getShopId();
   // get shop info, defaults to current
   const Shop = Collections.Shops.findOne(shopId);
@@ -69,11 +69,11 @@ Template.registerHelper("reactionTemplate", function (options) {
     layout: {
       $elemMatch: options.hash
     },
-    shopId: shopId
+    shopId
   });
 
   //  we can have multiple packages contributing to the layout / workflow
-  packages.forEach(function (reactionPackage) {
+  packages.forEach((reactionPackage) => {
     const layoutWorkflows = _.filter(reactionPackage.layout, options.hash);
     // check the packages for layout workflow templates
     for (layout of layoutWorkflows) {

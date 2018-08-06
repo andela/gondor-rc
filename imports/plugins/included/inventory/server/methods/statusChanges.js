@@ -30,15 +30,12 @@ import { Logger, Reaction } from "/server/api";
 
 /**
  * @file Methods for Inventory. Run these methods using `Meteor.call()`
- *
- *
- * @namespace Methods/Inventory
 */
 Meteor.methods({
   /**
    * @name inventory/setStatus
    * @method
-   * @memberof Methods/Inventory
+   * @memberof Inventory/Methods
    * @summary Sets status from one status to a new status. Defaults to `new` to `reserved`
    * @example Meteor.call("inventory/backorder", reservation, backOrderQty);
    * @param  {Array} cartItems array of objects of type Schemas.CartItems
@@ -48,8 +45,8 @@ Meteor.methods({
    * @todo move this to bulkOp
    * @return {Number} returns reservationCount
    */
-  "inventory/setStatus": function (cartItems, status, currentStatus, notFoundStatus) {
-    check(cartItems, [Schemas.CartItem]);
+  "inventory/setStatus"(cartItems, status, currentStatus, notFoundStatus) {
+    Schemas.CartItem.validate(cartItems);
     check(status, Match.Optional(String));
     check(currentStatus, Match.Optional(String));
     check(notFoundStatus, Match.Optional(String));
@@ -57,7 +54,7 @@ Meteor.methods({
 
     // check basic user permissions
     // if (!Reaction.hasPermission(["guest", "anonymous"])) {
-    //   throw new Meteor.Error(403, "Access Denied");
+    //   throw new Meteor.Error("access-denied", "Access Denied");
     // }
 
     // set defaults
@@ -125,8 +122,7 @@ Meteor.methods({
       let i = 1;
       while (i < newReservedQty) {
         // updated existing new inventory to be reserved
-        Logger.debug(
-          `updating reservation status ${i} of ${newReservedQty - 1}/${totalRequiredQty} items.`);
+        Logger.debug(`updating reservation status ${i} of ${newReservedQty - 1}/${totalRequiredQty} items.`);
         // we should be updating existing inventory here.
         // backorder process created additional backorder inventory if there
         // wasn't enough.
@@ -141,34 +137,33 @@ Meteor.methods({
             "workflow.status": reservationStatus
           }
         });
-        reservationCount++;
-        i++;
+        reservationCount += 1;
+        i += 1;
       }
     }
-    Logger.debug(
-      `finished creating ${reservationCount} new ${reservationStatus} reservations`);
+    Logger.debug(`finished creating ${reservationCount} new ${reservationStatus} reservations`);
     return reservationCount;
   },
 
   /**
    * @name inventory/clearStatus
    * @method
-   * @memberof Methods/Inventory
+   * @memberof Inventory/Methods
    * @summary Used to reset status on inventory item (defaults to `new`)
    * @param  {Array} cartItems array of objects Schemas.CartItem
    * @param  {Array} status optional reset workflow.status, defaults to `new`
    * @param  {Array} currentStatus optional matching workflow.status, defaults to `reserved`
    * @return {undefined} undefined
    */
-  "inventory/clearStatus": function (cartItems, status, currentStatus) {
-    check(cartItems, [Schemas.CartItem]);
+  "inventory/clearStatus"(cartItems, status, currentStatus) {
+    Schemas.CartItem.validate(cartItems);
     check(status, Match.Optional(String)); // workflow status
     check(currentStatus, Match.Optional(String));
     this.unblock();
 
     // // check basic user permissions
     // if (!Reaction.hasPermission(["guest", "anonymous"])) {
-    //   throw new Meteor.Error(403, "Access Denied");
+    //   throw new Meteor.Error("access-denied", "Access Denied");
     // }
 
     // optional workflow status or default to "new"
@@ -185,9 +180,10 @@ Meteor.methods({
         "orderItemId": item._id,
         "workflow.status": oldStatus
       });
-      let i = existingReservations.count();
+      const reservationsCount = existingReservations.count();
+      let clearCount = item.quantity;
       // reset existing cartItem reservations
-      while (i <= item.quantity) {
+      while (clearCount && reservationsCount) {
         Inventory.update({
           "productId": item.productId,
           "variantId": item.variants._id,
@@ -200,7 +196,8 @@ Meteor.methods({
             "workflow.status": newStatus // reset status
           }
         });
-        i++;
+
+        clearCount -= 1;
       }
     }
     Logger.debug("inventory/clearReserve", newStatus);
@@ -209,14 +206,14 @@ Meteor.methods({
   /**
    * @name inventory/clearReserve
    * @method
-   * @memberof Methods/Inventory
+   * @memberof Inventory/Methods
    * @example Meteor.call("inventory/clearReserve", cart.items)
    * @summary Resets `reserved` items to `new`
    * @param  {Array} cartItems array of objects Schemas.CartItem
    * @return {undefined}
    */
-  "inventory/clearReserve": function (cartItems) {
-    check(cartItems, [Schemas.CartItem]);
+  "inventory/clearReserve"(cartItems) {
+    Schemas.CartItem.validate(cartItems);
     return Meteor.call("inventory/clearStatus", cartItems);
   },
 
@@ -225,12 +222,12 @@ Meteor.methods({
    * @summary Converts new items to reserved, or backorders
    * @method
    * @example Meteor.call("inventory/addReserve", cart.items)
-   * @memberof Methods/Inventory
+   * @memberof Inventory/Methods
    * @param  {Array} cartItems array of objects Schemas.CartItem
    * @return {undefined}
    */
-  "inventory/addReserve": function (cartItems) {
-    check(cartItems, [Schemas.CartItem]);
+  "inventory/addReserve"(cartItems) {
+    Schemas.CartItem.validate(cartItems);
     return Meteor.call("inventory/setStatus", cartItems);
   },
 
@@ -240,13 +237,13 @@ Meteor.methods({
    * but this could be used for inserting any custom inventory.
    * @method
    * A note on DDP Limits: As these are wide open we defined some {@link http://docs.meteor.com/#/full/ddpratelimiter ddp limiting rules}
-   * @memberof Methods/Inventory
+   * @memberof Inventory/Methods
    * @param {Object} reservation Schemas.Inventory
    * @param {Number} backOrderQty number of backorder items to create
    * @returns {Number} number of inserted backorder documents
    */
-  "inventory/backorder": function (reservation, backOrderQty) {
-    check(reservation, Schemas.Inventory);
+  "inventory/backorder"(reservation, backOrderQty) {
+    Schemas.Inventory.validate(reservation);
     check(backOrderQty, Number);
     this.unblock();
 
@@ -262,7 +259,7 @@ Meteor.methods({
 
     // check basic user permissions
     // if (!Reaction.hasPermission(["guest","anonymous"])) {
-    //   throw new Meteor.Error(403, "Access Denied");
+    //   throw new Meteor.Error("access-denied", "Access Denied");
     // }
 
     // set defaults
@@ -280,7 +277,7 @@ Meteor.methods({
       while (i < backOrderQty) {
         const id = Inventory._makeNewID();
         batch.insert(Object.assign({ _id: id }, newReservation));
-        i++;
+        i += 1;
       }
 
       const execute = Meteor.wrapAsync(batch.execute, batch);
@@ -302,13 +299,13 @@ Meteor.methods({
    * @name inventory/lowStock
    * @summary Send low stock warnings
    * @method
-   * @memberof Methods/Inventory
+   * @memberof Inventory/Methods
    * @param  {Object} product object type Product
    * @return {undefined}
    * @todo implement inventory/lowstock calculations
    */
-  "inventory/lowStock": function (product) {
-    check(product, Schemas.Product);
+  "inventory/lowStock"(product) {
+    Schemas.Product.validate(product);
     // placeholder is here to give plugins a place to hook into
     Logger.debug("inventory/lowStock");
   },
@@ -317,12 +314,12 @@ Meteor.methods({
    * @name inventory/remove
    * @summary Delete an inventory item permanently
    * @method
-   * @memberof Methods/Inventory
+   * @memberof Inventory/Methods
    * @param  {Object} inventoryItem object type Schemas.Inventory
    * @return {String} return remove result
    */
-  "inventory/remove": function (inventoryItem) {
-    check(inventoryItem, Schemas.Inventory);
+  "inventory/remove"(inventoryItem) {
+    Schemas.Inventory.validate(inventoryItem);
     // user needs createProduct permission to adjust inventory
     // REVIEW: Should this be checking against shop permissions instead?
 
@@ -331,7 +328,7 @@ Meteor.methods({
     const calledByServer = (this.connection === null && !Meteor.userId());
 
     if (!calledByServer && !Reaction.hasPermission("createProduct", this.userId, inventoryItem.shopId)) {
-      throw new Meteor.Error(403, "Access Denied");
+      throw new Meteor.Error("access-denied", "Access Denied");
     }
     // this.unblock();
     // TODO: add bulkOp here
@@ -343,52 +340,52 @@ Meteor.methods({
   /**
    * @name inventory/shipped
    * @method
-   * @memberof Methods/Inventory
+   * @memberof Inventory/Methods
    * @summary Mark inventory as shipped
    * @param  {Array} cartItems array of objects Schemas.CartItem
    * @return {undefined}
    */
-  "inventory/shipped": function (cartItems) {
-    check(cartItems, [Schemas.CartItem]);
+  "inventory/shipped"(cartItems) {
+    Schemas.CartItem.validate(cartItems);
     return Meteor.call("inventory/setStatus", cartItems, "shipped", "sold");
   },
 
   /**
    * @name inventory/sold
    * @method
-   * @memberof Methods/Inventory
+   * @memberof Inventory/Methods
    * @summary Mark inventory as sold
    * @param  {Array} cartItems array of objects Schemas.CartItem
    * @return {undefined}
    */
-  "inventory/sold": function (cartItems) {
-    check(cartItems, [Schemas.CartItem]);
+  "inventory/sold"(cartItems) {
+    Schemas.CartItem.validate(cartItems);
     return Meteor.call("inventory/setStatus", cartItems, "sold", "reserved");
   },
 
   /**
    * @name inventory/return
    * @method
-   * @memberof Methods/Inventory
+   * @memberof Inventory/Methods
    * @summary Mark inventory as returned
    * @param  {Array} cartItems array of objects Schemas.CartItem
    * @return {undefined}
    */
-  "inventory/return": function (cartItems) {
-    check(cartItems, [Schemas.CartItem]);
+  "inventory/return"(cartItems) {
+    Schemas.CartItem.validate(cartItems);
     return Meteor.call("inventory/setStatus", cartItems, "return");
   },
 
   /**
    * @name inventory/returnToStock
    * @method
-   * @memberof Methods/Inventory
+   * @memberof Inventory/Methods
    * @summary Mark inventory as return and available for sale
    * @param  {Array} cartItems array of objects Schemas.CartItem
    * @return {undefined}
    */
-  "inventory/returnToStock": function (cartItems) {
-    check(cartItems, [Schemas.CartItem]);
+  "inventory/returnToStock"(cartItems) {
+    Schemas.CartItem.validate(cartItems);
     return Meteor.call("inventory/clearStatus", cartItems, "new", "return");
   }
 });

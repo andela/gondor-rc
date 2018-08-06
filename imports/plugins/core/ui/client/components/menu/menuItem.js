@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import classnames from "classnames/dedupe";
 import { Components, registerComponent } from "@reactioncommerce/reaction-components";
 
 class MenuItem extends Component {
@@ -34,32 +33,34 @@ class MenuItem extends Component {
   }
 
   render() {
-    const baseClassName = classnames({
-      "rui": true,
-      "menu-item": true,
-      "disabled": this.props.disabled === true
-    }, this.props.className);
-
     return (
-      <a
-        className={baseClassName}
-        href= "#"
+      <Components.Button
+        tagName="div"
+        className={{
+          "rui": true,
+          "menu-item": true,
+          "flat": false,
+          "btn": false,
+          "btn-default": false,
+          "active": this.props.active,
+          [this.props.className || ""]: true
+        }}
+        disabled={this.props.disabled}
         data-event-action={this.props.eventAction}
         onClick={this.handleClick}
-        role="button"
       >
         {this.renderIcon()}
         {this.renderLabel()}
-      </a>
+      </Components.Button>
     );
   }
 }
 
 MenuItem.propTypes = {
-  active: PropTypes.bool,
+  active: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   children: PropTypes.node,
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  disabled: PropTypes.bool,
+  disabled: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   eventAction: PropTypes.string,
   i18nKeyLabel: PropTypes.string,
   i18nKeySelectedLabel: PropTypes.string,

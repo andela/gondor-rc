@@ -31,12 +31,9 @@ export function getOrderRiskBadge(riskLevel) {
  * @return {string} label - risklevel value (if risklevel is not normal)
  */
 export function getOrderRiskStatus(order) {
-  let riskLevel;
   const billingForShop = order.billing.find((billing) => billing.shopId === Reaction.getShopId());
-
-  if (billingForShop && billingForShop.paymentMethod && billingForShop.paymentMethod.riskLevel) {
-    riskLevel = billingForShop.paymentMethod.riskLevel;
-  }
+  const paymentMethod = (billingForShop && billingForShop.paymentMethod) || {};
+  const { riskLevel } = paymentMethod;
 
   // normal transactions do not need to be flagged
   if (riskLevel === "normal") {
@@ -50,9 +47,21 @@ export function getOrderRiskStatus(order) {
   return riskLevel;
 }
 
+/*
+ * @method getTaxRiskStatus
+ * @private
+ * @summary Gets the tax status of the order.
+ * @param {object} order - order object
+ * @return {boolean} label - true if the tax was not submitted by user.
+ */
+export function getTaxRiskStatus(order) {
+  return order.taxCalculationFailed || order.bypassAddressValidation;
+}
+
 /**
- * filterWorkflowStatus
- *
+ * @name filterWorkflowStatus
+ * @method
+ * @memberof Helpers
  * @summary get query for a given filter
  * @param {String} filter - filter string to check against
  * @return {Object} query for the workflow status
@@ -111,8 +120,8 @@ export function filterWorkflowStatus(filter) {
 }
 
 /**
- * filterShippingStatus
- *
+ * @name filterShippingStatus
+ * @memberof Helpers
  * @summary get query for a given filter
  * @param {String} filter - filter string to check against
  * @return {Object} query for the shipping status
@@ -152,29 +161,25 @@ export function filterShippingStatus(filter) {
 }
 
 /**
- * getBillingInfo
- *
+ * @name getBillingInfo
+ * @memberof Helpers
  * @summary get proper billing object as per current active shop
  * @param {Object} order - order object to check against
  * @return {Object} proper billing object to use
  */
 export function getBillingInfo(order) {
-  const billingInfo = order && order.billing && order.billing.find((billing) => {
-    return billing && (billing.shopId === Reaction.getShopId());
-  });
+  const billingInfo = order && order.billing && order.billing.find((billing) => billing && (billing.shopId === Reaction.getShopId()));
   return billingInfo || {};
 }
 
 /**
- * getShippingInfo
- *
+ * @name getShippingInfo
+ * @memberof Helpers
  * @summary get proper shipping object as per current active shop
  * @param {Object} order - order object to check against
  * @return {Object} proper shipping object to use
  */
 export function getShippingInfo(order) {
-  const shippingInfo = order && order.shipping && order.shipping.find((shipping) => {
-    return shipping && shipping.shopId === Reaction.getShopId();
-  });
+  const shippingInfo = order && order.shipping && order.shipping.find((shipping) => shipping && shipping.shopId === Reaction.getShopId());
   return shippingInfo || {};
 }

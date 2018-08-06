@@ -1,5 +1,9 @@
-import * as BraintreeMethods from "./braintreeMethods";
 import { Meteor } from "meteor/meteor";
+import * as BraintreeMethods from "./braintreeMethods";
+
+/**
+ * @namespace Payment/Braintree/Methods
+ */
 
 Meteor.methods({
   "braintreeSubmit": BraintreeMethods.paymentSubmit,

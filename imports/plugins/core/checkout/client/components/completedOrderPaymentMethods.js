@@ -11,13 +11,14 @@ const creditCardClasses = {
 
 /**
  * @summary Displays one of possibly many payment methods on an order
+ * @memberof Components
  * @param {Object} props - React PropTypes
  * @property {Object} paymentMethod - An object representing the payment method
  * @return {Node} React node containing each payment method
  */
 const CompletedOrderPaymentMethod = ({ paymentMethod }) => {
   // allow i18n override for "processor" label
-  const i18nKey = "checkout.paymentMethod." + paymentMethod.processor;
+  const i18nKey = `checkout.paymentMethod.${paymentMethod.processor}`;
   // display stored card methods
   if (paymentMethod.method === "credit" && paymentMethod.storedCard) {
     const creditCardType = paymentMethod.storedCard.substring(0, 4).toUpperCase();

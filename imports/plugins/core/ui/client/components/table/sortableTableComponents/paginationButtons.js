@@ -5,10 +5,6 @@ import { i18next } from "/client/api";
 
 
 class PaginationButtons extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   renderIcon() {
     const { children } = this.props;
 
@@ -75,7 +71,7 @@ class PaginationButtons extends Component {
 
 PaginationButtons.propTypes = {
   children: PropTypes.string,
-  disabled: PropTypes.bool,
+  disabled: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   onClick: PropTypes.func
 };
 

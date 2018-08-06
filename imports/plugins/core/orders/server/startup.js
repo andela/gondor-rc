@@ -1,33 +1,25 @@
 import { Meteor } from "meteor/meteor";
-import { AnalyticsEvents, Orders } from "/lib/collections";
+import { Hooks } from "/server/api";
 
-
-Orders.before.insert((userId, order) => {
-  const analyticsEvent = {
-    eventType: "buy",
-    value: order._id,
-    label: "bought products"
-  };
-  AnalyticsEvents.insert(analyticsEvent);
-});
 
 /**
 *  Step 3 of the "workflow/pushOrderWorkflow" flow
 *
-*	The following methods are called from Orders.before.update hook.
-*	@see packages/reaction-schema/common/hooks/orders.js
-  * @see packages/reaction-core/common/methods/workflow.js
+*  The following methods are called from Orders.before.update hook.
+*  @see packages/reaction-schema/common/hooks/orders.js
+*  @see packages/reaction-core/common/methods/workflow.js
 */
 
 /**
- * Orders collection before update
- * @param {String} userId - User wanting to update this documen
+ * @summary Updates an order's workflow before persisting order.
+ *
  * @param {Order} order - Order object, before any modifications
- * @param {Array} fieldNames - Array of field names to update
- * @param {Object} modifier - Mongo modifier object
+ * @param {Object} options - Includes userId, modifier and validation
  * @return {Boolean} true if document should be updated, false otherwise
+ * @private
 */
-Orders.before.update((userId, order, fieldNames, modifier) => {
+Hooks.Events.add("beforeUpdateOrderWorkflow", (order, options) => {
+  const { userId, modifier } = options;
   // if we're adding a new product or variant to the cart
   if (modifier.$set) {
     // Updating status of order e.g. "coreOrderWorkflow/processing"

@@ -123,12 +123,9 @@ class VariantList extends Component {
 
     if (this.props.childVariants) {
       childVariants = this.props.childVariants.map((childVariant, index) => {
-        const media = this.props.childVariantMedia.filter((mediaItem) => {
-          if (mediaItem.metadata.variantId === childVariant._id) {
-            return true;
-          }
-          return false;
-        });
+        const media = this.props.childVariantMedia.filter((mediaItem) => (
+          (mediaItem.document.metadata.variantId === childVariant._id)
+        ));
 
         return (
           <Components.EditContainer
@@ -144,6 +141,7 @@ class VariantList extends Component {
             showsVisibilityButton={true}
           >
             <Components.ChildVariant
+              isEditable={this.props.editable}
               isSelected={this.props.variantIsSelected(childVariant._id)}
               media={media}
               onClick={this.handleChildVariantClick}
@@ -184,7 +182,7 @@ VariantList.propTypes = {
   childVariantMedia: PropTypes.arrayOf(PropTypes.any),
   childVariants: PropTypes.arrayOf(PropTypes.object),
   displayPrice: PropTypes.func,
-  editable: PropTypes.bool,
+  editable: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   isSoldOut: PropTypes.func,
   onCreateVariant: PropTypes.func,
   onEditVariant: PropTypes.func,

@@ -12,7 +12,7 @@ import { currencyDep } from "./main";
  * @param {Boolean} useDefaultShopCurrency - flag for displaying shop's currency in Admin view of PDP
  * @return {Object}  user currency or shop currency if none is found
  */
-function findCurrency(defaultCurrency, useDefaultShopCurrency) {
+export function findCurrency(defaultCurrency, useDefaultShopCurrency) {
   const shop = Shops.findOne(Reaction.getPrimaryShopId(), {
     fields: {
       currencies: 1,
@@ -20,11 +20,11 @@ function findCurrency(defaultCurrency, useDefaultShopCurrency) {
     }
   });
 
-  const shopCurrency = shop && shop.currency || "USD";
+  const shopCurrency = (shop && shop.currency) || "USD";
   const user = Accounts.findOne({
     _id: Meteor.userId()
   });
-  const profileCurrency = user.profile && user.profile.currency;
+  const profileCurrency = user && user.profile && user.profile.currency;
   if (typeof shop === "object" && shop.currencies && profileCurrency) {
     let userCurrency = {};
     if (shop.currencies[profileCurrency]) {
@@ -38,7 +38,7 @@ function findCurrency(defaultCurrency, useDefaultShopCurrency) {
     }
     return userCurrency;
   }
-  return shopCurrency;
+  return shop.currencies[shopCurrency];
 }
 
 /**
@@ -76,56 +76,37 @@ export function formatPriceString(formatPrice, useDefaultShopCurrency) {
   // for the cases then we have only one price. It is a number.
   const currentPrice = formatPrice.toString();
   let price = 0;
-  const prices = ~currentPrice.indexOf(" - ") ?
+  const prices = currentPrice.indexOf(" - ") >= 0 ?
     currentPrice.split(" - ") : [currentPrice];
 
   // basic "for" is faster then "for ...of" for arrays. We need more speed here
   const len = prices.length;
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < len; i += 1) {
     const originalPrice = prices[i];
     try {
       // we know the locale, but we don"t know exchange rate. In that case we
       // should return to default shop currency
       if (typeof userCurrency.rate !== "number") {
-        throw new Meteor.Error("exchangeRateUndefined");
+        throw new Meteor.Error("invalid-exchange-rate", "Exchange rate is invalid");
       }
-      prices[i] *= userCurrency.rate;
+      // Only convert for non-admin view.
+      if (!defaultShopCurrency) {
+        prices[i] *= userCurrency.rate;
+      }
 
-      price = _formatPrice(price, originalPrice, prices[i],
-        currentPrice, userCurrency, i, len);
+      price = _formatPrice(
+        price, originalPrice, prices[i],
+        currentPrice, userCurrency, i, len
+      );
     } catch (error) {
       Logger.debug("currency error, fallback to shop currency");
-      price = _formatPrice(price, originalPrice, prices[i],
-        currentPrice, locale.shopCurrency, i, len);
+      price = _formatPrice(
+        price, originalPrice, prices[i],
+        currentPrice, locale.shopCurrency, i, len
+      );
     }
   }
   return price;
-}
-
-/**
- * @name formatNumber
- * @memberof i18n
- * @method
- * @param {String} currentPrice - current Price
- * @return {String} return formatted number
- */
-export function formatNumber(currentPrice) {
-  const locale = Reaction.Locale.get();
-  let price = currentPrice;
-  const format = Object.assign({}, locale.currency, {
-    format: "%v"
-  });
-  const shopFormat = Object.assign({}, locale.shopCurrency, {
-    format: "%v"
-  });
-
-  if (typeof locale.currency === "object" && locale.currency.rate) {
-    price = currentPrice * locale.currency.rate;
-    return accounting.formatMoney(price, format);
-  }
-
-  Logger.debug("currency error, fallback to shop currency");
-  return accounting.formatMoney(currentPrice, shopFormat);
 }
 
 /**
@@ -141,8 +122,10 @@ export function formatNumber(currentPrice) {
  * @param  {Number} len           length
  * @return {Number}               formatted price
  */
-function _formatPrice(price, originalPrice, actualPrice, currentPrice, currency,
-  pos, len) {
+function _formatPrice(
+  price, originalPrice, actualPrice, currentPrice, currency,
+  pos, len
+) {
   // this checking for locale.shopCurrency mostly
   if (typeof currency !== "object") {
     return false;

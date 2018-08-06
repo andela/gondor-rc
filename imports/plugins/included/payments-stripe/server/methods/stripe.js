@@ -1,10 +1,11 @@
 import accounting from "accounting-js";
+import Random from "@reactioncommerce/random";
 import stripeNpm from "stripe";
 import { Meteor } from "meteor/meteor";
 import { check } from "meteor/check";
-import { Random } from "meteor/random";
 import { Reaction, Logger, Hooks } from "/server/api";
 import { Cart, Shops, Accounts, Packages } from "/lib/collections";
+import { PaymentMethodArgument } from "/lib/collections/schemas";
 
 function parseCardData(data) {
   return {
@@ -37,6 +38,7 @@ utils.getStripeApi = function (paymentPackageId) {
  * @summary Capture the results of a previous charge
  * @param {object} paymentMethod - Object containing info about the previous transaction
  * @returns {object} Object indicating the result, saved = true means success
+ * @private
  */
 function stripeCaptureCharge(paymentMethod) {
   let result;
@@ -67,7 +69,7 @@ function stripeCaptureCharge(paymentMethod) {
     Logger.error(error);
     result = {
       saved: false,
-      error: error
+      error
     };
     return { error, result };
   }
@@ -75,14 +77,14 @@ function stripeCaptureCharge(paymentMethod) {
 }
 
 /**
- * normalizes the status of a transaction
- * @method normalizeStatus
+ * @summary normalizes the status of a transaction
  * @param  {object} transaction - The transaction that we need to normalize
  * @return {string} normalized status string - either failed, settled, or created
+ * @private
  */
 function normalizeStatus(transaction) {
   if (!transaction) {
-    throw new Meteor.Error("normalizeStatus requires a transaction");
+    throw new Meteor.Error("invalid-parameter", "normalizeStatus requires a transaction");
   }
 
   // if this transaction failed, mode is "failed"
@@ -100,14 +102,14 @@ function normalizeStatus(transaction) {
 }
 
 /**
- * normalizes the mode of a transaction
- * @method normalizeMode
+ * @summary normalizes the mode of a transaction
  * @param  {object} transaction The transaction that we need to normalize
  * @return {string} normalized status string - either failed, capture, or authorize
+ * @private
  */
 function normalizeMode(transaction) {
   if (!transaction) {
-    throw new Meteor.Error("normalizeMode requires a transaction");
+    throw new Meteor.Error("invalid-parameter", "normalizeMode requires a transaction");
   }
 
   // if this transaction failed, mode is "failed"
@@ -125,15 +127,14 @@ function normalizeMode(transaction) {
 }
 
 /**
- * @method normalizeRiskLevel
- * @private
  * @summary Normalizes the risk level response of a transaction to the values defined in paymentMethod schema
  * @param  {object} transaction - The transaction that we need to normalize
  * @return {string} normalized status string - either elevated, high, or normal
+ * @private
  */
 function normalizeRiskLevel(transaction) {
   if (!transaction) {
-    throw new Meteor.Error("normalizeRiskLevel requires a transaction");
+    throw new Meteor.Error("invalid-parameter", "normalizeRiskLevel requires a transaction");
   }
 
   const outcome = transaction.outcome && transaction.outcome.risk_level;
@@ -154,35 +155,33 @@ function normalizeRiskLevel(transaction) {
 function buildPaymentMethods(options) {
   const { cardData, cartItemsByShop, transactionsByShopId } = options;
   if (!transactionsByShopId) {
-    throw new Meteor.Error("Creating a payment method log requries transaction data");
+    throw new Meteor.Error("invalid-parameter", "Creating a payment method log requries transaction data");
   }
 
   const shopIds = Object.keys(transactionsByShopId);
-  const storedCard = cardData.type.charAt(0).toUpperCase() + cardData.type.slice(1) + " " + cardData.number.slice(-4);
+  const storedCard = `${cardData.type.charAt(0).toUpperCase() + cardData.type.slice(1)} ${cardData.number.slice(-4)}`;
   const paymentMethods = [];
 
 
   shopIds.forEach((shopId) => {
     if (transactionsByShopId[shopId]) {
-      const cartItems = cartItemsByShop[shopId].map((item) => {
-        return {
-          _id: item._id,
-          productId: item.productId,
-          variantId: item.variants._id,
-          shopId: shopId,
-          quantity: item.quantity
-        };
-      });
+      const cartItems = cartItemsByShop[shopId].map((item) => ({
+        _id: item._id,
+        productId: item.productId,
+        variantId: item.variants._id,
+        shopId,
+        quantity: item.quantity
+      }));
 
       // we need to grab this per shop to get the API key
       const packageData = Packages.findOne({
         name: "reaction-stripe",
-        shopId: shopId
+        shopId
       });
 
       const paymentMethod = {
         processor: "Stripe",
-        storedCard: storedCard,
+        storedCard,
         method: "credit",
         paymentPackageId: packageData._id,
         // TODO: REVIEW WITH AARON - why is paymentSettings key important
@@ -196,7 +195,7 @@ function buildPaymentMethods(options) {
         createdAt: new Date(transactionsByShopId[shopId].created),
         transactions: [],
         items: cartItems,
-        shopId: shopId
+        shopId
       };
       paymentMethod.transactions.push(transactionsByShopId[shopId]);
       paymentMethods.push(paymentMethod);
@@ -207,7 +206,7 @@ function buildPaymentMethods(options) {
 }
 
 export const methods = {
-  "stripe/payment/createCharges": async function (transactionType, cardData, cartId) {
+  async "stripe/payment/createCharges"(transactionType, cardData, cartId) {
     check(transactionType, String);
     check(cardData, {
       name: String,
@@ -230,7 +229,7 @@ export const methods = {
 
     if (!stripePkg || !stripePkg.settings || !stripePkg.settings.api_key) {
       // Fail if we can't find a Stripe API key
-      throw new Meteor.Error("Attempted to create multiple stripe charges, but stripe was not configured properly.");
+      throw new Meteor.Error("not-configured", "Attempted to create multiple stripe charges, but stripe was not configured properly.");
     }
 
     const capture = transactionType === "capture";
@@ -243,7 +242,7 @@ export const methods = {
     if (!customerAccount || !Array.isArray(customerAccount.emails)) {
       // TODO: Is it okay to create random email here if anonymous?
       Logger.Error("cart email missing!");
-      throw new Meteor.Error("Email is required for marketplace checkouts.");
+      throw new Meteor.Error("invalid-parameter", "Email is required for marketplace checkouts.");
     }
 
     const defaultEmail = customerAccount.emails.find((email) => email.provides === "default");
@@ -252,7 +251,7 @@ export const methods = {
     } else if (!defaultEmail) {
       customerEmail = cart.email;
     } else {
-      throw new Meteor.Error("Customer does not have default email");
+      throw new Meteor.Error("invalid-parameter", "Customer does not have default email");
     }
 
     // Initialize stripe api lib
@@ -272,14 +271,14 @@ export const methods = {
     // TODO: If there is only one transactionsByShopId and the shopId is primaryShopId -
     // Create a standard charge and bypass creating a customer for this charge
     const primaryShop = Shops.findOne({ _id: primaryShopId });
-    const currency = primaryShop.currency;
+    const { currency } = primaryShop;
 
     try {
       // Creates a customer object, adds a source via the card data
       // and waits for the promise to resolve
       const customer = Promise.await(stripe.customers.create({
         email: customerEmail
-      }).then(function (cust) {
+      }).then((cust) => {
         const customerCard = stripe.customers.createSource(cust.id, { source: { ...card, object: "card" } });
         return customerCard;
       }));
@@ -301,8 +300,8 @@ export const methods = {
         const stripeOptions = {};
         const stripeCharge = {
           amount: formatForStripe(cartTotals[shopId]),
-          capture: capture,
-          currency: currency
+          capture,
+          currency
           // TODO: add product metadata to stripe charge
         };
 
@@ -314,7 +313,7 @@ export const methods = {
           // If this is a merchant shop, we need to tokenize the customer
           // and charge the token with the merchant id
           merchantStripePkg = Reaction.getPackageSettingsWithOptions({
-            shopId: shopId,
+            shopId,
             name: "reaction-stripe"
           });
 
@@ -325,7 +324,7 @@ export const methods = {
             !merchantStripePkg.settings ||
             !merchantStripePkg.settings.connectAuth ||
             !merchantStripePkg.settings.connectAuth.stripe_user_id) {
-            throw new Meteor.Error(`Error processing payment for merchant with shopId ${shopId}`);
+            throw new Meteor.Error("server-error", `Error processing payment for merchant with shopId ${shopId}`);
           }
 
           // get stripe account for this shop
@@ -358,6 +357,7 @@ export const methods = {
            * @param {object} options.shopId the shopId
            * @todo Consider abstracting the application fee out of the Stripe implementation, into core payments
            * @returns {number} the application fee after having been through all hooks (must be returned by ever hook)
+           * @private
            */
           const applicationFee = Hooks.Events.run("onCalculateStripeApplicationFee", coreApplicationFee, {
             cart, // The cart
@@ -408,9 +408,9 @@ export const methods = {
         };
       }
       // If we get an unexpected error, log and return a censored error message
-      Logger.error("Received unexpected error type: " + error.rawType);
+      Logger.error(`Received unexpected error type: ${error.rawType}`);
       Logger.error(error);
-      throw new Meteor.Error("Error creating multiple stripe charges", "An unexpected error occurred");
+      throw new Meteor.Error("server-error", "An unexpected error occurred while creating multiple stripe charges");
     }
   },
   /**
@@ -419,8 +419,11 @@ export const methods = {
    * @param  {Object} paymentMethod A PaymentMethod object
    * @return {Object} results from Stripe normalized
    */
-  "stripe/payment/capture": function (paymentMethod) {
-    check(paymentMethod, Reaction.Schemas.PaymentMethod);
+  "stripe/payment/capture"(paymentMethod) {
+    // Call both check and validate because by calling `clean`, the audit pkg
+    // thinks that we haven't checked paymentMethod arg
+    check(paymentMethod, Object);
+    PaymentMethodArgument.validate(PaymentMethodArgument.clean(paymentMethod));
 
     const captureDetails = {
       amount: formatForStripe(paymentMethod.amount)
@@ -445,10 +448,14 @@ export const methods = {
    * @param  {String} reason refund was issued (currently unused by client)
    * @return {Object} result
    */
-  "stripe/refund/create": function (paymentMethod, amount, reason = "requested_by_customer") {
-    check(paymentMethod, Reaction.Schemas.PaymentMethod);
+  "stripe/refund/create"(paymentMethod, amount, reason = "requested_by_customer") {
     check(amount, Number);
     check(reason, String);
+
+    // Call both check and validate because by calling `clean`, the audit pkg
+    // thinks that we haven't checked paymentMethod arg
+    check(paymentMethod, Object);
+    PaymentMethodArgument.validate(PaymentMethodArgument.clean(paymentMethod));
 
     let result;
     try {
@@ -485,8 +492,12 @@ export const methods = {
    * @param  {Object} paymentMethod object
    * @return {Object} result
    */
-  "stripe/refund/list": function (paymentMethod) {
-    check(paymentMethod, Reaction.Schemas.PaymentMethod);
+  "stripe/refund/list"(paymentMethod) {
+    // Call both check and validate because by calling `clean`, the audit pkg
+    // thinks that we haven't checked paymentMethod arg
+    check(paymentMethod, Object);
+    PaymentMethodArgument.validate(PaymentMethodArgument.clean(paymentMethod));
+
     const stripeKey = utils.getStripeApi(paymentMethod.paymentPackageId);
     const stripe = stripeNpm(stripeKey);
     let refundListResults;

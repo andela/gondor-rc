@@ -5,18 +5,24 @@ import TextareaAutosize from "react-textarea-autosize";
 import { Components, registerComponent } from "@reactioncommerce/reaction-components";
 import { i18next } from "/client/api";
 
+
 class TextField extends Component {
   /**
    * Getter: value
    * @return {String} value for text input
    */
   get value() {
-    return this.props.value || "";
+    // if the props.value is not a number
+    // return either the value or and empty string
+    if (isNaN(this.props.value)) {
+      return this.props.value || "";
+    }
+    return this.props.value;
   }
 
   /**
    * Getter: isValid
-   * @return {Boolean} true/false if field is valid from props.isValid or props.valitation[this.props.name].isValid
+   * @return {Boolean} true/false if field is valid from props.isValid or props.validation[this.props.name].isValid
    */
   get isValid() {
     const { isValid } = this.props;
@@ -50,6 +56,17 @@ class TextField extends Component {
     return undefined;
   }
 
+  getEventValue(event) {
+    if (this.props.type === "number") {
+      try {
+        return Number(event.target.value);
+      } catch (err) {
+        return event.target.value;
+      }
+    }
+    return event.target.value;
+  }
+
   /**
    * onValueChange
    * @summary set the state when the value of the input is changed
@@ -58,7 +75,7 @@ class TextField extends Component {
    */
   onChange = (event) => {
     if (this.props.onChange) {
-      this.props.onChange(event, event.target.value, this.props.name);
+      this.props.onChange(event, this.getEventValue(event), this.props.name);
     }
   }
 
@@ -70,7 +87,7 @@ class TextField extends Component {
    */
   onBlur = (event) => {
     if (this.props.onBlur) {
-      this.props.onBlur(event, event.target.value, this.props.name);
+      this.props.onBlur(event, this.getEventValue(event), this.props.name);
     }
   }
 
@@ -82,7 +99,7 @@ class TextField extends Component {
    */
   onFocus = (event) => {
     if (this.props.onFocus) {
-      this.props.onFocus(event, event.target.value, this.props.name);
+      this.props.onFocus(event, this.getEventValue(event), this.props.name);
     }
   }
 
@@ -122,6 +139,7 @@ class TextField extends Component {
         value={this.value}
         style={this.props.style}
         disabled={this.props.disabled}
+        maxRows={this.props.maxRows}
         id={this.props.id}
       />
     );
@@ -151,6 +169,8 @@ class TextField extends Component {
         placeholder={placeholder}
         ref="input"
         type={this.props.type || "text"}
+        min={this.props.minValue}
+        max={this.props.maxValue}
         value={this.value}
         style={this.props.style}
         disabled={this.props.disabled}
@@ -178,7 +198,7 @@ class TextField extends Component {
   renderLabel() {
     if (this.props.label) {
       return (
-        <label>
+        <label htmlFor={this.props.id}>
           <Components.Translation defaultValue={this.props.label} i18nKey={this.props.i18nKeyLabel} />
         </label>
       );
@@ -194,7 +214,7 @@ class TextField extends Component {
   renderHelpText() {
     const helpMode = this.isHelpMode;
     const message = this.validationMessage;
-    let helpText = this.props.helpText;
+    let { helpText } = this.props;
     let i18nKey = this.props.i18nKeyHelpText;
 
     if (this.isValid === false && message) {
@@ -256,7 +276,7 @@ class TextField extends Component {
 TextField.propTypes = {
   align: PropTypes.oneOf(["left", "center", "right", "justify"]),
   className: PropTypes.string,
-  disabled: PropTypes.bool,
+  disabled: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   helpText: PropTypes.string,
   i18nKeyHelpText: PropTypes.string,
   i18nKeyLabel: PropTypes.string,
@@ -264,7 +284,10 @@ TextField.propTypes = {
   id: PropTypes.string,
   isValid: PropTypes.bool,
   label: PropTypes.string,
-  multiline: PropTypes.bool,
+  maxRows: PropTypes.number,
+  maxValue: PropTypes.any,
+  minValue: PropTypes.number,
+  multiline: PropTypes.bool, // eslint-disable-line react/boolean-prop-naming
   name: PropTypes.string,
   onBlur: PropTypes.func,
   onChange: PropTypes.func,

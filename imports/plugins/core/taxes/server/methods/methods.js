@@ -9,23 +9,23 @@ import { Logger } from "/server/api";
  * @file Methods for Taxes. Run these methods using `Meteor.call()`.
  *
  *
- * @namespace Methods/Taxes
+ * @namespace Taxes/Methods
 */
 
 export const methods = {
   /**
    * @name taxes/deleteRate
    * @method
-   * @memberof Methods/Taxes
+   * @memberof Taxes/Methods
    * @param  {String} taxId tax taxId to delete
    * @return {String} returns update/insert result
    */
-  "taxes/deleteRate": function (taxId) {
+  "taxes/deleteRate"(taxId) {
     check(taxId, String);
 
     // check permissions to delete
     if (!Reaction.hasPermission("taxes")) {
-      throw new Meteor.Error(403, "Access Denied");
+      throw new Meteor.Error("access-denied", "Access Denied");
     }
 
     return Taxes.remove(taxId);
@@ -34,45 +34,58 @@ export const methods = {
   /**
    * @name taxes/addRate
    * @method
-   * @memberof Methods/Taxes
-   * @param  {String} modifier update statement
-   * @param  {String} docId    tax docId
-   * @return {String} returns update/insert result
+   * @memberof Taxes/Methods
+   * @param  {Object} doc A Taxes document to be inserted
+   * @param  {String} [docId] DEPRECATED. Existing ID to trigger an update. Use taxes/editRate method instead.
+   * @return {String} Insert result
    */
-  "taxes/addRate": function (modifier, docId) {
-    check(modifier, Object);
-    check(docId, Match.OneOf(String, null, undefined));
+  "taxes/addRate"(doc, docId) {
+    check(doc, Object); // actual schema validation happens during insert below
 
-    // check permissions to add
-    if (!Reaction.hasPermission("taxes")) {
-      throw new Meteor.Error(403, "Access Denied");
-    }
-    // if no doc, insert
-    if (!docId) {
-      return Taxes.insert(modifier);
-    }
-    // else update and return
-    return Taxes.update(docId, modifier);
+    // Backward compatibility
+    check(docId, Match.Optional(String));
+    if (docId) return Meteor.call("taxes/editRate", { _id: docId, modifier: doc });
+
+    if (!Reaction.hasPermission("taxes")) throw new Meteor.Error("access-denied", "Access Denied");
+    doc.shopId = Reaction.getShopId();
+    return Taxes.insert(doc);
+  },
+
+  /**
+   * @name taxes/editRate
+   * @method
+   * @memberof Taxes/Methods
+   * @param  {Object} details An object with _id and modifier props
+   * @return {String} Update result
+   */
+  "taxes/editRate"(details) {
+    check(details, {
+      _id: String,
+      modifier: Object // actual schema validation happens during update below
+    });
+    if (!Reaction.hasPermission("taxes")) throw new Meteor.Error("access-denied", "Access Denied");
+    const { _id, modifier } = details;
+    return Taxes.update(_id, modifier);
   },
 
   /**
    * @name taxes/setRate
    * @summary Update the cart without hooks
    * @method
-   * @memberof Methods/Taxes
+   * @memberof Taxes/Methods
    * @param  {String} cartId cartId
    * @param  {Number} taxRate taxRate
    * @param  {Object} taxes taxes
    * @return {Number} returns update result
    */
-  "taxes/setRate": function (cartId, taxRate, taxes) {
+  "taxes/setRate"(cartId, taxRate, taxes) {
     check(cartId, String);
     check(taxRate, Number);
     check(taxes, Match.Optional(Array));
 
-    return Cart.direct.update(cartId, {
+    return Cart.update(cartId, {
       $set: {
-        taxes: taxes,
+        taxes,
         tax: taxRate
       }
     });
@@ -81,7 +94,7 @@ export const methods = {
   /**
    * @name taxes/setRateByShopAndItem
    * @method
-   * @memberof Methods/Taxes
+   * @memberof Taxes/Methods
    * @summary Update the cart without hooks
    * @param  {String} cartId cartId
    * @param  {Object} options - Options object
@@ -91,7 +104,7 @@ export const methods = {
    * @param  {Object} options.cartTaxData - Tax data for shop associated with cart.shopId
    * @return {Number} returns update result
    */
-  "taxes/setRateByShopAndItem": function (cartId, options) {
+  "taxes/setRateByShopAndItem"(cartId, options) {
     check(cartId, String);
     check(options, {
       taxRatesByShop: Object,
@@ -102,12 +115,12 @@ export const methods = {
 
     const { cartTaxData, cartTaxRate, itemsWithTax, taxRatesByShop } = options;
 
-    return Cart.direct.update(cartId, {
+    return Cart.update(cartId, {
       $set: {
         taxes: cartTaxData,
         tax: cartTaxRate,
         items: itemsWithTax,
-        taxRatesByShop: taxRatesByShop
+        taxRatesByShop
       }
     });
   },
@@ -115,11 +128,11 @@ export const methods = {
   /**
    * @name taxes/calculate
    * @method
-   * @memberof Methods/Taxes
+   * @memberof Taxes/Methods
    * @param  {String} cartId cartId
    * @return {Object}  returns tax object
    */
-  "taxes/calculate": function (cartId) {
+  "taxes/calculate"(cartId) {
     check(cartId, String);
     const cartToCalc = Cart.findOne(cartId);
     const cartShopId = cartToCalc.shopId;

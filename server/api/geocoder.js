@@ -11,10 +11,9 @@ import { Logger, Reaction } from "/server/api";
  * https://github.com/aldeed/meteor-geocoder
  * The MIT License (MIT)
  * Copyright (c) 2014 Eric Dobbertin
+ * @ignore
  */
 
-//
-// init geocoder
 function GeoCoder(options) {
   let extra;
   const self = this;
@@ -40,13 +39,15 @@ function GeoCoder(options) {
   self.options = _.extend({
     geocoderProvider: "google",
     httpAdapter: "https",
-    extra: extra
+    extra
   }, options || {});
 }
 
 function gc(address, options, callback) {
-  const g = require("node-geocoder")(options.geocoderProvider, options.httpAdapter,
-    options.extra);
+  const g = require("node-geocoder")(
+    options.geocoderProvider, options.httpAdapter,
+    options.extra
+  );
   g.geocode(address, callback);
 }
 
@@ -54,7 +55,7 @@ GeoCoder.prototype.geocode = function geoCoderGeocode(address, callback) {
   let geoCallback = callback;
   let geoAddress = address;
   if (geoCallback) {
-    geoCallback = Meteor.bindEnvironment(geoCallback, function (error) {
+    geoCallback = Meteor.bindEnvironment(geoCallback, (error) => {
       if (error) throw error;
     });
     gc(geoAddress, this.options, geoCallback);
@@ -65,10 +66,12 @@ GeoCoder.prototype.geocode = function geoCoderGeocode(address, callback) {
 };
 
 function rv(lat, lng, options, callback) {
-  const g = require("node-geocoder")(options.geocoderProvider, options.httpAdapter,
-    options.extra);
+  const g = require("node-geocoder")(
+    options.geocoderProvider, options.httpAdapter,
+    options.extra
+  );
   g.reverse({
-    lat: lat,
+    lat,
     lon: lng
   }, callback);
 }
@@ -76,7 +79,7 @@ function rv(lat, lng, options, callback) {
 GeoCoder.prototype.reverse = function geoCoderReverse(lat, lng, callback) {
   let geoCallback = callback;
   if (geoCallback) {
-    geoCallback = Meteor.bindEnvironment(geoCallback, function (error) {
+    geoCallback = Meteor.bindEnvironment(geoCallback, (error) => {
       if (error) throw error;
     });
     rv(lat, lng, this.options, geoCallback);
@@ -117,7 +120,7 @@ GeoCoder.prototype.geoip = function geoCoderGeocode(address, callback) {
   let geoCallback = callback;
   let geoAddress = address;
   if (geoCallback) {
-    geoCallback = Meteor.bindEnvironment(geoCallback, function (error) {
+    geoCallback = Meteor.bindEnvironment(geoCallback, (error) => {
       if (error) throw error;
     });
     gi(geoAddress, this.options, geoCallback);

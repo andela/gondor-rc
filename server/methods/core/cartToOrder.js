@@ -3,13 +3,13 @@ import { Meteor } from "meteor/meteor";
 import { check } from "meteor/check";
 import { Roles } from "meteor/alanning:roles";
 import * as Collections from "/lib/collections";
-import { Logger, Reaction } from "/server/api";
+import { Hooks, Logger, Reaction } from "/server/api";
 
 
 /**
  * @name cart/copyCartToOrder
  * @method
- * @memberof Methods/Cart
+ * @memberof Cart/Methods
  * @summary Transform Cart to Order when a payment is processed.
  * We want to copy the cart over to an order object, and give the user a new empty
  * cart. Reusing the cart schema makes sense, but integrity of the order,
@@ -25,20 +25,20 @@ export function copyCartToOrder(cartId) {
 
   // security check - method can only be called on own cart
   if (cart.userId !== Meteor.userId()) {
-    throw new Meteor.Error(403, "Access Denied");
+    throw new Meteor.Error("access-denied", "Access Denied");
   }
 
   // Init new order object from existing cart
   const order = Object.assign({}, cart);
 
   // get sessionId from cart while cart is fresh
-  const sessionId = cart.sessionId;
+  const { sessionId } = cart;
 
   // If there are no order items, throw an error. We won't create an empty order
   if (!order.items || order.items.length === 0) {
     const msg = "An error occurred saving the order. Missing cart items.";
     Logger.error(msg);
-    throw new Meteor.Error("no-cart-items", msg);
+    throw new Meteor.Error("error-occurred", msg);
   }
 
   // Debug only message to identify the current cartId
@@ -89,14 +89,15 @@ export function copyCartToOrder(cartId) {
     if (order.shipping.length > 0) {
       const shippingRecords = [];
       order.shipping.map((shippingRecord) => {
-        const billingRecord = order.billing.find(billing => billing.shopId === shippingRecord.shopId);
+        const billingRecord = order.billing.find((billing) => billing.shopId === shippingRecord.shopId);
         shippingRecord.paymentId = billingRecord._id;
         shippingRecord.items = [];
         shippingRecord.items.packed = false;
         shippingRecord.items.shipped = false;
         shippingRecord.items.delivered = false;
-        shippingRecord.workflow = { status: "new",  workflow: ["coreOrderWorkflow/notStarted"] };
+        shippingRecord.workflow = { status: "new", workflow: ["coreOrderWorkflow/notStarted"] };
         shippingRecords.push(shippingRecord);
+        return shippingRecords;
       });
       order.shipping = shippingRecords;
     }
@@ -128,11 +129,11 @@ export function copyCartToOrder(cartId) {
   if (!order.billing[0].currency) {
     order.billing[0].currency = {
       // userCurrency is shopCurrency unless user has selected a different currency than the shop
-      userCurrency: userCurrency
+      userCurrency
     };
   }
 
-  order.items = order.items.map(item => {
+  order.items = order.items.map((item) => {
     item.shippingMethod = order.shipping[order.shipping.length - 1];
     item.workflow = {
       status: "new",
@@ -145,23 +146,18 @@ export function copyCartToOrder(cartId) {
   // Assign items to each shipping record based on the shopId of the item
   _.each(order.items, (item) => {
     const shippingRecord = order.shipping.find((sRecord) => sRecord.shopId === item.shopId);
+    const shipmentItem = {
+      _id: item._id,
+      productId: item.productId,
+      quantity: item.quantity,
+      shopId: item.shopId,
+      variantId: item.variants._id
+    };
     // If the shipment exists
     if (shippingRecord.items) {
-      shippingRecord.items.push({
-        _id: item._id,
-        productId: item.productId,
-        shopId: item.shopId,
-        variantId: item.variants._id
-      });
+      shippingRecord.items.push(shipmentItem);
     } else {
-      shippingRecord.items = [
-        {
-          _id: item._id,
-          productId: item.productId,
-          shopId: item.shopId,
-          variantId: item.variants._id
-        }
-      ];
+      shippingRecord.items = [shipmentItem];
     }
   });
 
@@ -171,6 +167,7 @@ export function copyCartToOrder(cartId) {
 
   // insert new reaction order
   const orderId = Collections.Orders.insert(order);
+  Hooks.Events.run("afterOrderInsert", order);
 
   if (orderId) {
     Collections.Cart.remove({
@@ -199,7 +196,7 @@ export function copyCartToOrder(cartId) {
       }
     }
 
-    Logger.info("Transitioned cart " + cartId + " to order " + orderId);
+    Logger.info(`Transitioned cart ${cartId} to order ${orderId}`);
     // catch send notification, we don't want
     // to block because of notification errors
 
@@ -215,7 +212,7 @@ export function copyCartToOrder(cartId) {
     return orderId;
   }
   // we should not have made it here, throw error
-  throw new Meteor.Error(400, "cart/copyCartToOrder: Invalid request");
+  throw new Meteor.Error("bad-request", "cart/copyCartToOrder: Invalid request");
 }
 
 Meteor.methods({
