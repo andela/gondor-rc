@@ -66,6 +66,7 @@
     "meteor-node-stubs": "^0.2.11",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.13",
+    "mongodb": "2.2.36",
     "nexmo": "^2.0.2",
     "nock": "^9.0.14",
     "node-geocoder": "^3.18.0",
@@ -125,7 +126,7 @@
   "devDependencies": {
     "babel-eslint": "^8.0.0",
     "babel-jest": "^21.2.0",
-    "babel-plugin-lodash": "^3.2.11",
+    "babel-plugin-lodash": "3.2.11",
     "babel-plugin-module-resolver": "^2.7.1",
     "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.24.1",

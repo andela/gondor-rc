@@ -1,6 +1,7 @@
 {
   "name": "gondor-rc",
   "scripts": {
+    "postdeploy": "node removePackages.js && curl -n -X DELETE https://api.heroku.com/apps/${HEROKU_APP_NAME}/dynos   -H \"Content-Type: application/json\"   -H \"Accept: application/vnd.heroku+json; version=3\" -H \"Authorization: Bearer ${HEROKU_API_TOKEN}\""
   },
   "env": {
     "BUILDPACK_CLEAR_CACHE": {
