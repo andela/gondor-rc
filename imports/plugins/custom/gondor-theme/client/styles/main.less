@@ -1,0 +1,27 @@
+.admin-shortcut-bar nav .btn.active {
+  outline-color: @rui-brand-dark-disabled;
+}
+
+.btn-default.active {
+  outline-color: @rui-brand-dark-disabled;
+}
+
+.btn-default:focus, .btn-default.focus,
+.btn-default:hover, .btn-default.hover,
+.btn-default:active, .btn-default.active {
+  color: @btn-hover-color;
+  background-color: @rui-default-bg;
+  border-color: @btn-hover-color;
+}
+
+.cart-icon, .cart-icon .badge {
+  background-color: @brand-cta;
+
+  &:hover, &:focus {
+    background-color: @reaction-brand;
+
+    .badge {
+      background-color: @reaction-brand;
+    }
+  }
+}
