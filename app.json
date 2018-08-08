@@ -10,6 +10,12 @@
     "BUILDPACK_PRELAUNCH_METEOR": {
       "required": true
     },
+    "HEROKU_APP_NAME": {
+      "required": true
+    },
+    "HEROKU_PARENT_APP_NAME": {
+      "required": true
+    },
     "BUILDPACK_VERBOSE": {
       "required": true
     },
