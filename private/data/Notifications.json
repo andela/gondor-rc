@@ -1,0 +1,49 @@
+[{
+	"_id": "ZSG7o3HcARFNyJo6S",
+	"type": "newOrder",
+	"to": "Sp97QugDP8HDYnhbs",
+	"url": "/reaction/notifications",
+	"message": "Your order was accepted",
+	"hasDetails": false,
+	"status": "unread",
+	"timeSent": {
+		"$date": "2018-08-08T16:46:38.308Z"
+	}
+},
+{
+	"_id": "wuAM7YJGaWXuE9CFe",
+	"type": "forAdmin",
+	"to": "NewPnhw4gTQ9LewSJ",
+	"url": "/reaction/dashboard/orders",
+	"message": "You have a new order.",
+	"hasDetails": false,
+	"status": "unread",
+	"timeSent": {
+		"$date": "2018-08-08T16:46:38.384Z"
+	}
+},
+{
+	"_id": "FgTqcmQPS4p22SKSv",
+	"type": "newOrder",
+	"to": "Sp97QugDP8HDYnhbs",
+	"url": "/reaction/notifications",
+	"message": "Your order was accepted",
+	"hasDetails": false,
+	"status": "unread",
+	"timeSent": {
+		"$date": "2018-08-08T17:01:21.385Z"
+	}
+},
+{
+	"_id": "nTYo9dLhLrE86hc8t",
+	"type": "forAdmin",
+	"to": "NewPnhw4gTQ9LewSJ",
+	"url": "/reaction/dashboard/orders",
+	"message": "You have a new order.",
+	"hasDetails": false,
+	"status": "unread",
+	"timeSent": {
+		"$date": "2018-08-08T17:01:21.414Z"
+	}
+}]
+

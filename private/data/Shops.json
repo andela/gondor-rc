@@ -509,7 +509,7 @@
       "scale": 0
     }
   },
-  "currency": "USD",
+  "currency": "NGN",
   "languages": [
     {
       "label": "العربية",
@@ -3164,13 +3164,13 @@
       }
     }
   },
-  "name": "Reaction",
+  "name": "Gondor-RC",
   "taxes": [{
     "taxesIncluded": null,
     "taxShipping": null,
     "countyTaxes": true
   }],
-  "timezone": "US/Pacific",
+  "timezone": "UTC+1",
   "baseUOL": "in",
   "unitsOfLength": [{
     "uol": "in",
@@ -3199,14 +3199,14 @@
     "label": "Kilograms"
   }],
   "addressBook": [{
-    "company": "Reaction Commerce",
-    "fullName": "Ongo Works",
-    "address1": "2110 Main Street",
-    "address2": "Suite 207",
-    "city": "Santa Monica",
-    "region": "CA",
+    "company": "Gondor MiddleEarth",
+    "fullName": "Andela Lagos",
+    "address1": "256 Ikorodu Road",
+    "address2": "Epic Tower",
+    "city": "Ilupeju",
+    "region": "LA",
     "postal": "90405",
-    "country": "US",
+    "country": "NG",
     "phone": "8885551212",
     "isCommercial": true,
     "isShippingDefault": true,

@@ -19,6 +19,12 @@
     "BUILDPACK_VERBOSE": {
       "required": true
     },
+    "HEROKU_APP_NAME": {
+      "required": true
+    },
+    "HEROKU_PARENT_APP_NAME": {
+      "required": true
+    },
     "PAPERTRAIL_API_TOKEN": {
       "required": true
     },
