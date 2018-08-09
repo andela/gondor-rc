@@ -1,0 +1,246 @@
+[{
+	"_id": "3uK75LdyLEZHgdqvD",
+	"documentId": "k9AMieQbJCWzrWemj",
+	"documentData": {
+		"ownerId": "bnMKY5ewWDFqvDwtE",
+		"productId": "o29vY35xZy6eZhmkQ",
+		"variantId": "rLHvRSFw4EWELdYt7",
+		"shopId": "J8Bhq3uTtdgwZx3rz",
+		"priority": 0,
+		"toGrid": 1,
+		"workflow": "published"
+	},
+	"documentType": "image",
+	"parentDocument": "o29vY35xZy6eZhmkQ",
+	"changeType": "insert",
+	"workflow": {
+		"status": "revision/published"
+	},
+	"createdAt": {
+		"$date": "2018-08-09T09:32:59.399Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-09T09:33:03.944Z"
+	}
+},
+{
+	"_id": "vY7CYKJgEaEwcQ34T",
+	"documentId": "m6vH3CJgdwN3W4TnL",
+	"documentData": {
+		"ownerId": "bnMKY5ewWDFqvDwtE",
+		"productId": "ekCWSG9gWixeqKF2N",
+		"variantId": "5YagDCtMFZtbFqc84",
+		"shopId": "J8Bhq3uTtdgwZx3rz",
+		"priority": 0,
+		"toGrid": 1,
+		"workflow": "published"
+	},
+	"documentType": "image",
+	"parentDocument": "ekCWSG9gWixeqKF2N",
+	"changeType": "insert",
+	"workflow": {
+		"status": "revision/published"
+	},
+	"createdAt": {
+		"$date": "2018-08-09T09:34:01.355Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-09T09:34:08.961Z"
+	}
+},
+{
+	"_id": "qkmEh5u8Xt6zR3irv",
+	"documentId": "ShBsfEuZuA45Cdkwm",
+	"documentData": {
+		"ownerId": "bnMKY5ewWDFqvDwtE",
+		"productId": "7EzBXjmu98orxct6J",
+		"variantId": "Y4hm4ts5krjv4r3nJ",
+		"shopId": "J8Bhq3uTtdgwZx3rz",
+		"priority": 0,
+		"toGrid": 1,
+		"workflow": "published"
+	},
+	"documentType": "image",
+	"parentDocument": "7EzBXjmu98orxct6J",
+	"changeType": "insert",
+	"workflow": {
+		"status": "revision/published"
+	},
+	"createdAt": {
+		"$date": "2018-08-09T09:34:55.396Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-09T09:34:58.218Z"
+	}
+},
+{
+	"_id": "mLvwkjkjEbmmBfTaJ",
+	"documentId": "S5CfsdoyfCcGANh9f",
+	"documentData": {
+		"_id": "S5CfsdoyfCcGANh9f",
+		"title": "Warmer",
+		"ancestors": [
+			"7EzBXjmu98orxct6J"
+		],
+		"price": 22,
+		"type": "variant",
+		"isVisible": true,
+		"isDeleted": false,
+		"compareAtPrice": 24,
+		"weight": 1,
+		"length": 0,
+		"width": 0,
+		"height": 0,
+		"inventoryManagement": true,
+		"inventoryPolicy": false,
+		"lowInventoryWarningThreshold": 20,
+		"inventoryQuantity": 100,
+		"shopId": "J8Bhq3uTtdgwZx3rz",
+		"taxable": true,
+		"taxCode": "0000",
+		"optionTitle": "Untitled Option",
+		"originCountry": "US",
+		"workflow": {
+			"status": "new"
+		}
+	},
+	"documentType": "product",
+	"createdAt": {
+		"$date": "2018-08-09T09:36:03.503Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-09T09:36:10.366Z"
+	},
+	"workflow": {
+		"status": "revision/update"
+	},
+	"diff": [
+		{
+			"kind": "E",
+			"path": [
+				"price"
+			],
+			"lhs": 20,
+			"rhs": 22
+		},
+		{
+			"kind": "E",
+			"path": [
+				"compareAtPrice"
+			],
+			"lhs": 22,
+			"rhs": 24
+		}
+	]
+},
+{
+	"_id": "uoSbqxg5bMACFh595",
+	"documentId": "7EzBXjmu98orxct6J",
+	"documentData": {
+		"_id": "7EzBXjmu98orxct6J",
+		"title": "Warmer",
+		"type": "simple",
+		"ancestors": [],
+		"shopId": "J8Bhq3uTtdgwZx3rz",
+		"originCountry": "US",
+		"requiresShipping": true,
+		"handle": "warmer",
+		"isDeleted": false,
+		"isVisible": true,
+		"template": "productDetailSimple",
+		"createdAt": {
+			"$date": "2018-08-08T11:59:44.437Z"
+		},
+		"updatedAt": {
+			"$date": "2018-08-09T09:36:03.544Z"
+		},
+		"price": {
+			"range": "22",
+			"min": 22,
+			"max": 22
+		},
+		"workflow": {
+			"status": "new"
+		},
+		"isLowQuantity": false,
+		"isSoldOut": true,
+		"isBackorder": true
+	},
+	"documentType": "product",
+	"createdAt": {
+		"$date": "2018-08-09T09:36:03.557Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-09T09:36:03.581Z"
+	},
+	"workflow": {
+		"status": "revision/update"
+	},
+	"diff": [
+		{
+			"kind": "E",
+			"path": [
+				"updatedAt"
+			],
+			"lhs": {
+				"$date": "2018-08-08T16:50:13.381Z"
+			},
+			"rhs": {
+				"$date": "2018-08-09T09:36:03.544Z"
+			}
+		},
+		{
+			"kind": "E",
+			"path": [
+				"price",
+				"range"
+			],
+			"lhs": "0 - 20",
+			"rhs": "22"
+		},
+		{
+			"kind": "E",
+			"path": [
+				"price",
+				"min"
+			],
+			"lhs": 0,
+			"rhs": 22
+		},
+		{
+			"kind": "E",
+			"path": [
+				"price",
+				"max"
+			],
+			"lhs": 20,
+			"rhs": 22
+		}
+	]
+},
+{
+	"_id": "6LxGSDDjCCDi6KBM5",
+	"documentId": "acQpTQHfjwafTgoiR",
+	"documentData": {
+		"ownerId": "bnMKY5ewWDFqvDwtE",
+		"productId": "7EzBXjmu98orxct6J",
+		"variantId": "S5CfsdoyfCcGANh9f",
+		"shopId": "J8Bhq3uTtdgwZx3rz",
+		"priority": 0,
+		"toGrid": 1,
+		"workflow": "published"
+	},
+	"documentType": "image",
+	"parentDocument": "7EzBXjmu98orxct6J",
+	"changeType": "insert",
+	"workflow": {
+		"status": "revision/update"
+	},
+	"createdAt": {
+		"$date": "2018-08-09T09:36:18.284Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-09T09:36:18.284Z"
+	}
+}]
+

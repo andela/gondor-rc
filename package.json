@@ -66,7 +66,7 @@
     "meteor-node-stubs": "^0.2.11",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.13",
-    "mongodb": "2.2.36",
+    "mongodb": "^2.2.36",
     "nexmo": "^2.0.2",
     "nock": "^9.0.14",
     "node-geocoder": "^3.18.0",

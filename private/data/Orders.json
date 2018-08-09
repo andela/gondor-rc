@@ -1,0 +1,901 @@
+[{
+	"_id": "znDmEjLhoFLfWFPXF",
+	"sessionId": "JFzBCYmkBxcHkFXvv",
+	"userId": "Sp97QugDP8HDYnhbs",
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"workflow": {
+		"status": "new",
+		"workflow": [
+			"coreOrderWorkflow/created"
+		]
+	},
+	"discount": 0,
+	"billing": [
+		{
+			"paymentMethod": {
+				"processor": "Example",
+				"paymentPackageId": "4TRLrNXpbhk4iF4qE",
+				"paymentSettingsKey": "example-paymentmethod",
+				"storedCard": "Mastercard 7657",
+				"method": "credit",
+				"transactionId": "AWjTaMrtDju9gwurZ",
+				"riskLevel": "normal",
+				"currency": "USD",
+				"amount": 42,
+				"status": "created",
+				"mode": "authorize",
+				"createdAt": {
+					"$date": "2018-08-08T16:46:37.946Z"
+				},
+				"transactions": [
+					{
+						"amount": 42,
+						"transactionId": "AWjTaMrtDju9gwurZ",
+						"currency": "USD"
+					}
+				],
+				"workflow": {
+					"status": "new"
+				}
+			},
+			"invoice": {
+				"shipping": "0.00",
+				"subtotal": "42.00",
+				"taxes": "0.00",
+				"discounts": "0.00",
+				"total": "42.00"
+			},
+			"address": {
+				"country": "NG",
+				"fullName": "Tovieye",
+				"address1": "1A Fatai Ayinde St, Off igbajo st,",
+				"address2": "Off Ondo Street, Irawo B/Stop, Ikorodu Road",
+				"postal": "104221",
+				"city": "Ikorodu",
+				"region": "Lagos",
+				"phone": "+447873568370",
+				"isShippingDefault": true,
+				"isBillingDefault": true,
+				"isCommercial": false,
+				"_id": "8cxijL2bqG4vAnkXy",
+				"failedValidation": false
+			},
+			"shopId": "J8Bhq3uTtdgwZx3rz",
+			"_id": "TRme8X9qxJmnYmFod",
+			"currency": {
+				"userCurrency": "USD",
+				"exchangeRate": "1.00"
+			}
+		}
+	],
+	"tax": 0,
+	"items": [
+		{
+			"_id": "BkgPGpoGtT3vd6cby",
+			"shopId": "J8Bhq3uTtdgwZx3rz",
+			"productId": "J5CXabZrP5xdKDdsT",
+			"quantity": 1,
+			"product": {
+				"_id": "J5CXabZrP5xdKDdsT",
+				"title": "Mocassin",
+				"type": "simple",
+				"ancestors": [],
+				"shopId": "J8Bhq3uTtdgwZx3rz",
+				"originCountry": "US",
+				"requiresShipping": true,
+				"handle": "mocassin",
+				"isDeleted": false,
+				"isVisible": true,
+				"template": "productDetailSimple",
+				"createdAt": {
+					"$date": "2018-08-08T16:46:37.937Z"
+				},
+				"updatedAt": {
+					"$date": "2018-08-08T16:46:37.937Z"
+				},
+				"price": {
+					"range": "20",
+					"min": 20,
+					"max": 20
+				},
+				"workflow": {
+					"status": "new"
+				},
+				"isLowQuantity": false,
+				"isSoldOut": true,
+				"isBackorder": true
+			},
+			"variants": {
+				"_id": "Xd4fp6drE9azLub74",
+				"title": "Mocassin",
+				"ancestors": [
+					"J5CXabZrP5xdKDdsT"
+				],
+				"price": 20,
+				"type": "variant",
+				"isVisible": true,
+				"isDeleted": false,
+				"compareAtPrice": 23,
+				"weight": 1,
+				"length": 0,
+				"width": 0,
+				"height": 0,
+				"inventoryManagement": true,
+				"inventoryPolicy": false,
+				"lowInventoryWarningThreshold": 10,
+				"inventoryQuantity": 100,
+				"shopId": "J8Bhq3uTtdgwZx3rz",
+				"taxable": true,
+				"taxCode": "0000",
+				"optionTitle": "Untitled Option",
+				"originCountry": "US",
+				"workflow": {
+					"status": "new"
+				}
+			},
+			"title": "Mocassin",
+			"type": "simple",
+			"parcel": {
+				"weight": 1,
+				"height": 0,
+				"width": 0,
+				"length": 0
+			},
+			"shippingMethod": {
+				"shopId": "J8Bhq3uTtdgwZx3rz",
+				"shipmentQuotes": [
+					{
+						"carrier": "Flat Rate",
+						"method": {
+							"name": "Free",
+							"label": "Free Shipping",
+							"group": "Ground",
+							"handling": 0,
+							"rate": 0,
+							"enabled": true,
+							"_id": "YvNPCB3CXdxKrpmvv",
+							"carrier": "Flat Rate"
+						},
+						"rate": 0,
+						"shopId": "J8Bhq3uTtdgwZx3rz"
+					}
+				],
+				"shipmentQuotesQueryStatus": {
+					"requestStatus": "success",
+					"numOfShippingMethodsFound": 1
+				},
+				"_id": "hTpRhMiy3JZGwuJMr",
+				"address": {
+					"country": "NG",
+					"fullName": "Tovieye",
+					"address1": "1A Fatai Ayinde St, Off igbajo st,",
+					"address2": "Off Ondo Street, Irawo B/Stop, Ikorodu Road",
+					"postal": "104221",
+					"city": "Ikorodu",
+					"region": "Lagos",
+					"phone": "+447873568370",
+					"isShippingDefault": true,
+					"isBillingDefault": true,
+					"isCommercial": false,
+					"_id": "8cxijL2bqG4vAnkXy",
+					"failedValidation": false
+				},
+				"shipmentMethod": {
+					"name": "Free",
+					"label": "Free Shipping",
+					"group": "Ground",
+					"handling": 0,
+					"rate": 0,
+					"enabled": true,
+					"_id": "YvNPCB3CXdxKrpmvv",
+					"carrier": "Flat Rate"
+				},
+				"paymentId": "TRme8X9qxJmnYmFod",
+				"items": [
+					{
+						"_id": "BkgPGpoGtT3vd6cby",
+						"productId": "J5CXabZrP5xdKDdsT",
+						"shopId": "J8Bhq3uTtdgwZx3rz",
+						"variantId": "Xd4fp6drE9azLub74"
+					},
+					{
+						"_id": "kuLqrkmWnxXRD6kRm",
+						"productId": "o29vY35xZy6eZhmkQ",
+						"shopId": "J8Bhq3uTtdgwZx3rz",
+						"variantId": "rLHvRSFw4EWELdYt7"
+					}
+				],
+				"workflow": {
+					"status": "new",
+					"workflow": [
+						"coreOrderWorkflow/notStarted"
+					]
+				}
+			},
+			"workflow": {
+				"status": "new",
+				"workflow": [
+					"coreOrderWorkflow/created"
+				]
+			}
+		},
+		{
+			"_id": "kuLqrkmWnxXRD6kRm",
+			"shopId": "J8Bhq3uTtdgwZx3rz",
+			"productId": "o29vY35xZy6eZhmkQ",
+			"quantity": 1,
+			"product": {
+				"_id": "o29vY35xZy6eZhmkQ",
+				"title": "Sporty",
+				"type": "simple",
+				"ancestors": [],
+				"shopId": "J8Bhq3uTtdgwZx3rz",
+				"originCountry": "US",
+				"requiresShipping": true,
+				"handle": "sporty",
+				"isDeleted": false,
+				"isVisible": true,
+				"template": "productDetailSimple",
+				"createdAt": {
+					"$date": "2018-08-08T16:46:37.937Z"
+				},
+				"updatedAt": {
+					"$date": "2018-08-08T16:46:37.938Z"
+				},
+				"price": {
+					"range": "22",
+					"min": 22,
+					"max": 22
+				},
+				"workflow": {
+					"status": "new"
+				},
+				"isLowQuantity": false,
+				"isSoldOut": true,
+				"isBackorder": true
+			},
+			"variants": {
+				"_id": "rLHvRSFw4EWELdYt7",
+				"title": "Sporty",
+				"ancestors": [
+					"o29vY35xZy6eZhmkQ"
+				],
+				"price": 22,
+				"type": "variant",
+				"isVisible": true,
+				"isDeleted": false,
+				"compareAtPrice": 23,
+				"weight": 1,
+				"length": 0,
+				"width": 0,
+				"height": 0,
+				"inventoryManagement": true,
+				"inventoryPolicy": false,
+				"lowInventoryWarningThreshold": 70,
+				"inventoryQuantity": 80,
+				"shopId": "J8Bhq3uTtdgwZx3rz",
+				"taxable": true,
+				"taxCode": "0000",
+				"optionTitle": "Untitled Option",
+				"originCountry": "US",
+				"workflow": {
+					"status": "new"
+				}
+			},
+			"title": "Sporty",
+			"type": "simple",
+			"parcel": {
+				"weight": 1,
+				"height": 0,
+				"width": 0,
+				"length": 0
+			},
+			"shippingMethod": {
+				"shopId": "J8Bhq3uTtdgwZx3rz",
+				"shipmentQuotes": [
+					{
+						"carrier": "Flat Rate",
+						"method": {
+							"name": "Free",
+							"label": "Free Shipping",
+							"group": "Ground",
+							"handling": 0,
+							"rate": 0,
+							"enabled": true,
+							"_id": "YvNPCB3CXdxKrpmvv",
+							"carrier": "Flat Rate"
+						},
+						"rate": 0,
+						"shopId": "J8Bhq3uTtdgwZx3rz"
+					}
+				],
+				"shipmentQuotesQueryStatus": {
+					"requestStatus": "success",
+					"numOfShippingMethodsFound": 1
+				},
+				"_id": "hTpRhMiy3JZGwuJMr",
+				"address": {
+					"country": "NG",
+					"fullName": "Tovieye",
+					"address1": "1A Fatai Ayinde St, Off igbajo st,",
+					"address2": "Off Ondo Street, Irawo B/Stop, Ikorodu Road",
+					"postal": "104221",
+					"city": "Ikorodu",
+					"region": "Lagos",
+					"phone": "+447873568370",
+					"isShippingDefault": true,
+					"isBillingDefault": true,
+					"isCommercial": false,
+					"_id": "8cxijL2bqG4vAnkXy",
+					"failedValidation": false
+				},
+				"shipmentMethod": {
+					"name": "Free",
+					"label": "Free Shipping",
+					"group": "Ground",
+					"handling": 0,
+					"rate": 0,
+					"enabled": true,
+					"_id": "YvNPCB3CXdxKrpmvv",
+					"carrier": "Flat Rate"
+				},
+				"paymentId": "TRme8X9qxJmnYmFod",
+				"items": [
+					{
+						"_id": "BkgPGpoGtT3vd6cby",
+						"productId": "J5CXabZrP5xdKDdsT",
+						"shopId": "J8Bhq3uTtdgwZx3rz",
+						"variantId": "Xd4fp6drE9azLub74"
+					},
+					{
+						"_id": "kuLqrkmWnxXRD6kRm",
+						"productId": "o29vY35xZy6eZhmkQ",
+						"shopId": "J8Bhq3uTtdgwZx3rz",
+						"variantId": "rLHvRSFw4EWELdYt7"
+					}
+				],
+				"workflow": {
+					"status": "new",
+					"workflow": [
+						"coreOrderWorkflow/notStarted"
+					]
+				}
+			},
+			"workflow": {
+				"status": "new",
+				"workflow": [
+					"coreOrderWorkflow/created"
+				]
+			}
+		}
+	],
+	"shipping": [
+		{
+			"shopId": "J8Bhq3uTtdgwZx3rz",
+			"shipmentQuotes": [
+				{
+					"carrier": "Flat Rate",
+					"method": {
+						"name": "Free",
+						"label": "Free Shipping",
+						"group": "Ground",
+						"handling": 0,
+						"rate": 0,
+						"enabled": true,
+						"_id": "YvNPCB3CXdxKrpmvv",
+						"carrier": "Flat Rate"
+					},
+					"rate": 0,
+					"shopId": "J8Bhq3uTtdgwZx3rz"
+				}
+			],
+			"shipmentQuotesQueryStatus": {
+				"requestStatus": "success",
+				"numOfShippingMethodsFound": 1
+			},
+			"_id": "hTpRhMiy3JZGwuJMr",
+			"address": {
+				"country": "NG",
+				"fullName": "Tovieye",
+				"address1": "1A Fatai Ayinde St, Off igbajo st,",
+				"address2": "Off Ondo Street, Irawo B/Stop, Ikorodu Road",
+				"postal": "104221",
+				"city": "Ikorodu",
+				"region": "Lagos",
+				"phone": "+447873568370",
+				"isShippingDefault": true,
+				"isBillingDefault": true,
+				"isCommercial": false,
+				"_id": "8cxijL2bqG4vAnkXy",
+				"failedValidation": false
+			},
+			"shipmentMethod": {
+				"name": "Free",
+				"label": "Free Shipping",
+				"group": "Ground",
+				"handling": 0,
+				"rate": 0,
+				"enabled": true,
+				"_id": "YvNPCB3CXdxKrpmvv",
+				"carrier": "Flat Rate"
+			},
+			"paymentId": "TRme8X9qxJmnYmFod",
+			"items": [
+				{
+					"_id": "BkgPGpoGtT3vd6cby",
+					"productId": "J5CXabZrP5xdKDdsT",
+					"shopId": "J8Bhq3uTtdgwZx3rz",
+					"variantId": "Xd4fp6drE9azLub74"
+				},
+				{
+					"_id": "kuLqrkmWnxXRD6kRm",
+					"productId": "o29vY35xZy6eZhmkQ",
+					"shopId": "J8Bhq3uTtdgwZx3rz",
+					"variantId": "rLHvRSFw4EWELdYt7"
+				}
+			],
+			"workflow": {
+				"status": "new",
+				"workflow": [
+					"coreOrderWorkflow/notStarted"
+				]
+			}
+		}
+	],
+	"cartId": "6FdbSBZQBNiJisMQH",
+	"email": "tovieye.ozi@andela.com",
+	"createdAt": {
+		"$date": "2018-08-08T16:46:37.930Z"
+	}
+},
+{
+	"_id": "ebyfQYfvpW8rE4z6x",
+	"sessionId": "JFzBCYmkBxcHkFXvv",
+	"userId": "Sp97QugDP8HDYnhbs",
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"workflow": {
+		"status": "new",
+		"workflow": [
+			"coreOrderWorkflow/created"
+		]
+	},
+	"billing": [
+		{
+			"paymentMethod": {
+				"processor": "Example",
+				"paymentPackageId": "4TRLrNXpbhk4iF4qE",
+				"paymentSettingsKey": "example-paymentmethod",
+				"storedCard": "Mastercard 7657",
+				"method": "credit",
+				"transactionId": "EJ5SThR6bBbA5r88o",
+				"riskLevel": "normal",
+				"currency": "USD",
+				"amount": 42,
+				"status": "created",
+				"mode": "authorize",
+				"createdAt": {
+					"$date": "2018-08-08T17:01:20.979Z"
+				},
+				"transactions": [
+					{
+						"amount": 42,
+						"transactionId": "EJ5SThR6bBbA5r88o",
+						"currency": "USD"
+					}
+				],
+				"workflow": {
+					"status": "new"
+				}
+			},
+			"invoice": {
+				"shipping": "0.00",
+				"subtotal": "42.00",
+				"taxes": "0.00",
+				"discounts": "0.00",
+				"total": "42.00"
+			},
+			"address": {
+				"country": "NG",
+				"fullName": "Tovieye",
+				"address1": "1A Fatai Ayinde St, Off igbajo st,",
+				"address2": "Off Ondo Street, Irawo B/Stop, Ikorodu Road",
+				"postal": "104221",
+				"city": "Ikorodu",
+				"region": "Lagos",
+				"phone": "+447873568370",
+				"isShippingDefault": true,
+				"isBillingDefault": true,
+				"isCommercial": false,
+				"_id": "8cxijL2bqG4vAnkXy",
+				"failedValidation": false
+			},
+			"shopId": "J8Bhq3uTtdgwZx3rz",
+			"_id": "QrBg9eFKwv7vHhGK3",
+			"currency": {
+				"userCurrency": "USD",
+				"exchangeRate": "1.00"
+			}
+		}
+	],
+	"discount": 0,
+	"tax": 0,
+	"shipping": [
+		{
+			"address": {
+				"country": "NG",
+				"fullName": "Tovieye",
+				"address1": "1A Fatai Ayinde St, Off igbajo st,",
+				"address2": "Off Ondo Street, Irawo B/Stop, Ikorodu Road",
+				"postal": "104221",
+				"city": "Ikorodu",
+				"region": "Lagos",
+				"phone": "+447873568370",
+				"isShippingDefault": true,
+				"isBillingDefault": true,
+				"isCommercial": false,
+				"_id": "8cxijL2bqG4vAnkXy",
+				"failedValidation": false
+			},
+			"shopId": "J8Bhq3uTtdgwZx3rz",
+			"_id": "DLE2sjMYfrttykHmN",
+			"shipmentQuotesQueryStatus": {
+				"requestStatus": "success",
+				"numOfShippingMethodsFound": 1
+			},
+			"shipmentQuotes": [
+				{
+					"carrier": "Flat Rate",
+					"method": {
+						"name": "Free",
+						"label": "Free Shipping",
+						"group": "Ground",
+						"handling": 0,
+						"rate": 0,
+						"enabled": true,
+						"_id": "YvNPCB3CXdxKrpmvv",
+						"carrier": "Flat Rate"
+					},
+					"rate": 0,
+					"shopId": "J8Bhq3uTtdgwZx3rz"
+				}
+			],
+			"shipmentMethod": {
+				"name": "Free",
+				"label": "Free Shipping",
+				"group": "Ground",
+				"handling": 0,
+				"rate": 0,
+				"enabled": true,
+				"_id": "YvNPCB3CXdxKrpmvv",
+				"carrier": "Flat Rate"
+			},
+			"paymentId": "QrBg9eFKwv7vHhGK3",
+			"items": [
+				{
+					"_id": "p4dNgFvektG7mJMpz",
+					"productId": "ekCWSG9gWixeqKF2N",
+					"shopId": "J8Bhq3uTtdgwZx3rz",
+					"variantId": "5YagDCtMFZtbFqc84"
+				},
+				{
+					"_id": "4dXKWWcR5QPkXG7L7",
+					"productId": "o29vY35xZy6eZhmkQ",
+					"shopId": "J8Bhq3uTtdgwZx3rz",
+					"variantId": "rLHvRSFw4EWELdYt7"
+				}
+			],
+			"workflow": {
+				"status": "new",
+				"workflow": [
+					"coreOrderWorkflow/notStarted"
+				]
+			}
+		}
+	],
+	"items": [
+		{
+			"_id": "p4dNgFvektG7mJMpz",
+			"shopId": "J8Bhq3uTtdgwZx3rz",
+			"productId": "ekCWSG9gWixeqKF2N",
+			"quantity": 1,
+			"product": {
+				"_id": "ekCWSG9gWixeqKF2N",
+				"type": "simple",
+				"ancestors": [],
+				"shopId": "J8Bhq3uTtdgwZx3rz",
+				"title": "Mocassin",
+				"originCountry": "US",
+				"requiresShipping": true,
+				"handle": "mocassin",
+				"isDeleted": false,
+				"isVisible": true,
+				"template": "productDetailSimple",
+				"createdAt": {
+					"$date": "2018-08-08T17:01:20.970Z"
+				},
+				"updatedAt": {
+					"$date": "2018-08-08T17:01:20.971Z"
+				},
+				"price": {
+					"range": "20",
+					"min": 20,
+					"max": 20
+				},
+				"workflow": {
+					"status": "new"
+				},
+				"isLowQuantity": false,
+				"isSoldOut": true,
+				"isBackorder": true
+			},
+			"variants": {
+				"_id": "5YagDCtMFZtbFqc84",
+				"ancestors": [
+					"ekCWSG9gWixeqKF2N"
+				],
+				"price": 20,
+				"type": "variant",
+				"isVisible": true,
+				"isDeleted": false,
+				"compareAtPrice": 22,
+				"weight": 1,
+				"length": 0,
+				"width": 0,
+				"height": 0,
+				"inventoryManagement": true,
+				"inventoryPolicy": false,
+				"lowInventoryWarningThreshold": 10,
+				"inventoryQuantity": 100,
+				"shopId": "J8Bhq3uTtdgwZx3rz",
+				"taxable": true,
+				"taxCode": "0000",
+				"title": "Mocassin",
+				"optionTitle": "Untitled Option",
+				"originCountry": "US",
+				"workflow": {
+					"status": "new"
+				}
+			},
+			"title": "Mocassin",
+			"type": "simple",
+			"parcel": {
+				"weight": 1,
+				"height": 0,
+				"width": 0,
+				"length": 0
+			},
+			"shippingMethod": {
+				"address": {
+					"country": "NG",
+					"fullName": "Tovieye",
+					"address1": "1A Fatai Ayinde St, Off igbajo st,",
+					"address2": "Off Ondo Street, Irawo B/Stop, Ikorodu Road",
+					"postal": "104221",
+					"city": "Ikorodu",
+					"region": "Lagos",
+					"phone": "+447873568370",
+					"isShippingDefault": true,
+					"isBillingDefault": true,
+					"isCommercial": false,
+					"_id": "8cxijL2bqG4vAnkXy",
+					"failedValidation": false
+				},
+				"shopId": "J8Bhq3uTtdgwZx3rz",
+				"_id": "DLE2sjMYfrttykHmN",
+				"shipmentQuotesQueryStatus": {
+					"requestStatus": "success",
+					"numOfShippingMethodsFound": 1
+				},
+				"shipmentQuotes": [
+					{
+						"carrier": "Flat Rate",
+						"method": {
+							"name": "Free",
+							"label": "Free Shipping",
+							"group": "Ground",
+							"handling": 0,
+							"rate": 0,
+							"enabled": true,
+							"_id": "YvNPCB3CXdxKrpmvv",
+							"carrier": "Flat Rate"
+						},
+						"rate": 0,
+						"shopId": "J8Bhq3uTtdgwZx3rz"
+					}
+				],
+				"shipmentMethod": {
+					"name": "Free",
+					"label": "Free Shipping",
+					"group": "Ground",
+					"handling": 0,
+					"rate": 0,
+					"enabled": true,
+					"_id": "YvNPCB3CXdxKrpmvv",
+					"carrier": "Flat Rate"
+				},
+				"paymentId": "QrBg9eFKwv7vHhGK3",
+				"items": [
+					{
+						"_id": "p4dNgFvektG7mJMpz",
+						"productId": "ekCWSG9gWixeqKF2N",
+						"shopId": "J8Bhq3uTtdgwZx3rz",
+						"variantId": "5YagDCtMFZtbFqc84"
+					},
+					{
+						"_id": "4dXKWWcR5QPkXG7L7",
+						"productId": "o29vY35xZy6eZhmkQ",
+						"shopId": "J8Bhq3uTtdgwZx3rz",
+						"variantId": "rLHvRSFw4EWELdYt7"
+					}
+				],
+				"workflow": {
+					"status": "new",
+					"workflow": [
+						"coreOrderWorkflow/notStarted"
+					]
+				}
+			},
+			"workflow": {
+				"status": "new",
+				"workflow": [
+					"coreOrderWorkflow/created"
+				]
+			}
+		},
+		{
+			"_id": "4dXKWWcR5QPkXG7L7",
+			"shopId": "J8Bhq3uTtdgwZx3rz",
+			"productId": "o29vY35xZy6eZhmkQ",
+			"quantity": 1,
+			"product": {
+				"_id": "o29vY35xZy6eZhmkQ",
+				"title": "Sporty",
+				"type": "simple",
+				"ancestors": [],
+				"shopId": "J8Bhq3uTtdgwZx3rz",
+				"originCountry": "US",
+				"requiresShipping": true,
+				"handle": "sporty",
+				"isDeleted": false,
+				"isVisible": true,
+				"template": "productDetailSimple",
+				"createdAt": {
+					"$date": "2018-08-08T17:01:20.971Z"
+				},
+				"updatedAt": {
+					"$date": "2018-08-08T17:01:20.972Z"
+				},
+				"price": {
+					"range": "22",
+					"min": 22,
+					"max": 22
+				},
+				"workflow": {
+					"status": "new"
+				},
+				"isLowQuantity": false,
+				"isSoldOut": true,
+				"isBackorder": true
+			},
+			"variants": {
+				"_id": "rLHvRSFw4EWELdYt7",
+				"title": "Sporty",
+				"ancestors": [
+					"o29vY35xZy6eZhmkQ"
+				],
+				"price": 22,
+				"type": "variant",
+				"isVisible": true,
+				"isDeleted": false,
+				"compareAtPrice": 23,
+				"weight": 1,
+				"length": 0,
+				"width": 0,
+				"height": 0,
+				"inventoryManagement": true,
+				"inventoryPolicy": false,
+				"lowInventoryWarningThreshold": 70,
+				"inventoryQuantity": 80,
+				"shopId": "J8Bhq3uTtdgwZx3rz",
+				"taxable": true,
+				"taxCode": "0000",
+				"optionTitle": "Untitled Option",
+				"originCountry": "US",
+				"workflow": {
+					"status": "new"
+				}
+			},
+			"title": "Sporty",
+			"type": "simple",
+			"parcel": {
+				"weight": 1,
+				"height": 0,
+				"width": 0,
+				"length": 0
+			},
+			"shippingMethod": {
+				"address": {
+					"country": "NG",
+					"fullName": "Tovieye",
+					"address1": "1A Fatai Ayinde St, Off igbajo st,",
+					"address2": "Off Ondo Street, Irawo B/Stop, Ikorodu Road",
+					"postal": "104221",
+					"city": "Ikorodu",
+					"region": "Lagos",
+					"phone": "+447873568370",
+					"isShippingDefault": true,
+					"isBillingDefault": true,
+					"isCommercial": false,
+					"_id": "8cxijL2bqG4vAnkXy",
+					"failedValidation": false
+				},
+				"shopId": "J8Bhq3uTtdgwZx3rz",
+				"_id": "DLE2sjMYfrttykHmN",
+				"shipmentQuotesQueryStatus": {
+					"requestStatus": "success",
+					"numOfShippingMethodsFound": 1
+				},
+				"shipmentQuotes": [
+					{
+						"carrier": "Flat Rate",
+						"method": {
+							"name": "Free",
+							"label": "Free Shipping",
+							"group": "Ground",
+							"handling": 0,
+							"rate": 0,
+							"enabled": true,
+							"_id": "YvNPCB3CXdxKrpmvv",
+							"carrier": "Flat Rate"
+						},
+						"rate": 0,
+						"shopId": "J8Bhq3uTtdgwZx3rz"
+					}
+				],
+				"shipmentMethod": {
+					"name": "Free",
+					"label": "Free Shipping",
+					"group": "Ground",
+					"handling": 0,
+					"rate": 0,
+					"enabled": true,
+					"_id": "YvNPCB3CXdxKrpmvv",
+					"carrier": "Flat Rate"
+				},
+				"paymentId": "QrBg9eFKwv7vHhGK3",
+				"items": [
+					{
+						"_id": "p4dNgFvektG7mJMpz",
+						"productId": "ekCWSG9gWixeqKF2N",
+						"shopId": "J8Bhq3uTtdgwZx3rz",
+						"variantId": "5YagDCtMFZtbFqc84"
+					},
+					{
+						"_id": "4dXKWWcR5QPkXG7L7",
+						"productId": "o29vY35xZy6eZhmkQ",
+						"shopId": "J8Bhq3uTtdgwZx3rz",
+						"variantId": "rLHvRSFw4EWELdYt7"
+					}
+				],
+				"workflow": {
+					"status": "new",
+					"workflow": [
+						"coreOrderWorkflow/notStarted"
+					]
+				}
+			},
+			"workflow": {
+				"status": "new",
+				"workflow": [
+					"coreOrderWorkflow/created"
+				]
+			}
+		}
+	],
+	"cartId": "3hMNSqiwb8wLL8r5y",
+	"email": "tovieye.ozi@andela.com",
+	"createdAt": {
+		"$date": "2018-08-08T17:01:20.965Z"
+	}
+}]
+

@@ -1,0 +1,28 @@
+<template name="completedOrders">
+  {{#if doesUserExist}}
+    <div class="flex flex-column flex-align-center flex-2x comp-order container-lg">
+
+      <div class="flex-item">
+        <div class="panel panel-default user-orders-list">
+          <div class="panel-heading">
+            {{#if isOwnerOfProfile}}
+              <h3 class="panel-title" data-i18n="accountsUI.yourOrders">Your orders</h3>
+            {{else}}
+              <h3 class="panel-title" data-i18n="accountsUI.usersOrders">User's orders</h3>
+            {{/if}}
+          </div>
+          <div class="panel-content">
+            {{> userOrdersList data=userOrders}}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  {{else}}
+    <div class="empty-view-message">
+      <i class="fa fa-user-times"></i>
+      <p data-i18n="accountsUI.oops">Oops!</p>
+      <p data-i18n="accountsUI.nonExistentAccount">The user you're looking for does not exist.</p>
+    </div>
+  {{/if}}
+</template>

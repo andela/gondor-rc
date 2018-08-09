@@ -1,120 +1,372 @@
 [{
-  "_id": "BCTMZ6HTxFSppJESk",
-  "shopId": "J8Bhq3uTtdgwZx3rz",
-  "ancestors": [],
-  "createdAt": {
-    "$date": "2014-04-03T13:46:52.411-0700"
-  },
-  "description": "Sign in as administrator to edit.\nYou can clone this product from the product grid.\nYou can upload images click or drag in image box on the left here.\nTag this product below, and then add tag in navigation.\nClick the bookmark in the tag to set product url.\nOption variants, price, quantity, and child variants are created by clicking on the variant below, clone the variant to add more options.\nDetails can be added below the image for more specific product information.\n Login next to the cart, and then click the dashboard icon for more tools.",
-  "handle": "example-product",
-  "hashtags": [
-    "rpjCvTBGjhBi2xdro",
-    "cseCBSSrJ3t8HQSNP"
-  ],
-  "price.range": "12.99 - 19.99",
-  "price.min": 12.99,
-  "price.max": 19.99,
-  "isVisible": true,
-  "isLowQuantity": false,
-  "isSoldOut": false,
-  "isBackorder": false,
-  "metafields": [{
-    "key": "Material",
-    "value": "Cotton"
-  }, {
-    "key": "Quality",
-    "value": "Excellent"
-  }],
-  "pageTitle": "This is a basic product. You can do a lot with it.",
-  "type": "simple",
-  "title": "Basic Reaction Product",
-  "updatedAt": {
-    "$date": "2014-06-01T12:17:13.949-0700"
-  },
-  "vendor": "Example Manufacturer"
-}, {
-  "_id": "6qiqPwBkeJdtdQc4G",
-  "ancestors": [
-    "BCTMZ6HTxFSppJESk"
-  ],
-  "title": "Basic Example Variant",
-  "price": 19.99,
-  "inventoryManagement": true,
-  "inventoryPolicy": true,
-  "inventoryQuantity": 15,
-  "isVisible": true,
-  "updatedAt": {
-    "$date": "2014-04-03T13:46:52.411-0700"
-  },
-  "createdAt": {
-    "$date": "2014-04-03T13:46:52.411-0700"
-  },
-  "weight": 35,
-  "metafields": [{
-    "key": null,
-    "value": null
-  }],
-  "shopId": "J8Bhq3uTtdgwZx3rz",
-  "taxable": true,
-  "type": "variant"
-}, {
-  "_id": "SMr4rhDFnYvFMtDTX",
-  "ancestors": [
-    "BCTMZ6HTxFSppJESk",
-    "6qiqPwBkeJdtdQc4G"
-  ],
-  "title": "Option 1 - Red Dwarf",
-  "optionTitle": "Red",
-  "price": 19.99,
-  "inventoryManagement": true,
-  "inventoryPolicy": true,
-  "inventoryQuantity": 19,
-  "isVisible": true,
-  "updatedAt": {
-    "$date": "2014-04-03T13:46:52.411-0700"
-  },
-  "createdAt": {
-    "$date": "2014-04-03T13:46:52.411-0700"
-  },
-  "weight": 25,
-  "length": 10,
-  "height": 3,
-  "width": 10,
-  "metafields": [{
-    "key": null,
-    "value": null
-  }],
-  "shopId": "J8Bhq3uTtdgwZx3rz",
-  "taxable": true,
-  "type": "variant"
-}, {
-  "_id": "CJoRBm9vRrorc9mxZ",
-  "ancestors": [
-    "BCTMZ6HTxFSppJESk",
-    "6qiqPwBkeJdtdQc4G"
-  ],
-  "title": "Option 2 - Green Tomato",
-  "optionTitle": "Green",
-  "price": 12.99,
-  "inventoryManagement": true,
-  "inventoryPolicy": true,
-  "inventoryQuantity": 42,
-  "isVisible": true,
-  "updatedAt": {
-    "$date": "2014-04-03T13:46:52.411-0700"
-  },
-  "createdAt": {
-    "$date": "2014-04-03T13:46:52.411-0700"
-  },
-  "weight": 25,
-  "length": 10,
-  "height": 3,
-  "width": 10,
-  "metafields": [{
-    "key": null,
-    "value": null
-  }],
-  "shopId": "J8Bhq3uTtdgwZx3rz",
-  "taxable": true,
-  "type": "variant"
+	"_id": "BCTMZ6HTxFSppJESk",
+	"title": "Basic Reaction Product",
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"ancestors": [],
+	"createdAt": {
+		"$date": "2014-04-03T20:46:52.411Z"
+	},
+	"description": "Sign in as administrator to edit.\nYou can clone this product from the product grid.\nYou can upload images click or drag in image box on the left here.\nTag this product below, and then add tag in navigation.\nClick the bookmark in the tag to set product url.\nOption variants, price, quantity, and child variants are created by clicking on the variant below, clone the variant to add more options.\nDetails can be added below the image for more specific product information.\n Login next to the cart, and then click the dashboard icon for more tools.",
+	"handle": "example-product",
+	"hashtags": [
+		"rpjCvTBGjhBi2xdro",
+		"cseCBSSrJ3t8HQSNP"
+	],
+	"price": {
+		"range": "12.99 - 19.99",
+		"min": 12.99,
+		"max": 19.99
+	},
+	"isVisible": true,
+	"isLowQuantity": false,
+	"isSoldOut": false,
+	"isBackorder": false,
+	"metafields": [
+		{
+			"key": "Material",
+			"value": "Cotton"
+		},
+		{
+			"key": "Quality",
+			"value": "Excellent"
+		}
+	],
+	"pageTitle": "This is a basic product. You can do a lot with it.",
+	"type": "simple",
+	"updatedAt": {
+		"$date": "2014-06-01T19:17:13.949Z"
+	},
+	"vendor": "Example Manufacturer",
+	"originCountry": "US",
+	"requiresShipping": true,
+	"isDeleted": false,
+	"template": "productDetailSimple",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "6qiqPwBkeJdtdQc4G",
+	"title": "Basic Example Variant",
+	"ancestors": [
+		"BCTMZ6HTxFSppJESk"
+	],
+	"price": 19.99,
+	"inventoryManagement": true,
+	"inventoryPolicy": true,
+	"inventoryQuantity": 15,
+	"isVisible": true,
+	"updatedAt": {
+		"$date": "2014-04-03T20:46:52.411Z"
+	},
+	"createdAt": {
+		"$date": "2014-04-03T20:46:52.411Z"
+	},
+	"weight": 35,
+	"metafields": [
+		{
+			"key": null,
+			"value": null
+		}
+	],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"type": "variant",
+	"isDeleted": false,
+	"compareAtPrice": 0,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"lowInventoryWarningThreshold": 0,
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"originCountry": "US",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "SMr4rhDFnYvFMtDTX",
+	"title": "Option 1 - Red Dwarf",
+	"ancestors": [
+		"BCTMZ6HTxFSppJESk",
+		"6qiqPwBkeJdtdQc4G"
+	],
+	"optionTitle": "Red",
+	"price": 19.99,
+	"inventoryManagement": true,
+	"inventoryPolicy": true,
+	"inventoryQuantity": 19,
+	"isVisible": true,
+	"updatedAt": {
+		"$date": "2014-04-03T20:46:52.411Z"
+	},
+	"createdAt": {
+		"$date": "2014-04-03T20:46:52.411Z"
+	},
+	"weight": 25,
+	"length": 10,
+	"height": 3,
+	"width": 10,
+	"metafields": [
+		{
+			"key": null,
+			"value": null
+		}
+	],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"type": "variant",
+	"isDeleted": false,
+	"compareAtPrice": 0,
+	"lowInventoryWarningThreshold": 0,
+	"taxCode": "0000",
+	"originCountry": "US",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "CJoRBm9vRrorc9mxZ",
+	"title": "Option 2 - Green Tomato",
+	"ancestors": [
+		"BCTMZ6HTxFSppJESk",
+		"6qiqPwBkeJdtdQc4G"
+	],
+	"optionTitle": "Green",
+	"price": 12.99,
+	"inventoryManagement": true,
+	"inventoryPolicy": true,
+	"inventoryQuantity": 42,
+	"isVisible": true,
+	"updatedAt": {
+		"$date": "2014-04-03T20:46:52.411Z"
+	},
+	"createdAt": {
+		"$date": "2014-04-03T20:46:52.411Z"
+	},
+	"weight": 25,
+	"length": 10,
+	"height": 3,
+	"width": 10,
+	"metafields": [
+		{
+			"key": null,
+			"value": null
+		}
+	],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"type": "variant",
+	"isDeleted": false,
+	"compareAtPrice": 0,
+	"lowInventoryWarningThreshold": 0,
+	"taxCode": "0000",
+	"originCountry": "US",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "o29vY35xZy6eZhmkQ",
+	"title": "Sporty",
+	"type": "simple",
+	"ancestors": [],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "US",
+	"requiresShipping": true,
+	"handle": "sporty",
+	"isDeleted": false,
+	"isVisible": true,
+	"template": "productDetailSimple",
+	"createdAt": {
+		"$date": "2018-08-08T11:47:14.110Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-08T11:49:45.005Z"
+	},
+	"price": {
+		"range": "22",
+		"min": 22,
+		"max": 22
+	},
+	"workflow": {
+		"status": "new"
+	},
+	"isLowQuantity": false,
+	"isSoldOut": true,
+	"isBackorder": true
+},
+{
+	"_id": "rLHvRSFw4EWELdYt7",
+	"title": "Sporty",
+	"ancestors": [
+		"o29vY35xZy6eZhmkQ"
+	],
+	"price": 22,
+	"type": "variant",
+	"isVisible": true,
+	"isDeleted": false,
+	"compareAtPrice": 23,
+	"weight": 1,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"inventoryManagement": true,
+	"inventoryPolicy": false,
+	"lowInventoryWarningThreshold": 70,
+	"inventoryQuantity": 80,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"originCountry": "US",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "7EzBXjmu98orxct6J",
+	"title": "Warmer",
+	"type": "simple",
+	"ancestors": [],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "US",
+	"requiresShipping": true,
+	"handle": "warmer",
+	"isDeleted": false,
+	"isVisible": true,
+	"template": "productDetailSimple",
+	"createdAt": {
+		"$date": "2018-08-08T11:59:44.437Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-08T16:50:13.381Z"
+	},
+	"price": {
+		"range": "0 - 20",
+		"min": 0,
+		"max": 20
+	},
+	"workflow": {
+		"status": "new"
+	},
+	"isLowQuantity": false,
+	"isSoldOut": true,
+	"isBackorder": true
+},
+{
+	"_id": "S5CfsdoyfCcGANh9f",
+	"title": "Warmer",
+	"ancestors": [
+		"7EzBXjmu98orxct6J"
+	],
+	"price": 20,
+	"type": "variant",
+	"isVisible": true,
+	"isDeleted": false,
+	"compareAtPrice": 22,
+	"weight": 1,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"inventoryManagement": true,
+	"inventoryPolicy": false,
+	"lowInventoryWarningThreshold": 20,
+	"inventoryQuantity": 100,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"originCountry": "US",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "Y4hm4ts5krjv4r3nJ",
+	"title": "- Untitled option",
+	"ancestors": [
+		"7EzBXjmu98orxct6J"
+	],
+	"type": "variant",
+	"price": 0,
+	"isVisible": false,
+	"isDeleted": false,
+	"compareAtPrice": 0,
+	"weight": 0,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"inventoryManagement": true,
+	"inventoryPolicy": false,
+	"lowInventoryWarningThreshold": 0,
+	"inventoryQuantity": 0,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"originCountry": "US",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "ekCWSG9gWixeqKF2N",
+	"type": "simple",
+	"ancestors": [],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"title": "Mocassin",
+	"originCountry": "US",
+	"requiresShipping": true,
+	"handle": "mocassin",
+	"isDeleted": false,
+	"isVisible": true,
+	"template": "productDetailSimple",
+	"createdAt": {
+		"$date": "2018-08-08T16:58:28.472Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-08T16:59:46.732Z"
+	},
+	"price": {
+		"range": "20",
+		"min": 20,
+		"max": 20
+	},
+	"workflow": {
+		"status": "new"
+	},
+	"isLowQuantity": false,
+	"isSoldOut": true,
+	"isBackorder": true
+},
+{
+	"_id": "5YagDCtMFZtbFqc84",
+	"ancestors": [
+		"ekCWSG9gWixeqKF2N"
+	],
+	"price": 20,
+	"type": "variant",
+	"isVisible": true,
+	"isDeleted": false,
+	"compareAtPrice": 22,
+	"weight": 1,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"inventoryManagement": true,
+	"inventoryPolicy": false,
+	"lowInventoryWarningThreshold": 10,
+	"inventoryQuantity": 100,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"taxCode": "0000",
+	"title": "Mocassin",
+	"optionTitle": "Untitled Option",
+	"originCountry": "US",
+	"workflow": {
+		"status": "new"
+	}
 }]
+
