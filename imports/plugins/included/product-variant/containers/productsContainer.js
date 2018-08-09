@@ -94,14 +94,16 @@ const wrapComponent = (Comp) => (
 
     render() {
       return (
-        <Comp
-          ready={this.ready}
-          products={this.props.products}
-          productsSubscription={this.props.productsSubscription}
-          loadMoreProducts={this.loadMoreProducts}
-          loadProducts={this.loadProducts}
-          showNotFound={this.props.showNotFound}
-        />
+        <div>
+          <Comp
+            ready={this.ready}
+            products={this.props.products}
+            productsSubscription={this.props.productsSubscription}
+            loadMoreProducts={this.loadMoreProducts}
+            loadProducts={this.loadProducts}
+            showNotFound={this.props.showNotFound}
+          />
+        </div>
       );
     }
   }
