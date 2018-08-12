@@ -48,6 +48,7 @@ class CustomProductGridItem extends ProductGridItem {
       </div>
     </div>);
   }
+
   renderGridContent() {
     const { product, isAdmin, isOwner } = this.props;
 
