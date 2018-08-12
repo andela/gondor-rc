@@ -183,12 +183,12 @@
 		"$date": "2018-08-08T11:47:14.110Z"
 	},
 	"updatedAt": {
-		"$date": "2018-08-08T11:49:45.005Z"
+		"$date": "2018-08-10T16:14:46.330Z"
 	},
 	"price": {
-		"range": "22",
-		"min": 22,
-		"max": 22
+		"range": "220000",
+		"min": 220000,
+		"max": 220000
 	},
 	"workflow": {
 		"status": "new"
@@ -203,11 +203,11 @@
 	"ancestors": [
 		"o29vY35xZy6eZhmkQ"
 	],
-	"price": 22,
+	"price": 220000,
 	"type": "variant",
 	"isVisible": true,
 	"isDeleted": false,
-	"compareAtPrice": 23,
+	"compareAtPrice": 230000,
 	"weight": 1,
 	"length": 0,
 	"width": 0,
@@ -241,12 +241,12 @@
 		"$date": "2018-08-08T11:59:44.437Z"
 	},
 	"updatedAt": {
-		"$date": "2018-08-08T16:50:13.381Z"
+		"$date": "2018-08-10T16:14:17.429Z"
 	},
 	"price": {
-		"range": "0 - 20",
-		"min": 0,
-		"max": 20
+		"range": "20000",
+		"min": 20000,
+		"max": 20000
 	},
 	"workflow": {
 		"status": "new"
@@ -261,11 +261,11 @@
 	"ancestors": [
 		"7EzBXjmu98orxct6J"
 	],
-	"price": 20,
+	"price": 20000,
 	"type": "variant",
 	"isVisible": true,
 	"isDeleted": false,
-	"compareAtPrice": 22,
+	"compareAtPrice": 22000,
 	"weight": 1,
 	"length": 0,
 	"width": 0,
@@ -313,10 +313,10 @@
 },
 {
 	"_id": "ekCWSG9gWixeqKF2N",
+	"title": "Mocassin",
 	"type": "simple",
 	"ancestors": [],
 	"shopId": "J8Bhq3uTtdgwZx3rz",
-	"title": "Mocassin",
 	"originCountry": "US",
 	"requiresShipping": true,
 	"handle": "mocassin",
@@ -327,12 +327,12 @@
 		"$date": "2018-08-08T16:58:28.472Z"
 	},
 	"updatedAt": {
-		"$date": "2018-08-08T16:59:46.732Z"
+		"$date": "2018-08-10T16:13:15.486Z"
 	},
 	"price": {
-		"range": "20",
-		"min": 20,
-		"max": 20
+		"range": "8000",
+		"min": 8000,
+		"max": 8000
 	},
 	"workflow": {
 		"status": "new"
@@ -343,14 +343,15 @@
 },
 {
 	"_id": "5YagDCtMFZtbFqc84",
+	"title": "Mocassin",
 	"ancestors": [
 		"ekCWSG9gWixeqKF2N"
 	],
-	"price": 20,
+	"price": 8000,
 	"type": "variant",
 	"isVisible": true,
 	"isDeleted": false,
-	"compareAtPrice": 22,
+	"compareAtPrice": 9000,
 	"weight": 1,
 	"length": 0,
 	"width": 0,
@@ -362,7 +363,6 @@
 	"shopId": "J8Bhq3uTtdgwZx3rz",
 	"taxable": true,
 	"taxCode": "0000",
-	"title": "Mocassin",
 	"optionTitle": "Untitled Option",
 	"originCountry": "US",
 	"workflow": {

@@ -3,7 +3,7 @@ import { Reaction, Hooks } from "/server/api";
 Hooks.Events.add("afterCoreInit", () => {
   Reaction.addRolesToGroups({
     allShops: true,
-    groups: ["guest", "customer"],
+    groups: ["customer"],
     roles: ["account/verify", "ordercomplete", "reaction/notifications"]
   });
 });

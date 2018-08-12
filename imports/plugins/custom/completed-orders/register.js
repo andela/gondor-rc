@@ -9,25 +9,15 @@ import { Reaction } from "/server/api";
 Reaction.registerPackage({
   label: "Completed Orders",
   name: "completed-orders",
+  icon: "fa fa-ticket",
   autoEnable: true,
   settings: {},
-  registry: [ {
+  registry: [{
     route: "/ordercomplete",
     template: "completedOrders",
     name: "ordercomplete",
-    label: "CompletedOrder"
-  }],
-  layout: [{
-    layout: "coreLayout",
-    workflow: "coreWorkflow",
-    collection: "Accounts",
-    theme: "default",
-    enabled: true,
-    structure: {
-      template: "orderNavbar",
-      layoutHeader: "NavBar",
-      layoutFooter: "",
-      notFound: "notFound"
-    }
+    label: "Order History",
+    icon: "fa fa-ticket",
+    provides: ["userAccountDropdown"]
   }]
 });

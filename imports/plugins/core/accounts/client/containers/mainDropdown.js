@@ -83,7 +83,7 @@ function handleChange(event, value) {
   }
 }
 
-const composer = ({ currentAccount }, onData) => {
+export const composer = ({ currentAccount }, onData) => {
   const userImage = getUserAvatar(currentAccount);
   const userName = displayName(currentAccount);
   const adminShortcuts = getAdminShortcutIcons();
@@ -95,7 +95,7 @@ const composer = ({ currentAccount }, onData) => {
   });
 };
 
-const handlers = {
+export const handlers = {
   handleChange,
   userShortcuts: {
     provides: "userAccountDropdown",
