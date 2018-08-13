@@ -4,6 +4,7 @@ import { Meteor } from "meteor/meteor";
 import { ReactionProduct } from "/lib/api";
 import ProductFiles from "../../lib/collections/ProductFiles.js";
 import DigitalProductArea from "../components/digitalProductArea.js";
+import { Logger } from "/client/api";
 
 class DigitalProductAreaContainer extends Component {
   state = {
@@ -35,10 +36,14 @@ class DigitalProductAreaContainer extends Component {
 
       upload.on("end", (error, fileObj) => {
         if (error) {
-          // TODO: handle error
+          Logger.debug(error);
         } else {
           Alerts.toast("Product uploaded successfully");
-          Meteor.call("products/updateProductField", currentProduct._id, "storagePath", fileObj.path);
+
+          Meteor.call("products/updateProductField", currentProduct._id, "isDigital", true);
+          Meteor.call("products/updateProductField", currentProduct._id, "fileId", fileObj._id);
+          Meteor.call("products/updateProductField", currentProduct._id, "fileName", fileObj.name);
+
           this.setState({ uploading: false });
         }
       });
@@ -52,7 +57,7 @@ class DigitalProductAreaContainer extends Component {
 
     return (
       <DigitalProductArea
-        productFileExists={Boolean(currentProduct.storagePath)}
+        product={currentProduct}
         isDigital={this.state.isDigital}
         toggleCheck={this.toggleCheck}
         uploadProductFile={this.uploadProductFile}

@@ -3,47 +3,59 @@ import PropTypes from "prop-types";
 import { Reaction } from "/lib/api";
 import { registerComponent } from "@reactioncommerce/reaction-components";
 
+
 const DigitalProductArea = ({
-  productFileExists,
+  product,
   isDigital,
   toggleCheck,
   uploadProductFile,
   uploading
-}) => (
-  Reaction.hasOwnerAccess() &&
-  <div>
-    <div style={{ marginBottom: "15px" }}>
-      <input
-        type="checkbox"
-        checked={isDigital ? "checked" : ""}
-        onChange={toggleCheck}
-      />
-      <span style={{ paddingLeft: "10px" }}>Digital product</span>
-    </div>
-    {
-      isDigital &&
-      <div>
-        <label>{productFileExists ? "Change product file" : "Upload product file" }</label>
+}) => {
+  const productFileExists = Boolean(product.fileName);
+
+  return (
+    Reaction.hasOwnerAccess() &&
+    <div className="digital-product-area">
+      <div className="checkbox">
         <input
-          type="file"
-          className="form-control"
-          onChange={uploadProductFile}
+          type="checkbox"
+          checked={isDigital ? "checked" : ""}
+          onChange={toggleCheck}
         />
+        <span>Digital product</span>
       </div>
-    }
-    {
-      uploading &&
-      <div>
-        <img width="50" src="/images/rc-loader.svg"/>
-        <span>Uploading</span>
-      </div>
-    }
-  </div>
-);
+      {
+        isDigital &&
+        <div>
+          <label>
+            {
+              productFileExists ?
+                `Change product file (${product.fileName})` :
+                "Upload product file"
+            }
+          </label>
+          <input
+            type="file"
+            className="form-control"
+            onChange={uploadProductFile}
+          />
+        </div>
+      }
+      {
+        uploading &&
+        <div>
+          <img width="50" src="/images/rc-loader.svg"/>
+          <span>Uploading</span>
+        </div>
+      }
+    </div>
+  );
+};
+
 
 DigitalProductArea.propTypes = {
   isDigital: PropTypes.bool.isRequired,
-  productFileExists: PropTypes.bool.isRequired,
+  product: PropTypes.object.isRequired,
   toggleCheck: PropTypes.func.isRequired,
   uploadProductFile: PropTypes.func.isRequired,
   uploading: PropTypes.bool.isRequired
