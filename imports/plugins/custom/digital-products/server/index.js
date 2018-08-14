@@ -1,13 +1,8 @@
 import { Reaction } from "/server/api";
-import { Meteor } from "meteor/meteor";
 import extensions from "../lib/layout/extensions.js";
-import ProductFiles from "../lib/collections/ProductFiles.js";
-
-// import "../lib/collections/schemas";
-
-Meteor.publish("files.products", function () {
-  return ProductFiles.find().cursor;
-});
+import "./methods/digital-products-methods.js";
+import "./security/digital-products-security.js";
+import "./init.js";
 
 Reaction.registerTemplate({
   name: "productDetailSimple",

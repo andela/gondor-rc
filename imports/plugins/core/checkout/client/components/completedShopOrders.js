@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { registerComponent } from "@reactioncommerce/reaction-components";
-import CompletedOrderItem from "./completedOrderItem";
+import { Components, registerComponent } from "@reactioncommerce/reaction-components";
+// import CompletedOrderItem from "./completedOrderItem";
 
 /**
  * @summary Displays the order breakdown for each Shop
@@ -31,7 +31,7 @@ const CompletedShopOrders = ({ shopName, items, handleDisplayMedia, shippingMeth
       </div>
       <div className="order-details-info-box-topless">
         {items.map(function (item) {
-          return <CompletedOrderItem item={item} key={item._id} handleDisplayMedia={handleDisplayMedia} />;
+          return <Components.CompletedOrderItem item={item} key={item._id} handleDisplayMedia={handleDisplayMedia} />;
         })}
       </div>
 
