@@ -43,6 +43,8 @@ function handleChange(event, value) {
     });
   } else if (value.route === "/ordercomplete") {
     Reaction.Router.go("/ordercomplete");
+  } else if (value.route === "/top-products") {
+    Reaction.Router.go("/top-products");
   } else if (value.name !== "account/profile") {
     return Reaction.showActionView(value);
   } else if (value.route || value.name) {
