@@ -49,7 +49,6 @@ function composer(props, onData) {
     */
     if (props.searchCollection === "products") {
       productResults = Collections.ProductSearch.find().fetch();
-
       if (productResults.length) {
         if (Array.isArray(props.sorters) && props.sorters.length) {
           productResults = productResults.sort(createSorter(...props.sorters));

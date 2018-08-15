@@ -26,7 +26,6 @@ class CustomSearchModal extends SearchModal {
       { property: "vendor", value: JSON.stringify({ property: "vendor", ascending: false }), label: "Vendor: Descending" }
     ];
     const availableSortOptions = (compareRow, currentRow) => {
-      if (currentRow === 0 && this.props.sorters[1].property === "all") { return sortOptions; }
       const available = sortOptions.filter(option => option.property !== this.props.sorters[compareRow].property);
       if (currentRow === 0 && available[0].property !== "all") {available.push(sortOptions[0]);}
       return available;
