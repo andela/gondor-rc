@@ -89,7 +89,6 @@ class SearchModal extends Component {
       </div>
     );
   }
-
   render() {
     return (
       <div>

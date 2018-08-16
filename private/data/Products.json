@@ -43,7 +43,8 @@
 	"template": "productDetailSimple",
 	"workflow": {
 		"status": "new"
-	}
+	},
+	"isDigital": false
 },
 {
 	"_id": "6qiqPwBkeJdtdQc4G",
@@ -195,7 +196,12 @@
 	},
 	"isLowQuantity": false,
 	"isSoldOut": true,
-	"isBackorder": true
+	"isBackorder": true,
+	"isDigital": false,
+	"hashtags": [
+		"fi5zh9sGY9qughMhf"
+	],
+	"vendor": "Otse"
 },
 {
 	"_id": "rLHvRSFw4EWELdYt7",
@@ -253,7 +259,11 @@
 	},
 	"isLowQuantity": false,
 	"isSoldOut": true,
-	"isBackorder": true
+	"isBackorder": true,
+	"isDigital": false,
+	"hashtags": [
+		"fi5zh9sGY9qughMhf"
+	]
 },
 {
 	"_id": "S5CfsdoyfCcGANh9f",
@@ -339,7 +349,11 @@
 	},
 	"isLowQuantity": false,
 	"isSoldOut": true,
-	"isBackorder": true
+	"isBackorder": true,
+	"isDigital": false,
+	"hashtags": [
+		"fi5zh9sGY9qughMhf"
+	]
 },
 {
 	"_id": "5YagDCtMFZtbFqc84",
@@ -368,5 +382,699 @@
 	"workflow": {
 		"status": "new"
 	}
+},
+{
+	"_id": "X5jxykfroXA98DiKw",
+	"title": "Warmer by Ivy",
+	"ancestors": [
+		"7EzBXjmu98orxct6J"
+	],
+	"price": 25000,
+	"type": "variant",
+	"isVisible": true,
+	"isDeleted": false,
+	"compareAtPrice": 22000,
+	"weight": 1,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"inventoryManagement": true,
+	"inventoryPolicy": false,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option - copy",
+	"originCountry": "US",
+	"workflow": {
+		"status": "new"
+	},
+	"lowInventoryWarningThreshold": 0,
+	"inventoryQuantity": 0
+},
+{
+	"_id": "oCGPmfpdcgzAfvniY",
+	"title": "Warmer by Otse",
+	"height": 0,
+	"taxCode": "0000",
+	"compareAtPrice": 22000,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"width": 0,
+	"isVisible": true,
+	"originCountry": "US",
+	"ancestors": [
+		"7EzBXjmu98orxct6J"
+	],
+	"isDeleted": false,
+	"inventoryPolicy": false,
+	"optionTitle": "Untitled Option - copy - copy",
+	"taxable": true,
+	"workflow": {
+		"status": "new"
+	},
+	"inventoryManagement": true,
+	"price": 26000,
+	"weight": 1,
+	"length": 0,
+	"type": "variant",
+	"lowInventoryWarningThreshold": 10,
+	"inventoryQuantity": 40
+},
+{
+	"_id": "JQj5jzqooQfex4wnD",
+	"title": "Warmer by Ogo",
+	"height": 0,
+	"taxCode": "0000",
+	"compareAtPrice": 22000,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"width": 0,
+	"isVisible": true,
+	"originCountry": "US",
+	"ancestors": [
+		"7EzBXjmu98orxct6J"
+	],
+	"isDeleted": false,
+	"inventoryPolicy": false,
+	"optionTitle": "Untitled Option - copy - copy - copy",
+	"taxable": true,
+	"workflow": {
+		"status": "new"
+	},
+	"inventoryManagement": true,
+	"price": 22000,
+	"weight": 1,
+	"length": 0,
+	"type": "variant",
+	"lowInventoryWarningThreshold": 10,
+	"inventoryQuantity": 50
+},
+{
+	"_id": "Gnd4XfyjoXRZuJ2n6",
+	"title": "Warmer by Jacob",
+	"height": 0,
+	"taxCode": "0000",
+	"compareAtPrice": 22000,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"width": 0,
+	"isVisible": true,
+	"originCountry": "US",
+	"ancestors": [
+		"7EzBXjmu98orxct6J"
+	],
+	"isDeleted": false,
+	"inventoryPolicy": false,
+	"optionTitle": "Untitled Option - copy - copy - copy - copy",
+	"taxable": true,
+	"workflow": {
+		"status": "new"
+	},
+	"inventoryManagement": true,
+	"price": 27000,
+	"weight": 1,
+	"length": 0,
+	"type": "variant",
+	"lowInventoryWarningThreshold": 10,
+	"inventoryQuantity": 70
+},
+{
+	"_id": "RodmaLJMQ7gijWvrr",
+	"title": "Warmer - Untitled option",
+	"ancestors": [
+		"7EzBXjmu98orxct6J",
+		"S5CfsdoyfCcGANh9f"
+	],
+	"type": "variant",
+	"price": 0,
+	"isVisible": false,
+	"isDeleted": false,
+	"compareAtPrice": 0,
+	"weight": 0,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"inventoryManagement": true,
+	"inventoryPolicy": false,
+	"lowInventoryWarningThreshold": 0,
+	"inventoryQuantity": 0,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"originCountry": "NG",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "HH2JcxCA2q6iAawC5",
+	"title": "sporty",
+	"type": "simple",
+	"ancestors": [],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "NG",
+	"requiresShipping": true,
+	"handle": "sporty-copy",
+	"isDeleted": false,
+	"isVisible": true,
+	"template": "productDetailSimple",
+	"createdAt": {
+		"$date": "2018-08-13T12:03:02.178Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-13T14:16:00.324Z"
+	},
+	"isDigital": false,
+	"price": {
+		"range": "100000",
+		"min": 100000,
+		"max": 100000
+	},
+	"workflow": {
+		"status": "new"
+	},
+	"isLowQuantity": false,
+	"isSoldOut": true,
+	"isBackorder": true,
+	"vendor": "Ivy"
+},
+{
+	"_id": "3Rje4gJzxTrPXDD7h",
+	"title": "sporty",
+	"ancestors": [
+		"HH2JcxCA2q6iAawC5"
+	],
+	"price": 100000,
+	"type": "variant",
+	"isVisible": true,
+	"isDeleted": false,
+	"compareAtPrice": 80000,
+	"weight": 1,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"inventoryManagement": true,
+	"inventoryPolicy": false,
+	"lowInventoryWarningThreshold": 10,
+	"inventoryQuantity": 40,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"originCountry": "NG",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "dzR5EsktLWFAPfHrK",
+	"title": "sporty",
+	"type": "simple",
+	"ancestors": [],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "NG",
+	"requiresShipping": true,
+	"handle": "sporty-copy-2",
+	"isDeleted": false,
+	"isVisible": true,
+	"template": "productDetailSimple",
+	"createdAt": {
+		"$date": "2018-08-13T12:07:06.125Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-13T14:17:06.386Z"
+	},
+	"isDigital": false,
+	"price": {
+		"range": "200000",
+		"min": 200000,
+		"max": 200000
+	},
+	"workflow": {
+		"status": "new"
+	},
+	"isLowQuantity": false,
+	"isSoldOut": true,
+	"isBackorder": true,
+	"vendor": "Ogo"
+},
+{
+	"_id": "vcjgz3Ahqa5XxFtLD",
+	"title": "sporty",
+	"ancestors": [
+		"dzR5EsktLWFAPfHrK"
+	],
+	"price": 200000,
+	"type": "variant",
+	"isVisible": true,
+	"isDeleted": false,
+	"compareAtPrice": 210000,
+	"weight": 1,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"inventoryManagement": true,
+	"inventoryPolicy": false,
+	"lowInventoryWarningThreshold": 2,
+	"inventoryQuantity": 10,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"originCountry": "NG",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "h3JFJkuqtyNWi9XF8",
+	"title": "sporty",
+	"type": "simple",
+	"ancestors": [],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "NG",
+	"requiresShipping": true,
+	"handle": "sporty-copy-3",
+	"isDeleted": false,
+	"isVisible": true,
+	"template": "productDetailSimple",
+	"createdAt": {
+		"$date": "2018-08-13T15:32:10.299Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-15T12:25:39.222Z"
+	},
+	"isDigital": false,
+	"price": {
+		"range": "150000",
+		"min": 150000,
+		"max": 150000
+	},
+	"workflow": {
+		"status": "new"
+	},
+	"isLowQuantity": false,
+	"isSoldOut": true,
+	"facebookMsg": "facebook",
+	"twitterMsg": "twitter",
+	"pinterestMsg": "pinterest",
+	"googleplusMsg": "google",
+	"hashtags": [
+		"fi5zh9sGY9qughMhf"
+	],
+	"isBackorder": true,
+	"vendor": "Moses"
+},
+{
+	"_id": "iqhJ2t2AkwgLAJYwN",
+	"title": "sporty",
+	"ancestors": [
+		"h3JFJkuqtyNWi9XF8"
+	],
+	"price": 150000,
+	"type": "variant",
+	"isVisible": true,
+	"isDeleted": false,
+	"compareAtPrice": 160000,
+	"weight": 0,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"inventoryManagement": true,
+	"inventoryPolicy": false,
+	"lowInventoryWarningThreshold": 10,
+	"inventoryQuantity": 120,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"originCountry": "NG",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "W7snv3gBrqtZsKvDp",
+	"title": "Sporty",
+	"type": "simple",
+	"ancestors": [],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "NG",
+	"requiresShipping": true,
+	"handle": "sporty-copy-4",
+	"isDeleted": false,
+	"isVisible": true,
+	"template": "productDetailSimple",
+	"createdAt": {
+		"$date": "2018-08-13T16:33:57.447Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-15T12:30:06.505Z"
+	},
+	"isDigital": false,
+	"price": {
+		"range": "10000",
+		"min": 10000,
+		"max": 10000
+	},
+	"workflow": {
+		"status": "new"
+	},
+	"isLowQuantity": false,
+	"isSoldOut": true,
+	"isBackorder": true,
+	"vendor": "Moses"
+},
+{
+	"_id": "6gPkuzJc6KY4hs3r3",
+	"title": "Sporty",
+	"ancestors": [
+		"W7snv3gBrqtZsKvDp"
+	],
+	"price": 10000,
+	"type": "variant",
+	"isVisible": true,
+	"isDeleted": false,
+	"compareAtPrice": 12000,
+	"weight": 1,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"inventoryManagement": true,
+	"inventoryPolicy": false,
+	"lowInventoryWarningThreshold": 10,
+	"inventoryQuantity": 100,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"originCountry": "NG",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "Y3Z84pezHDdPQoGwS",
+	"title": "sporty",
+	"type": "simple",
+	"ancestors": [],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "NG",
+	"requiresShipping": true,
+	"handle": "sporty-copy-5",
+	"isDeleted": false,
+	"isVisible": true,
+	"template": "productDetailSimple",
+	"createdAt": {
+		"$date": "2018-08-13T16:36:09.153Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-15T12:29:30.157Z"
+	},
+	"isDigital": false,
+	"price": {
+		"range": "105000",
+		"min": 105000,
+		"max": 105000
+	},
+	"workflow": {
+		"status": "new"
+	},
+	"isLowQuantity": false,
+	"isSoldOut": true,
+	"isBackorder": true,
+	"vendor": "Moses"
+},
+{
+	"_id": "E3nGf3sFnQZnwqdbD",
+	"title": "sporty",
+	"ancestors": [
+		"Y3Z84pezHDdPQoGwS"
+	],
+	"price": 105000,
+	"type": "variant",
+	"isVisible": true,
+	"isDeleted": false,
+	"compareAtPrice": 110000,
+	"weight": 1,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"inventoryManagement": true,
+	"inventoryPolicy": true,
+	"lowInventoryWarningThreshold": 10,
+	"inventoryQuantity": 120,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"originCountry": "NG",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "LG3saQonZXZY7bJn8",
+	"title": "sporty2",
+	"type": "simple",
+	"ancestors": [],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "NG",
+	"requiresShipping": true,
+	"handle": "sporty2",
+	"isDeleted": false,
+	"isVisible": true,
+	"template": "productDetailSimple",
+	"createdAt": {
+		"$date": "2018-08-13T16:37:35.779Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-13T16:39:40.977Z"
+	},
+	"isDigital": false,
+	"price": {
+		"range": "2000",
+		"min": 2000,
+		"max": 2000
+	},
+	"workflow": {
+		"status": "new"
+	},
+	"vendor": "ogo",
+	"metafields": [
+		{
+			"key": "Brand",
+			"value": "Alcantara"
+		}
+	],
+	"isLowQuantity": false,
+	"isSoldOut": false,
+	"isBackorder": false
+},
+{
+	"_id": "uCPHMKFWdDXMdLYiF",
+	"title": "sporty",
+	"ancestors": [
+		"LG3saQonZXZY7bJn8"
+	],
+	"price": 2000,
+	"type": "variant",
+	"isVisible": true,
+	"isDeleted": false,
+	"compareAtPrice": 3000,
+	"weight": 1,
+	"length": 0,
+	"width": 0,
+	"height": 0,
+	"inventoryManagement": true,
+	"inventoryPolicy": false,
+	"lowInventoryWarningThreshold": 1000,
+	"inventoryQuantity": 2000,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"taxable": true,
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"originCountry": "NG",
+	"workflow": {
+		"status": "new"
+	}
+},
+{
+	"_id": "GitAcqRfxEXWfnriA",
+	"title": "Sporty",
+	"type": "simple",
+	"ancestors": [],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "NG",
+	"requiresShipping": true,
+	"handle": "sporty-copy-6",
+	"isDeleted": false,
+	"isVisible": true,
+	"template": "productDetailSimple",
+	"createdAt": {
+		"$date": "2018-08-15T12:55:16.978Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-15T12:56:56.945Z"
+	},
+	"isDigital": false,
+	"price": {
+		"range": "10000",
+		"min": 10000,
+		"max": 10000
+	},
+	"workflow": {
+		"status": "new"
+	},
+	"isLowQuantity": false,
+	"isSoldOut": true,
+	"vendor": "Otse",
+	"isBackorder": true
+},
+{
+	"_id": "R6SDhepPtak7aHJgr",
+	"title": "Sporty",
+	"inventoryPolicy": false,
+	"price": 10000,
+	"height": 0,
+	"isVisible": true,
+	"taxable": true,
+	"ancestors": [
+		"GitAcqRfxEXWfnriA"
+	],
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"workflow": {
+		"status": "new"
+	},
+	"length": 0,
+	"compareAtPrice": 12000,
+	"inventoryQuantity": 100000,
+	"weight": 1,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "NG",
+	"inventoryManagement": true,
+	"type": "variant",
+	"lowInventoryWarningThreshold": 1000,
+	"isDeleted": false,
+	"width": 0
+},
+{
+	"_id": "QDdMtWWqyQvBEPvPu",
+	"title": "Sporty",
+	"type": "simple",
+	"ancestors": [],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "NG",
+	"requiresShipping": true,
+	"handle": "sporty-copy-7",
+	"isDeleted": false,
+	"isVisible": false,
+	"template": "productDetailSimple",
+	"createdAt": {
+		"$date": "2018-08-15T12:57:22.784Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-15T12:58:27.131Z"
+	},
+	"isDigital": false,
+	"price": {
+		"range": "0.00",
+		"min": 0,
+		"max": 0
+	},
+	"workflow": {
+		"status": "new"
+	},
+	"isLowQuantity": false,
+	"isSoldOut": true,
+	"vendor": "Ivy",
+	"isBackorder": true
+},
+{
+	"_id": "oh5WcwppQfFRcve4y",
+	"title": "Sporty",
+	"inventoryPolicy": false,
+	"price": 10000,
+	"height": 0,
+	"isVisible": false,
+	"taxable": true,
+	"ancestors": [
+		"QDdMtWWqyQvBEPvPu"
+	],
+	"taxCode": "0000",
+	"optionTitle": "Untitled Option",
+	"workflow": {
+		"status": "new"
+	},
+	"length": 0,
+	"compareAtPrice": 12000,
+	"inventoryQuantity": 1000,
+	"weight": 2,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "NG",
+	"inventoryManagement": true,
+	"type": "variant",
+	"lowInventoryWarningThreshold": 800,
+	"isDeleted": false,
+	"width": 0
+},
+{
+	"_id": "ty7eyks2zfQcnZu3M",
+	"title": "Sporty",
+	"type": "simple",
+	"ancestors": [],
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"originCountry": "NG",
+	"requiresShipping": true,
+	"handle": "sporty-copy-8",
+	"isDeleted": false,
+	"isVisible": true,
+	"template": "productDetailSimple",
+	"createdAt": {
+		"$date": "2018-08-15T13:41:08.552Z"
+	},
+	"updatedAt": {
+		"$date": "2018-08-15T13:46:16.935Z"
+	},
+	"isDigital": false,
+	"price": {
+		"range": "150000",
+		"min": 150000,
+		"max": 150000
+	},
+	"workflow": {
+		"status": "new"
+	},
+	"isLowQuantity": false,
+	"isSoldOut": true,
+	"isBackorder": true,
+	"vendor": "Stephen"
+},
+{
+	"_id": "pPtA3YjJceBgogj2E",
+	"title": "Sporty",
+	"type": "variant",
+	"width": 0,
+	"originCountry": "NG",
+	"isDeleted": false,
+	"ancestors": [
+		"ty7eyks2zfQcnZu3M"
+	],
+	"compareAtPrice": 152000,
+	"inventoryManagement": true,
+	"taxable": true,
+	"height": 0,
+	"shopId": "J8Bhq3uTtdgwZx3rz",
+	"length": 0,
+	"inventoryQuantity": 200,
+	"isVisible": true,
+	"optionTitle": "Untitled Option",
+	"workflow": {
+		"status": "new"
+	},
+	"price": 150000,
+	"taxCode": "0000",
+	"weight": 1,
+	"inventoryPolicy": false,
+	"lowInventoryWarningThreshold": 10
 }]
 

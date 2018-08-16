@@ -18,7 +18,7 @@ Reaction.registerPackage({
         title: 10,
         description: 5,
         pageTitle: 3,
-        metafields: 1,
+        metafields: 4,
         vendor: 4
       }
     }
