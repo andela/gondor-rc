@@ -61,6 +61,9 @@ function transform(doc, userId) {
   // in this transform. non admin users should get public setting
   if (hasAdmin === false && doc.settings) {
     registrySettings.public = doc.settings.public;
+    if (doc.settings.publicApiKey) registrySettings.publicApiKey = doc.settings.publicApiKey;
+    if (doc.settings["paystack-paymentmethod"]) registrySettings["paystack-paymentmethod"].publicApiKey = doc.settings["paystack-paymentmethod"].publicApiKey;
+
     delete doc.settings;
     Object.assign(packageSettings, registrySettings);
     doc.settings = packageSettings;
@@ -92,7 +95,8 @@ Meteor.publish("Packages", function (shopId) {
         layout: 1,
         icon: 1,
         settings: 1,
-        audience: 1
+        audience: 1,
+        publicApiKey: 1
       }
     };
 

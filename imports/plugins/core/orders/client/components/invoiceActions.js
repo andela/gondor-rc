@@ -46,6 +46,7 @@ class InvoiceActions extends Component {
     paymentCaptured: PropTypes.bool,
     paymentPendingApproval: PropTypes.bool,
     printOrder: PropTypes.string,
+    refunds: PropTypes.any,
     showAfterPaymentCaptured: PropTypes.bool
   }
 
@@ -90,7 +91,7 @@ class InvoiceActions extends Component {
 
     return (
       <div>
-        {this.props.hasRefundingEnabled &&
+        {this.props.hasRefundingEnabled && this.props.refunds.length === 0 &&
           <div className="flex refund-container">
             <div className="refund-input">
               <Components.NumericInput
@@ -152,6 +153,7 @@ class InvoiceActions extends Component {
           href={this.props.printOrder}
           target="_blank"
           data-i18n="app.printInvoice"
+          style={{ marginTop: "15px" }}
         >
           Print Invoice
         </a>
