@@ -13,7 +13,7 @@ function composer(props, onData) {
 
   if (searchPackage.length) {
     searchEnabled = true;
-    searchTemplate = searchPackage[0].template;
+    searchTemplate = "customSearchModal";
   } else {
     searchEnabled = false;
   }
