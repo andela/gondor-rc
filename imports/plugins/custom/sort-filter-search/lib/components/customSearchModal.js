@@ -7,6 +7,9 @@ import { accountsTable } from "/imports/plugins/included/ui-search/lib/helpers";
 
 
 class CustomSearchModal extends SearchModal {
+  componentDidMount() {
+    this.props.getVendors();
+  }
   renderSortAndFilter() {
     const priceOptions = [
       { value: "all", label: "All" },
@@ -32,6 +35,7 @@ class CustomSearchModal extends SearchModal {
     };
     return (
       <div className="sort-filter">
+
         <div className="filter-box">
 
           <span className="filter-sort">
@@ -62,7 +66,7 @@ class CustomSearchModal extends SearchModal {
           <span className="filter-sort" id="price-filter-span" style={{ width: "20%" }}>
             <Components.Select
               clearable={false}
-              label="Filter By"
+              label="Filter By Price"
               name="priceFilter"
               ref="priceFilterInput"
               options={priceOptions}
@@ -70,7 +74,19 @@ class CustomSearchModal extends SearchModal {
               value={this.props.priceFilter}
             />
           </span>
+          <span className="filter-sort" id="vendor-filter-span" style={{ width: "20%" }}>
+            <Components.Select
+              clearable={false}
+              label="Filter By Vendor"
+              name="vendorFilter"
+              ref="vendorFilterInput"
+              options={this.props.vendor}
+              onChange={this.props.handleVendorFilter}
+              value={this.props.vendorFilter}
+            />
+          </span>
         </div>
+
       </div>
     );
   }

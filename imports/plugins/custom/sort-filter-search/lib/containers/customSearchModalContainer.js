@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { compose } from "recompose";
 import _ from "lodash";
+import { Meteor } from "meteor/meteor";
 import { Reaction } from "/client/api";
 import { replaceComponent } from "@reactioncommerce/reaction-components";
 import SearchSubscription from "./searchSubscription";
@@ -22,11 +23,14 @@ const wrapComponent = (Comp) => (
         sorters: [{ property: "all", value: "default" },
           { property: "all", value: "default" }],
         priceFilter: "all",
+        vendor: [],
+        vendorFilter: "all",
         renderChild: true,
         facets: []
       };
       this.handleSort = this.handleSort.bind(this);
       this.handlePriceFilter = this.handlePriceFilter.bind(this);
+      this.getVendors = this.getVendors.bind(this);
     }
 
     componentDidMount() {
@@ -82,6 +86,17 @@ const wrapComponent = (Comp) => (
     handlePriceFilter(value) {
       this.setState({ priceFilter: value });
     }
+
+    handleVendorFilter = (value) => {
+      this.setState({ vendorFilter: value.toString() });
+    }
+
+    getVendors = () => {
+      Meteor.call("product/getVendor", (err, res) => {
+        this.setState({ vendor: res });
+      });
+    }
+
     handleChildUnmount = () =>  {
       this.setState({ renderChild: false });
     }
@@ -95,6 +110,7 @@ const wrapComponent = (Comp) => (
                 handleChange={this.handleChange}
                 handleSort={this.handleSort}
                 handlePriceFilter={this.handlePriceFilter}
+                handleVendorFilter={this.handleVendorFilter}
                 handleClick={this.handleClick}
                 handleToggle={this.handleToggle}
                 handleAccountClick={this.handleAccountClick}
@@ -105,6 +121,9 @@ const wrapComponent = (Comp) => (
                 facets={this.state.facets}
                 sorters={this.state.sorters}
                 priceFilter={this.state.priceFilter}
+                vendorFilter={this.state.vendorFilter}
+                vendor={this.state.vendor}
+                getVendors={this.getVendors}
               />
             </div> : null
           }

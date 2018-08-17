@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Meteor } from "meteor/meteor";
 import { createSorter } from "../util/sort";
+import { filterByPrice } from "../util/filter";
 import * as Collections from "/lib/collections";
 import { Components, composeWithTracker } from "@reactioncommerce/reaction-components";
 import CustomSearchModal from "../components/customSearchModal";
@@ -17,6 +18,7 @@ function getSiteName() {
   const shop = Collections.Shops.findOne();
   return typeof shop === "object" && shop.name ? shop.name : "";
 }
+
 
 function getProductHashtags(productResults) {
   const foundHashtags = {}; // Object to keep track of results for O(1) lookup
@@ -58,6 +60,26 @@ function composer(props, onData) {
       tagSearchResults = Collections.Tags.find({
         _id: { $in: productHashtags }
       }).fetch();
+    }
+
+
+    /*
+    * Product Filter by Price
+    */
+    if (props.priceFilter !== "all") {
+      let range = props.priceFilter.split("-");
+      range = range.map((limit) => {
+        return Number(limit);
+      });
+      productResults = filterByPrice(productResults, range);
+    }
+    /*
+    * Product Filter by Vendor
+    */
+    if (props.vendorFilter !== "all") {
+      productResults = productResults.filter((product) => {
+        return product.vendor === props.vendorFilter;
+      });
     }
 
     /*
