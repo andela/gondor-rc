@@ -1,0 +1,27 @@
+[{
+  "language": "English",
+  "i18n": "en",
+  "ns": "payondelivery-paymentmethod",
+  "translation": {
+    "reaction-payments": {
+      "admin": {
+        "shortcut": {
+          "payondeliveryPaymentProviderLabel": "Pay On Delivery",
+          "payondeliveryPaymentProviderTitle": "Pay On Delivery"
+        },
+        "dashboard": {
+          "payondeliveryPaymentProviderLabel": "Pay On Delivery",
+          "payondeliveryPaymentProviderTitle": "Pay On Delivery",
+          "payondeliveryPaymentProviderDescription": "Pay On Delivery Payment Method"
+        },
+        "paymentSettings": {
+          "payondeliveryPaymentLabel": "Pay On Delivery",
+          "payondeliveryPaymentSettingsLabel": "payondelivery Payment",
+          "payondeliveryCredentials": "This is Pay On Delivery payment method setting.",
+          "apiClientId": "API Client ID",
+          "supportedMethodsLabel": "Payment provider supported methods"
+        }
+      }
+    }
+  }
+}]
