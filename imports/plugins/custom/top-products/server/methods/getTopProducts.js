@@ -17,6 +17,7 @@ Meteor.methods({
       const productRegex = new RegExp(productName, "i");
       result = Orders.aggregate([
         { $unwind: "$items" },
+        { $match: { "workflow.status": "coreOrderWorkflow/completed" } },
         { $group: {
           _id: "$items.productId",
           productName: { $first: "$items.title" },
@@ -35,6 +36,7 @@ Meteor.methods({
     } else {
       result = Orders.aggregate([
         { $unwind: "$items" },
+        { $match: { "workflow.status": "coreOrderWorkflow/completed" } },
         { $group: {
           _id: "$items.productId",
           productName: { $first: "$items.title" },

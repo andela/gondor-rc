@@ -58,17 +58,21 @@ class OrderList extends React.Component {
     if (Reaction.hasDashboardAccess()) {
       return (
         <div>
-          <div className="table-responsive">
+          <div className="table-responsive text-center">
             <p className="text-center">Filter your result</p>
-            <form>
+            <form className="form-inline">
               <div className="form-group">
                 <label htmlFor="productname">Product Name:</label>
+                &nbsp;&nbsp;&nbsp;
                 <input name="productName" onChange={this.handleChange}
                   type="text" className="form-control"
-                  id="productname" placeholder="Product Name" />
+                  id="productname" placeholder="Product Name"
+                />
               </div>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <div className="form-group">
                 <label htmlFor="topNo">Limit:</label>
+                &nbsp;&nbsp;&nbsp;
                 <select id="limit" onChange={this.handleChange}
                   name="limit" className="form-control"
                 >
@@ -78,6 +82,8 @@ class OrderList extends React.Component {
                   <option value="100">100</option>
                 </select>
               </div>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span />
               <button type="button" onClick={this.handleSubmit}
                 className="btn btn-primary text-center"
               >Filter</button>
