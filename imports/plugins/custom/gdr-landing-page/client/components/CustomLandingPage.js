@@ -1,14 +1,39 @@
 import React from "react";
 import { getRawComponent, replaceComponent } from "/imports/plugins/core/components/lib";
 import { Router } from "/client/modules/router";
+import { Meteor } from "meteor/meteor";
 
 import WelcomeSection from "./WelcomeSection";
 import ProductsCategories from "./ProductsCategories";
 import Slider  from "./Slider";
+import TrendingProducts from "./TrendingProducts";
 
 const Products = getRawComponent("Products");
 
 class CustomLandingPage extends Products {
+  constructor(props) {
+    super(props);
+    this.state = {
+      trendingProducts: []
+    };
+
+    this.getTrendingProducts = this.getTrendingProducts.bind(this);
+  }
+
+  componentDidMount() {
+    this.getTrendingProducts(12);
+  }
+
+  getTrendingProducts(limit) {
+    Meteor.call("product/getTrendingProducts", limit, (err, res) => {
+      if (err) {
+        console.log(err);
+      }
+
+      this.setState({ trendingProducts: res });
+    });
+  }
+
   render() {
     // Force show the not-found view.
     if (this.props.showNotFound) {
@@ -18,8 +43,8 @@ class CustomLandingPage extends Products {
       if (this.hasProducts) {
         return (
           <div id="container-main">
-            {/* Display only on index page */}
             {
+              // Display only on index page
               (Router.getRouteName() === "index")
               &&
               (
@@ -29,7 +54,6 @@ class CustomLandingPage extends Products {
                     <h2 className="gdr-cat gdr-landingPage-title">
                         Categories
                     </h2>
-
                     <ProductsCategories />
                     <Slider {...this.props} products = {this.props.products} />
                   </div>
@@ -49,8 +73,19 @@ class CustomLandingPage extends Products {
               )
             }
 
-            {this.renderProductGrid()}
-            {this.renderLoadMoreProductsButton()}
+            {
+              (Router.getRouteName() === "index")
+              &&
+              (
+                <TrendingProducts
+                  trendingProducts={this.state.trendingProducts}
+                  products = {this.props.products}
+                />
+              )
+            }
+
+            {(Router.getRouteName() !== "index") && this.renderProductGrid()}
+            {(Router.getRouteName() !== "index") && this.renderLoadMoreProductsButton()}
             {this.renderSpinner()}
           </div>
         );
