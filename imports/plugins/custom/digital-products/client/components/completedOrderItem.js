@@ -19,7 +19,13 @@ const CompletedOrderItem = ({ item, handleDisplayMedia }) => {
   return (
     <div className="row order-details-line">
       <div className="order-details-media"><img src={image} /></div>
-      <div className="order-details-title">{item.product.title}<p>{item.variants.title}</p></div>
+      <div className="order-details-title">
+        {item.product.title}
+        <p>{item.variants.title}</p>
+        <a href={`/product/${product.title}#reviews`}>
+          <i>Review product</i>
+        </a>
+      </div>
       <div className="order-details-quantity"><span>{item.quantity}</span></div>
       {
         product.isDigital &&
