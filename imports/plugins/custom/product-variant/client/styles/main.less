@@ -210,3 +210,56 @@
 .product-grid-item .overlay .currency-symbol {
   text-align: left!important;
 }
+
+
+.social-share {
+  position: absolute;
+  top: 36px;
+  right: 3rem;
+  -webkit-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+  visibility: hidden;
+
+  .share-icon-container {
+    display: flex;
+    justify-content: flex-end;
+    cursor: pointer;
+    i {
+      font-size: 20px;
+    }
+  }
+  .SocialMediaShareButton:focus {
+    outline: none;
+  }
+  .social-icon-container {
+    
+    .social-icons {
+      display: flex;
+      flex-direction: column;
+      margin-right: 0.5rem;
+      .social-icon {
+        margin-bottom: 0.3rem;
+      }
+    }
+    .hide {
+      display: none
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    top: 11px;
+    opacity: 0.5;
+  }
+
+  to {
+    top: 36px;
+    opacity: 1;
+  }
+}
+
+.slideIn {
+  animation: slideIn 0.3s ease-in;
+  visibility: visible;
+}
