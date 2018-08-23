@@ -48,12 +48,18 @@ const createComposerWithLimit = (limit) => {
         sort: { createdAt: -1 }
       }).fetch();
 
+      const productReviewsByUser = Reviews.find({
+        productId: currentProductId,
+        userId: currentUser._id
+      }).count();
+
       const ordersPlacedByUser = Orders.find({
         "items.productId": currentProductId,
         "userId": currentUser._id
       }).count();
 
       const userHasBoughtProduct = Boolean(ordersPlacedByUser);
+      const userHasReviewedProduct = Boolean(productReviewsByUser);
 
       /**
        * Makes a meteor call to add a review to a product
@@ -78,6 +84,7 @@ const createComposerWithLimit = (limit) => {
       onData(null, {
         reviews,
         userHasBoughtProduct,
+        userHasReviewedProduct,
         currentUser,
         handleReview,
         loadMore,

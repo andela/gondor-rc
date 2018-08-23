@@ -15,7 +15,8 @@ class ReviewArea extends Component {
     product: PropTypes.object.isRequired,
     reviews: PropTypes.arrayOf(PropTypes.object).isRequired,
     totalProductReviews: PropTypes.number.isRequired,
-    userHasBoughtProduct: PropTypes.bool.isRequired
+    userHasBoughtProduct: PropTypes.bool.isRequired,
+    userHasReviewedProduct: PropTypes.bool.isRequired
   }
 
   /**
@@ -26,12 +27,14 @@ class ReviewArea extends Component {
   userCanReview = () => {
     const {
       currentUser,
-      userHasBoughtProduct
+      userHasBoughtProduct,
+      userHasReviewedProduct
     } = this.props;
 
     return !Reaction.hasOwnerAccess() &&
       currentUser &&
-      userHasBoughtProduct;
+      userHasBoughtProduct &&
+      !userHasReviewedProduct;
   }
 
   render() {

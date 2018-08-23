@@ -22,7 +22,7 @@ const CompletedOrderItem = ({ item, handleDisplayMedia }) => {
       <div className="order-details-title">
         {item.product.title}
         <p>{item.variants.title}</p>
-        <a href={`/product/${product.title}#reviews`}>
+        <a href={`/product/${product._id}#reviews`}>
           <i>Review product</i>
         </a>
       </div>
