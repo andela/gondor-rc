@@ -13,7 +13,7 @@ const ProductsCategories = () => (
           <img src="/images/sneakers.jpg" className="img-responsive" alt="Responsive" />
           <div className="gdr-cat-title">
             <p>
-                Footwares
+                Footwears
             </p>
           </div>
         </div>
