@@ -131,6 +131,7 @@ ongoworks:security@2.1.0
 ordered-dict@1.0.9
 ostrio:cookies@2.2.7
 ostrio:files@1.9.7
+percolate:find-from-publication@0.1.0
 percolate:migrations@0.9.8
 practicalmeteor:chai@2.1.0_1
 practicalmeteor:mocha-core@1.0.1

@@ -1,0 +1,13 @@
+[{
+  "_id": "5b7a1f705460ef4b0727764a",
+  "rating": 3,
+  "productId": "BCTMZ6HTxFSppJESk",
+  "userId": "NewPnhw4gTQ9LewSJ",
+  "details": "Great stuff tho",
+  "createdAt": {
+    "$date": "2018-08-20T01:51:23.183Z"
+  },
+  "updatedAt": {
+    "$date": "2018-08-20T01:51:23.183Z"
+  }
+}]

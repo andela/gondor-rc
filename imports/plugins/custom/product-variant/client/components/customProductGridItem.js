@@ -1,5 +1,6 @@
 import React from "react";
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon, WhatsappShareButton, WhatsappIcon } from "react-share";
+import ReactStars from "react-stars";
 import { formatPriceString } from "/client/api";
 import { replaceComponent, getRawComponent, withIsAdmin, withIsOwner } from "@reactioncommerce/reaction-components";
 
@@ -18,13 +19,18 @@ class CustomProductGridItem extends ProductGridItem {
     });
   }
   renderRatingStars() {
-    return (<div className="stars">
-      <i className="fa fa-star" />
-      <i className="fa fa-star" />
-      <i className="fa fa-star" />
-      <i className="fa fa-star" />
-      <i className="fa fa-star-o" />
-    </div>);
+    const { product } = this.props;
+    return (
+      <div>
+        <ReactStars
+          value={product.avgRating}
+          edit={false}
+          size={15}
+          className="product-card-ratings"
+        />
+        <span>({product.avgRating})</span>
+      </div>
+    );
   }
   renderCustomerProductDetails() {
     const { product, displayPrice } = this.props;
@@ -74,8 +80,12 @@ class CustomProductGridItem extends ProductGridItem {
           data-event-value={product._id}
           onClick={this.handleClick}
         >
-          {(!isAdmin && !isOwner) && this.renderCustomerProductDetails()}
-          {(isAdmin || isOwner) && this.renderVendorProductDetails()}
+          {
+            (isAdmin || isOwner)
+              ? this.renderVendorProductDetails()
+              : this.renderCustomerProductDetails()
+
+          }
         </a>
       </div>
     );
@@ -114,9 +124,9 @@ class CustomProductGridItem extends ProductGridItem {
 
             {this.renderAdditionalMedia()}
           </a>
-          <div className="social-share"
-            ref={elm => this.socialShare = elm}
-
+          <div
+            className="social-share"
+            ref={elm => {this.socialShare = elm;}}
           >
             <div className="share-icon-container">
               <i onClick={this.showIcons} className="fa fa-share-alt" />
