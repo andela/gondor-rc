@@ -11,7 +11,7 @@ class Footer extends Component {
                 <div className="col-sm-2">
                   <ul>
                     <li><a href="#">Contact us</a></li>
-                    <li><a href="#">FAQ</a></li>
+                    <li><a href="/faq">FAQ</a></li>
                   </ul>
                 </div>
                 <div className="col-sm-3">

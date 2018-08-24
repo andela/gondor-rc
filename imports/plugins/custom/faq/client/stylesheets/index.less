@@ -1,0 +1,98 @@
+.faq-container {
+  padding: 30px 0px 15px 0;
+  display: flex;
+  margin: 0 auto;
+  width: 80%;
+}
+
+.faq-content {
+  width: 100%;
+
+  h2 {
+    font-size: 32px;
+    font-style: normal;
+    font-weight: bold;
+    text-transform: uppercase;
+    line-height: 1.5;
+    color: #000000;
+    display: block;
+    letter-spacing: 1px;
+    margin-top: 2rem;
+    text-transform: uppercase;
+  }
+
+  .faq-divider {
+    width: 100%;
+    display: block;
+    border: 0;
+    border-color: #000000;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+  }
+
+  .faq-column {
+
+    .faq-accordion {
+
+      h2 {
+        margin-top: 6rem;
+      }
+
+      dt button {
+        background: transparent;
+        position: relative;
+        padding: 20px 20px 20px 40px;
+        color: #000000;
+        border: none;
+        border-bottom: 1px solid #000000;
+        text-align: left;
+        display: block;
+        cursor: pointer;
+        width: 100%;
+        outline: none;
+        text-transform: initial;
+        height: auto;
+        font-weight: normal;
+        box-shadow: none;
+        border-radius: 0px;
+        font-size: 3rem;
+    }
+
+    dt>button:hover, dt>button:focus {
+      background: #e8e1ea;
+      color: #232020;
+    }
+
+    dt [aria-expanded="false"]:after {
+      content: "\002b"; /* "play" icon */
+      font-size: 18px;
+      top: 50%;
+      position: absolute;
+      transform: translateY(-50.1%);
+      left: 15px;
+      font-size: 25px;
+    }
+
+    dt [aria-expanded="true"]:after {
+      content: "\002d";
+      font-size: 30px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50.1%);
+      left: 15px;
+    }
+
+    dd {
+      color: #000000;
+      width: 89%;
+      margin: 0 auto;
+      padding: 20px 0px 20px 0px;
+    }
+    
+    dd>p {
+      font-size: 2rem;
+    }
+    }
+
+  }
+}
