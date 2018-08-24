@@ -1,9 +1,19 @@
+button:focus, button:active {
+  outline-color: @rui-brand-active !important;
+  box-shadow: none !important;
+}
+
 .admin-shortcut-bar nav .btn.active {
-  outline-color: @rui-brand-dark-disabled;
+  outline-color: @rui-brand-active;
+}
+
+.btn:focus, .btn:active, .btn.active {
+  outline-color: @rui-brand-active;
+  box-shadow: none !important;
 }
 
 .btn-default.active {
-  outline-color: @rui-brand-dark-disabled;
+  outline-color: @rui-brand-active;
 }
 
 .btn-default:focus, .btn-default.focus,
@@ -28,4 +38,8 @@
 
 .order-completed h3 {
   color: @rui-default;
+}
+
+.btn-signin span {
+  color: #52355a;
 }

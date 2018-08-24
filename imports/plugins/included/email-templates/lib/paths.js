@@ -27,3 +27,10 @@ export const coreOrderNewTemplate = "orders/new";
 export const orderShipped = "orders/shipped";
 export const orderRefunded = "orders/refunded";
 export const orderItemRefund = "orders/itemRefund";
+
+
+/**
+ * Newsletter
+ */
+export const newsletterDefault = "newsletter/default";
+export const newsletterAlternative = "newsletter/alternative";
