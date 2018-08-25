@@ -2,11 +2,15 @@ import React from "react";
 import { getRawComponent, replaceComponent } from "/imports/plugins/core/components/lib";
 import { Router } from "/client/modules/router";
 import { Meteor } from "meteor/meteor";
+import { Logger }  from "/client/api";
 
 import WelcomeSection from "./WelcomeSection";
 import ProductsCategories from "./ProductsCategories";
 import Slider  from "./Slider";
 import TrendingProducts from "./TrendingProducts";
+
+import onboard from "/imports/plugins/custom/vendor-onboarding/client/onboard";
+import { dashboardSteps } from "/imports/plugins/custom/vendor-onboarding/client/tourSteps";
 
 const Products = getRawComponent("Products");
 
@@ -18,16 +22,23 @@ class CustomLandingPage extends Products {
     };
 
     this.getTrendingProducts = this.getTrendingProducts.bind(this);
+    this.initializeTour = this.initializeTour.bind(this);
   }
 
   componentDidMount() {
     this.getTrendingProducts(12);
+    this.initializeTour();
   }
 
+  initializeTour() {
+    setTimeout(() => {
+      onboard.autoDashboardTour(dashboardSteps);
+    }, 2000);
+  }
   getTrendingProducts(limit) {
     Meteor.call("product/getTrendingProducts", limit, (err, res) => {
       if (err) {
-        console.log(err);
+        Logger.error(err);
       }
 
       this.setState({ trendingProducts: res });

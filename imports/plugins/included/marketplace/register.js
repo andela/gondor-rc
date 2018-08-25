@@ -36,7 +36,8 @@ Reaction.registerPackage({
           "reaction-social",
           "reaction-stripe",
           "reaction-taxes",
-          "discount-codes"]
+          "discount-codes",
+          "tour"]
       }, {
         shopType: "affiliate",
         enabledPackages: [
@@ -45,7 +46,8 @@ Reaction.registerPackage({
           "reaction-product-variant",
           "reaction-notification",
           "reaction-analytics",
-          "reaction-sms"]
+          "reaction-sms",
+          "tour"]
       }]
     },
     public: {

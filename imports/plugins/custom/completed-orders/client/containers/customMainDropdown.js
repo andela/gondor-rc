@@ -8,6 +8,10 @@ import { getRawComponent,
   replaceComponent,
   withCurrentAccount } from "@reactioncommerce/reaction-components";
 import { Reaction, Logger }  from "/client/api";
+
+import onboard from "/imports/plugins/custom/vendor-onboarding/client/onboard";
+import { dashboardSteps } from "/imports/plugins/custom/vendor-onboarding/client/tourSteps";
+
 const MainDropdownComponent = getRawComponent("MainDropdown");
 
 function handleChange(event, value) {
@@ -41,6 +45,8 @@ function handleChange(event, value) {
         });
       }
     });
+  } else if (value.name === "tour" && Reaction.hasPermission("createProduct")) {
+    onboard.manualTour(dashboardSteps);
   } else if (value.route === "/ordercomplete") {
     Reaction.Router.go("/ordercomplete");
   } else if (value.route === "/top-products") {
