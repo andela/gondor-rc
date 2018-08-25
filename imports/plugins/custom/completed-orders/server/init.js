@@ -4,6 +4,6 @@ Hooks.Events.add("afterCoreInit", () => {
   Reaction.addRolesToGroups({
     allShops: true,
     groups: ["customer"],
-    roles: ["account/verify", "ordercomplete", "reaction/notifications"]
+    roles: ["account/verify", "ordercomplete"]
   });
 });
