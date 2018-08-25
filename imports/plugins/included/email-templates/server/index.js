@@ -147,3 +147,29 @@ Reaction.registerTemplate({
   template: Reaction.Email.getTemplateFile(TemplatePaths.orderItemRefund),
   subject: "{{shop.name}}: Refund confirmation - {{order._id}}"
 });
+
+const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const monthNumber = (new Date()).getMonth();
+const month = months[monthNumber];
+
+/*
+  * Newsletter Default
+  */
+Reaction.registerTemplate({
+  title: "Newsletter Default",
+  name: TemplatePaths.newsletterDefault,
+  type: "email",
+  template: Reaction.Email.getTemplateFile(TemplatePaths.newsletterDefault),
+  subject: `{{shop.name}}: ${month} Newsletter`
+});
+
+/*
+  * Newsletter Alternative
+  */
+Reaction.registerTemplate({
+  title: "Newsletter Alternative",
+  name: TemplatePaths.newsletterAlternative,
+  type: "email",
+  template: Reaction.Email.getTemplateFile(TemplatePaths.newsletterAlternative),
+  subject: `{{shop.name}}: ${month} Newsletter`
+});
