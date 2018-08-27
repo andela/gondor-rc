@@ -56,7 +56,8 @@ const CompletedOrder = ({ order, orderId, shops, orderSummary, paymentMethods, h
         {shops.map(function (shop) {
           const shopKey = Object.keys(shop);
           return (
-            <CompletedShopOrders
+            <Components.CompletedShopOrders
+              order={order}
               shopName={shop[shopKey].name}
               items={shop[shopKey].items}
               key={shopKey}

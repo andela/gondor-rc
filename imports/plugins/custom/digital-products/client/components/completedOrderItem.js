@@ -10,40 +10,43 @@ import ProductFiles from "../../lib/collections/ProductFiles.js";
  * @property {Function} handleDisplayMedia - a function for displaying the proper product image
  * @return {Node} React node containing each line item on an order
  */
-const CompletedOrderItem = ({ item, handleDisplayMedia }) => {
-  const itemMedia = handleDisplayMedia(item);
-  const image = itemMedia ? itemMedia.url() : "/resources/placeholder.gif";
-  const { product } = item;
-  const productFile = product.isDigital ? ProductFiles.findOne({ _id: product.fileId }) : {};
-
-  return (
-    <div className="row order-details-line">
-      <div className="order-details-media"><img src={image} /></div>
-      <div className="order-details-title">
-        {item.product.title}
-        <p>{item.variants.title}</p>
-        <a href={`/product/${product._id}#reviews`}>
-          <i>Review product</i>
-        </a>
+class CompletedOrderItem extends React.Component {
+  render() {
+    this.item = this.props.item;
+    this.handleDisplayMedia = this.props.handleDisplayMedia;
+    this.itemMedia = this.handleDisplayMedia(this.item);
+    this.image = this.itemMedia ? this.itemMedia.url() : "/resources/placeholder.gif";
+    this.product = this.item.product;
+    this.productFile = this.product.isDigital ? ProductFiles.findOne({ _id: this.product.fileId }) : {};
+    return (
+      <div className="row order-details-line">
+        <div className="order-details-media"><img src={this.image} /></div>
+        <div className="order-details-title">
+          {this.item.product.title}
+          <p>{this.item.variants.title}</p>
+          <a href={`/product/${this.product._id}#reviews`}>
+            <i>Review product</i>
+          </a>
+        </div>
+        <div className="order-details-quantity"><span>{this.item.quantity}</span></div>
+        {
+          this.product.isDigital &&
+            <div className="order-details-download">
+              <a
+                className="download-link"
+                href={this.productFile.link()}
+                download={this.productFile.name}
+                type={this.productFile.type}
+              >
+                Download
+              </a>
+            </div>
+        }
+        <div className="order-details-price"><Components.Currency amount={this.item.variants.price} /></div>
       </div>
-      <div className="order-details-quantity"><span>{item.quantity}</span></div>
-      {
-        product.isDigital &&
-          <div className="order-details-download">
-            <a
-              className="download-link"
-              href={productFile.link()}
-              download={productFile.name}
-              type={productFile.type}
-            >
-              Download
-            </a>
-          </div>
-      }
-      <div className="order-details-price"><Components.Currency amount={item.variants.price} /></div>
-    </div>
-  );
-};
+    );
+  }
+}
 
 
 CompletedOrderItem.propTypes = {

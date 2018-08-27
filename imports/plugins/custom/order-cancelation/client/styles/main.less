@@ -1,0 +1,32 @@
+@danger-color: #d41111;
+@white-color: #fff;
+@bright-purple-color: #8b6096;;
+
+.order-details-cancel {
+  padding-top: 10px;
+
+  .cancel-link {
+    border: 1px solid;
+    border-radius: 3px;
+    padding: 8px;
+    &:hover{
+      background-color: @danger-color;
+      color: @white-color;
+    }
+  }
+}
+
+.modal {
+  background-color: @bright-purple-color;
+  color: @white-color;
+}
+
+.modal-text-content {
+  color: white;
+}
+
+.modal-ctrl-btn {
+  .btn-cancel {
+    border-color: transparent !important;
+  }
+}
