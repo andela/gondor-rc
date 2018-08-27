@@ -4,6 +4,7 @@ import { Router } from "/client/modules/router";
 import { Meteor } from "meteor/meteor";
 import { Logger }  from "/client/api";
 
+import Modal from "./Modal";
 import WelcomeSection from "./WelcomeSection";
 import ProductsCategories from "./ProductsCategories";
 import Slider  from "./Slider";
@@ -18,7 +19,8 @@ class CustomLandingPage extends Products {
   constructor(props) {
     super(props);
     this.state = {
-      trendingProducts: []
+      trendingProducts: [],
+      notVisited: false
     };
 
     this.getTrendingProducts = this.getTrendingProducts.bind(this);
@@ -45,6 +47,15 @@ class CustomLandingPage extends Products {
     });
   }
 
+  componentDidMount() {
+    const show = localStorage.getItem("visited");
+    if (show === null) {
+      this.setState({
+        notVisited: true
+      });
+    }
+  }
+
   render() {
     // Force show the not-found view.
     if (this.props.showNotFound) {
@@ -54,6 +65,7 @@ class CustomLandingPage extends Products {
       if (this.hasProducts) {
         return (
           <div id="container-main">
+            {this.state.notVisited && <Modal />}
             {
               // Display only on index page
               (Router.getRouteName() === "index")
