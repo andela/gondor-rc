@@ -142,7 +142,7 @@ class CustomOrderSummary extends OrderSummary {
           order && order.workflow && order.workflow.status === "coreOrderWorkflow/canceled" &&
           this.state.rejectionReason &&
           <div className="order-summary-form-group rejection-reason-content">
-            <strong data-i18n="orderShipping.tracking">Reason For Rejection</strong>
+            <strong>Reason For Rejection</strong>
             <div className="invoice-details rejection-reason">
               {this.state.rejectionReason}
             </div>
