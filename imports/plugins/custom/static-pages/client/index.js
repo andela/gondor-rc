@@ -1,0 +1,1 @@
+import { StaticPage } from "./settings";

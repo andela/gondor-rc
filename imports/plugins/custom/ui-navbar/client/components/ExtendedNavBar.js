@@ -66,6 +66,7 @@ class ExtendedNavBar extends NavBar {
         {this.renderSearchBox()}
         {this.renderTourButton()}
         {this.renderNotificationIcon()}
+        {this.renderStaticPages()}
         {this.renderCurrency()}
         {this.renderMainDropdown()}
         {this.renderCartContainerAndPanel()}
