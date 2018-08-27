@@ -38,7 +38,9 @@ export const methods = {
     const admin = new RegExp("admin", "i");
     const users = Accounts.find({ username: { $not: admin } }).fetch();
 
-    const usersEmails = users.map(user => user.emails[0].address);
+    const usersWithEmail = users.filter(user => user.emails[0]);
+
+    const usersEmails = usersWithEmail.map(user =>  user.emails[0].address);
 
     // Get Shop information
     const shop = Shops.findOne(shopId);
