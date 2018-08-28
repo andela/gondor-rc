@@ -105,7 +105,7 @@ AutoForm.addHooks("example-payment-form", {
   },
   endSubmit: function () {
     if (!submitting) {
-      return uiEnd(this.template, "Complete your order");
+      return uiEnd(this.template, "Pay Now");
     }
   }
 });
