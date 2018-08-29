@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { Meteor } from "meteor/meteor";
-import { Reaction } from "/client/api";
 
 /**
  * @description frequently asked questions

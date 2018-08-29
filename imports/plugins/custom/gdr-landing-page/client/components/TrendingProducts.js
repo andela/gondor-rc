@@ -36,7 +36,7 @@ class TrendingProducts extends Component {
 
     // use defaults products if there aren't any trending products
     if (products.length < 1) {
-      products = this.props.products.slice(0, 11);
+      products = this.props.products.slice(0, 12);
     }
 
     const productsByKey = {};

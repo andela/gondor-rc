@@ -18,11 +18,11 @@ const Products = getRawComponent("Products");
 class CustomLandingPage extends Products {
   constructor(props) {
     super(props);
+    const show = localStorage.getItem("visited");
     this.state = {
       trendingProducts: [],
-      notVisited: false
+      notVisited: show === null
     };
-
     this.getTrendingProducts = this.getTrendingProducts.bind(this);
     this.initializeTour = this.initializeTour.bind(this);
   }
@@ -45,15 +45,6 @@ class CustomLandingPage extends Products {
 
       this.setState({ trendingProducts: res });
     });
-  }
-
-  componentDidMount() {
-    const show = localStorage.getItem("visited");
-    if (show === null) {
-      this.setState({
-        notVisited: true
-      });
-    }
   }
 
   render() {
