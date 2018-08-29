@@ -47,6 +47,8 @@ function handleChange(event, value) {
     });
   } else if (value.name === "tour" && Reaction.hasPermission("createProduct")) {
     onboard.manualTour(dashboardSteps);
+  } else if (value.route === "/wish-list" && !Reaction.hasPermission("createProduct")) {
+    Reaction.Router.go("/wish-list");
   } else if (value.route === "/ordercomplete") {
     Reaction.Router.go("/ordercomplete");
   } else if (value.route === "/top-products") {

@@ -2,7 +2,7 @@ import React from "react";
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon, WhatsappShareButton, WhatsappIcon } from "react-share";
 import ReactStars from "react-stars";
 import { formatPriceString } from "/client/api";
-import { replaceComponent, getRawComponent, withIsAdmin, withIsOwner } from "@reactioncommerce/reaction-components";
+import { replaceComponent, getRawComponent, withIsAdmin, withIsOwner, Components } from "@reactioncommerce/reaction-components";
 
 const ProductGridItem = getRawComponent("ProductGridItems");
 
@@ -43,9 +43,7 @@ class CustomProductGridItem extends ProductGridItem {
       </div>
       <div className="rating-cart">
         {this.renderRatingStars()}
-        <div className="cart">
-          <i className="fa fa-heart-o" aria-hidden="true" />
-        </div>
+        <Components.WishListIcon productId={this.props.product._id} />
       </div>
 
     </div>);

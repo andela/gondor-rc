@@ -11,12 +11,12 @@ Reaction.registerPackage({
   name: "faq",
   icon: "fa fa-table",
   autoEnable: true,
+  settings: {},
   registry: [{
     route: "/faq",
     template: "faq",
     name: "faq",
     label: "faq",
-    icon: "fa fa-table",
-    permissions: ["guest"]
+    icon: "fa fa-table"
   }]
 });

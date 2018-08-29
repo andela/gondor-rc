@@ -16,7 +16,7 @@ Reaction.registerPackage({
     route: "/top-products",
     template: "topProducts",
     name: "topproducts",
-    provides: ["userAccountDropdown"],
+    provides: ["shortcut"],
     label: "Top Products",
     icon: "fa fa-table"
   }]
