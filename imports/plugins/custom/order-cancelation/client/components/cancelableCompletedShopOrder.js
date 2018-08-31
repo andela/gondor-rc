@@ -3,7 +3,7 @@ import { Meteor } from "meteor/meteor";
 import PropTypes from "prop-types";
 import { Components, replaceComponent } from "@reactioncommerce/reaction-components";
 import Modal from "./Modal";
-// import CompletedOrderItem from "./completedOrderItem";
+import RejectDeliveryModal from "./RejectDeliveryModal";
 
 /**
  * @summary Displays the order breakdown for each Shop
@@ -19,17 +19,28 @@ class CancelableCompletedShopOrder extends React.Component {
   constructor() {
     super();
     this.state = {
-      showCancelModal: false
+      showCancelModal: false,
+      showRejectDeliveryModal: false
     };
 
     this.toggleCancelModal = this.toggleCancelModal.bind(this);
     this.cancelOrder = this.cancelOrder.bind(this);
+    this.renderRejectDeliveryModal = this.renderRejectDeliveryModal.bind(this);
+    this.toggleRejectDeliveryModal = this.toggleRejectDeliveryModal.bind(this);
+    this.handleFormSubmit = this.handleFormSubmit.bind(this);
   }
 
   toggleCancelModal(event) {
     event.preventDefault();
     this.setState({
       showCancelModal: !this.state.showCancelModal
+    });
+  }
+
+  toggleRejectDeliveryModal(event) {
+    event.preventDefault();
+    this.setState({
+      showRejectDeliveryModal: !this.state.showRejectDeliveryModal
     });
   }
 
@@ -47,6 +58,40 @@ class CancelableCompletedShopOrder extends React.Component {
         }
       });
   }
+
+  handleFormSubmit(event, id, reasonForRejection) {
+    const notes = {
+      content: reasonForRejection,
+      userId: this.props.order.userId,
+      updatedAt: new Date()
+    };
+
+    event.preventDefault();
+    Meteor.call("orders/cancel-payOnDelivery", id, notes,
+      (error, response) => {
+        if (error) {
+          Alerts.toast("Error:", error.message);
+        } else if (response) {
+          this.setState({
+            showRejectDeliveryModal: false
+          });
+
+          Alerts.toast("Delivery Rejected!");
+        }
+      });
+  }
+
+  renderRejectDeliveryModal() {
+    return (
+      this.state.showRejectDeliveryModal &&
+      <RejectDeliveryModal
+        id={this.props.order._id}
+        toggleRejectDeliveryModal={this.toggleRejectDeliveryModal}
+        handleFormSubmit={this.handleFormSubmit}
+      />
+    );
+  }
+
   render() {
     this.shippingName = this.props.isProfilePage ? (
       <span>
@@ -58,22 +103,27 @@ class CancelableCompletedShopOrder extends React.Component {
     this.items = this.props.items;
     const handleDisplayMedia = this.props.handleDisplayMedia;
     this.order = this.props.order;
+
     return (
       <div className="order-details-shop-breakdown">
         {this.state.showCancelModal &&
-        <Modal
-          id={this.order._id}
-          toggleCancelModal={this.toggleCancelModal}
-          cancelOrder={this.cancelOrder}
-        />
+          <Modal
+            id={this.order._id}
+            toggleCancelModal={this.toggleCancelModal}
+            cancelOrder={this.cancelOrder}
+          />
+        }
+        {
+          this.renderRejectDeliveryModal()
         }
         {/* This is the left side / main content */}
         <div className="order-details-info-box">
           <div className="store-detail-box">
             <span className="order-details-store-title">{this.props.shopName}</span>
             <span className="order-details-shipping-name">{this.shippingName}</span>
-            {
-              this.order.workflow.status === "new" &&
+          </div>
+          {
+            this.order.workflow.status === "new" &&
               <span>
                 <div className="order-details-cancel">
                   <a
@@ -85,14 +135,34 @@ class CancelableCompletedShopOrder extends React.Component {
                   </a>
                 </div>
               </span>
-            }
-          </div>
+          }
+          {
+            // Check if order is completed and payment method is `PayOnDelivery`
+            this.order.workflow.status === "coreOrderWorkflow/completed" &&
+              this.order.billing[0].paymentMethod.processor === "PayOnDelivery" &&
+              <div className="container cancel-link-container">
+                <span>
+                  <div className="order-details-cancel pull-right">
+                    <a
+                      className="cancel-link"
+                      href=""
+                      onClick={this.toggleRejectDeliveryModal}
+                    >
+                      Reject Delivery
+                    </a>
+                  </div>
+                </span>
+              </div>
+          }
         </div>
         <div className="order-details-info-box-topless">
           {this.items.map(function (item) {
-            return <Components.CompletedOrderItem
-              item={item} key={item._id}
-              handleDisplayMedia={handleDisplayMedia} />;
+            return (
+              <Components.CompletedOrderItem
+                item={item} key={item._id}
+                handleDisplayMedia={handleDisplayMedia}
+              />
+            );
           })}
         </div>
         {/* This is the left side / main content */}

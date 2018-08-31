@@ -54,7 +54,7 @@ class Modal extends Component {
               >Yes, I am</button>
               <button className="btn btn-success btn-cancel"
                 onClick={this.props.toggleCancelModal}
-              >No, I'm not</button>
+              >No, I&#39;m not</button>
             </div>
           </div>
         </PopModal>
