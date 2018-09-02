@@ -1,23 +1,7 @@
-@danger-color: #d41111;
 @white-color: #fff;
-@bright-purple-color: #8b6096;
-
-.order-details-cancel {
-  padding-top: 10px;
-
-  .cancel-link {
-    border: 1px solid;
-    border-radius: 3px;
-    padding: 8px;
-    &:hover{
-      background-color: @danger-color;
-      color: @white-color;
-    }
-  }
-}
 
 .modal {
-  background-color: @bright-purple-color;
+  background-color: @reaction-brand;
   color: @white-color;
 }
 
@@ -31,7 +15,7 @@
   }
 }
 
- .cancel-link-container {
+.cancel-link-container {
   padding: 10px;
 
   .order-details-cancel {
@@ -49,6 +33,36 @@
   }
 }
 
+.cancel-order-modal {
+  z-index: 3;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background-color: rgba(255, 255, 255, 0.75);
+  display: flex;
+  outline: none;
+  .modal {
+    background-color: @reaction-brand;
+    color: @white-color;
+  }
+  
+  .modal-text-content {
+    color: white;
+  }
+  
+  .modal-ctrl-btn {
+    .btn-cancel {
+      border-color: transparent !important;
+    }
+    .btn-ignore{
+      background-color: @white-color;
+      color: @reaction-brand;
+    }
+  }
+}
+
 .reject-delivery-btn {
   font-weight: normal;
   font-size: 1.3rem;
@@ -58,18 +72,6 @@
 
 .reject-delivery-btn:hover {
   text-decoration: underline
-}
-
-.reject-modal {
-  z-index: 3;
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
-  background-color: rgba(255, 255, 255, 0.75);
-  display: flex;
-  outline: none
 }
 
 .rejection-reason-content {
@@ -92,6 +94,17 @@
     border-bottom: 2px dashed;
   }
 }
+
+.reject-modal {
+  z-index: 3;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background-color: rgba(255, 255, 255, 0.75);
+  display: flex;
+  outline: none;
 
 .reject-delivery-modal {
   background: @reaction-brand;
@@ -192,4 +205,23 @@
 
 .roll-up-invoice-list .roll-up-content {
   margin-bottom: 4px
+}
+  
+  .modal {
+    background-color: @reaction-brand;
+    color: @white-color;
+  }
+  
+  .modal-text-content {
+    color: white;
+  }
+  .modal-ctrl-btn {
+    .btn-cancel {
+      border-color: transparent !important;
+    }
+    .btn-ignore{
+      background-color: @white-color;
+      color: @reaction-brand;
+    }
+  }
 }

@@ -2,11 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import PopModal from "react-modal";
 
-/**
- * @class
- * @constructor
- */
-class Modal extends Component {
+class CancelOrderModal extends Component {
   constructor() {
     super();
 
@@ -41,7 +37,7 @@ class Modal extends Component {
           onAfterOpen={this.afterOpenModal}
           onRequestClose={this.closeModal}
           ariaHideApp={false}
-          overlayClassName = "faq-modal"
+          overlayClassName = "cancel-order-modal"
           className="modalStyle"
           contentLabel="Example Modal"
         >
@@ -50,9 +46,9 @@ class Modal extends Component {
             <h2>Are you sure ?</h2>
             <div className="modal-ctrl-btn">
               <button className="btn btn-danger btn-cancel"
-                onClick={e => this.props.cancelOrder(e, this.props.id)}
+                onClick={this.props.cancelOrder}
               >Yes, I am</button>
-              <button className="btn btn-success btn-cancel"
+              <button className="btn btn-success btn-ignore"
                 onClick={this.props.toggleCancelModal}
               >No, I&#39;m not</button>
             </div>
@@ -63,10 +59,9 @@ class Modal extends Component {
   }
 }
 
-Modal.propTypes = {
+CancelOrderModal.propTypes = {
   cancelOrder: PropTypes.func.isRequired,
-  id: PropTypes.number.isRequired,
   toggleCancelModal: PropTypes.func.isRequired
 };
 
-export default Modal;
+export default CancelOrderModal;

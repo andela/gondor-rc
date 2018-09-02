@@ -2,8 +2,8 @@ import React from "react";
 import { Meteor } from "meteor/meteor";
 import PropTypes from "prop-types";
 import { Components, replaceComponent } from "@reactioncommerce/reaction-components";
-import Modal from "./Modal";
 import RejectDeliveryModal from "./RejectDeliveryModal";
+import CancelOrderModal from "./CancelOrderModal";
 
 /**
  * @summary Displays the order breakdown for each Shop
@@ -32,31 +32,31 @@ class CancelableCompletedShopOrder extends React.Component {
 
   toggleCancelModal(event) {
     event.preventDefault();
-    this.setState({
-      showCancelModal: !this.state.showCancelModal
-    });
+    this.setState(state => ({
+      showCancelModal: !state.showCancelModal
+    }));
   }
 
   toggleRejectDeliveryModal(event) {
     event.preventDefault();
-    this.setState({
-      showRejectDeliveryModal: !this.state.showRejectDeliveryModal
-    });
+    this.setState(state => ({
+      showRejectDeliveryModal: !state.showRejectDeliveryModal
+    }));
   }
 
-  cancelOrder(event, id) {
+  cancelOrder(event) {
     event.preventDefault();
-    Meteor.call("orders/cancel", id,
+    Meteor.call("orders/cancelOrder", this.props.order, true,
       (error, response) => {
-        this.setState({
-          showCancelModal: false
-        });
         if (error) {
-          Alerts.toast("Error:", error.message);
+          Alerts.toast("Error:", error.message || "An error occurred");
         } else if (response) {
           Alerts.toast("Order Canceled");
         }
       });
+    this.setState({
+      showCancelModal: false
+    });
   }
 
   handleFormSubmit(event, id, reasonForRejection) {
@@ -107,8 +107,7 @@ class CancelableCompletedShopOrder extends React.Component {
     return (
       <div className="order-details-shop-breakdown">
         {this.state.showCancelModal &&
-          <Modal
-            id={this.order._id}
+          <CancelOrderModal
             toggleCancelModal={this.toggleCancelModal}
             cancelOrder={this.cancelOrder}
           />
@@ -124,8 +123,9 @@ class CancelableCompletedShopOrder extends React.Component {
           </div>
           {
             this.order.workflow.status === "new" &&
+            <div className="container cancel-link-container">
               <span>
-                <div className="order-details-cancel">
+                <div className="order-details-cancel pull-right">
                   <a
                     className="cancel-link"
                     href=""
@@ -135,6 +135,7 @@ class CancelableCompletedShopOrder extends React.Component {
                   </a>
                 </div>
               </span>
+            </div>
           }
           {
             // Check if order is completed and payment method is `PayOnDelivery`
@@ -157,12 +158,9 @@ class CancelableCompletedShopOrder extends React.Component {
         </div>
         <div className="order-details-info-box-topless">
           {this.items.map(function (item) {
-            return (
-              <Components.CompletedOrderItem
-                item={item} key={item._id}
-                handleDisplayMedia={handleDisplayMedia}
-              />
-            );
+            return <Components.CompletedOrderItem
+              item={item} key={item._id}
+              handleDisplayMedia={handleDisplayMedia} />;
           })}
         </div>
         {/* This is the left side / main content */}
