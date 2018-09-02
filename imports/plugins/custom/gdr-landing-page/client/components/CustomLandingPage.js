@@ -30,6 +30,12 @@ class CustomLandingPage extends Products {
   componentDidMount() {
     this.getTrendingProducts(12);
     this.initializeTour();
+    const show = localStorage.getItem("visited");
+    if (show === null) {
+      this.setState({
+        notVisited: true
+      });
+    }
   }
 
   initializeTour() {

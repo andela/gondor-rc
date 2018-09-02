@@ -7,7 +7,8 @@ import { composeWithTracker } from "@reactioncommerce/reaction-components";
 import { Orders } from "/lib/collections";
 import { Card, CardHeader, CardBody, CardGroup } from "/imports/plugins/core/ui/client/components";
 import { i18next } from "/client/api";
-import OrderSummary from "../components/orderSummary";
+// import OrderSummary from "../components/orderSummary";
+import CustomOrderSummary from "../../../../custom/order-cancelation/client/components/CustomOrderSummary";
 import { getShippingInfo } from "../helpers";
 
 class OrderSummaryContainer extends Component {
@@ -115,7 +116,7 @@ class OrderSummaryContainer extends Component {
             title="Summary"
           />
           <CardBody expandable={false}>
-            <OrderSummary
+            <CustomOrderSummary
               {...this.props}
               dateFormat={this.dateFormat}
               tracking={this.tracking}
