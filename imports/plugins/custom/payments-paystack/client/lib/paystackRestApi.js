@@ -1,11 +1,11 @@
-import _ from "lodash";
+import once from "lodash/once";
 import { Meteor } from "meteor/meteor";
 import { ReactiveVar } from "meteor/reactive-var";
 import { Logger } from "/client/api";
 
 export const PaystackClientAPI = {
 
-  load: _.once(function () {
+  load: once(function () {
     const script = document.createElement("script");
     script.type = "text/javascript";
     script.async = true;
