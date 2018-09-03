@@ -89,5 +89,54 @@ Meteor.methods({
     } else {
       Logger.warn("Failed wallet/charge: Insufficient funds. Please fund wallet");
     }
+  },
+
+  "wallet/transfer"(senderUserId, recipientEmail, amount) {
+    check(senderUserId, String);
+    check(recipientEmail, String);
+    check(amount, Number);
+
+    const { walletBalance } = Accounts.findOne({
+      userId: senderUserId
+    });
+    if (walletBalance < amount) {
+      Logger.warn("Failed wallet/charge: Insufficient funds. Please fund wallet");
+      return { message: "Failed wallet/charge: Insufficient funds. Please fund wallet", success: false };
+    }
+    const recipient = Accounts.findOne({
+      "emails.0.address": recipientEmail
+    });
+
+    if (!recipient) {
+      Logger.warn("There is no user by the specified email");
+      return { message: "There is no user by the specified email", success: false };
+    }
+    let WriteResult2;
+
+    const WriteResult1 =  Accounts.update({
+      userId: senderUserId
+    }, {
+      $inc: {
+        walletBalance: (amount * -1)
+      }
+    });
+
+    if (WriteResult1 === 1) {
+      WriteResult2 =  Accounts.update({
+        userId: recipient._id
+      }, {
+        $inc: {
+          walletBalance: amount
+        }
+      });
+    } else if (!WriteResult1) {
+      Logger.warn("Failed to charge sender wallet");
+      return { message: "Failed to charge sender wallet", success: false };
+    }
+    if (!WriteResult2) {
+      Logger.warn("Failed to fund recipient wallet");
+      return { message: "Failed to fund recipient wallet", success: false };
+    }
+    return { message: `N${amount} successfully transferred to ${recipientEmail}`, success: true };
   }
 });
