@@ -1,3 +1,5 @@
+@white-color: #fff;
+
 .wallet-profile-area {
   .wallet-balance {
     text-align: center;
@@ -5,13 +7,44 @@
   .paystack-wallet-button {
     margin-right: 10px;
   }
-
+  
   .wallet-btns {
     margin-top: 20px;
+  }
+  .input-field{
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .error{
+    color: red
+  }
+  .btn-layout{
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    .error{
+      color: red
+    }
   }
 }
 
 .wallet-panel {
   border-bottom: 1px solid @border-color;
   min-height: 0 !important;
+}
+.swal2-modal.swal2-show {
+  background-color: @reaction-brand !important;
+  .swal2-title{
+    color: @white-color;
+  }
+}
+.swal2-confirm.swal2-styled {
+  background-color: @white-color !important;  
+  color: @reaction-brand !important;
+  margin-right: 20%
+}
+.swal2-cancel.swal2-styled {
+  color: @reaction-brand !important;
+  margin-left: 20%
 }

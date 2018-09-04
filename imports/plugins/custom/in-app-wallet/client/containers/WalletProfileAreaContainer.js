@@ -3,6 +3,17 @@ import { Accounts } from "/lib/collections";
 import WalletProfileArea from "../components/WalletProfileArea";
 import { Meteor } from "meteor/meteor";
 
+import { Promise } from "meteor/promise";
+
+const callWithPromise = (method, id, email, amount) => {
+  return new Promise((resolve, reject) => {
+    Meteor.call(method, id, email, amount, (error, result) => {
+      if (error) reject(error);
+      resolve(result);
+    });
+  });
+};
+
 /**
  *
  * @param {Object} props
@@ -26,9 +37,20 @@ const composer = (props, onData) => {
       Meteor.call("wallet/fund", Meteor.userId(), amount);
     };
 
+    /**
+     * Makes a meteor call to transfer funds from the wallet of the current loggedIn user
+     *
+     * @param {Number} amount Amount to transfer from wallet
+     * @param {String} email Recipient Email
+     */
+    const transferFunds = (email, amount) => {
+      return callWithPromise("wallet/transfer", Meteor.userId(), email, amount);
+    };
+
     onData(null, {
       balance: userAccount.walletBalance,
-      fundWallet
+      fundWallet,
+      transferFunds
     });
   }
 };
